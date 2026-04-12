@@ -6,7 +6,7 @@ const prisma = new PrimsaClient();
 
 async function generateUniqueInviteCode() {
     const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const CODE_LENGTH = 8;
+    const CODE_LENGTH = 6;
 
     let isUnique = false;
     let code = '';
