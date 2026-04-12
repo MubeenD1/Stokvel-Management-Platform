@@ -15,7 +15,7 @@ function JoinGroup(){
         setSuccess('');
 
         //this will check that the user has entered a code 
-        if(inviteCode.trim()){
+        if(!inviteCode.trim()){
             setError('Please enter an invite code');
             return;
 
