@@ -32,6 +32,8 @@ export default function CreateGroup() {
         },
         body: JSON.stringify({ name }),
     });
+
+    const data = await response.json();
     if (response.ok) {
         setSuccess("Group created successfully!");
         setName(""); // clear input
@@ -39,7 +41,6 @@ export default function CreateGroup() {
         setError(data.message || "Failed to create group");
     }
 
-      const data = await response.json();
       console.log("Group created:", data);
     } catch (error) {
       console.error("Error creating group:", error);
