@@ -1,17 +1,41 @@
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
+// const express = require('express')
+// const cors = require('cors')
+// require('dotenv').config()
 
-const app = express()
+// const app = express()
 
-app.use(cors())
-app.use(express.json())
+// app.use(cors())
+// app.use(express.json())
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' })
-})
+// app.get('/api/health', (req, res) => {
+//   res.json({ status: 'ok' })
+// })
 
-const PORT = process.env.PORT || 3000
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-})
+// const PORT = process.env.PORT || 3000
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`)
+// })
+
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+
+const groupRoutes = require('./src/routes/groupRoutes');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.get('/api/health', (req,res) => {
+  res.json({status:'ok'});
+
+  });
+
+  //group routes
+  app.use('/api/groups', groupRoutes);
+
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () =>{
+    console.log('Server running on port ${PORT');
+  });
