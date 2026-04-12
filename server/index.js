@@ -14,6 +14,9 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/auth')
 app.use('/api/auth', authRoutes)
 
+const roleRoutes = require('./routes/role')
+app.use('/api/groups', roleRoutes)
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
