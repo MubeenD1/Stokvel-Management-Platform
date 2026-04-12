@@ -4,7 +4,6 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import JoinGroup from './pages/JoinGroup';
 import CreateGroup from './pages/CreateGroup';
-import InviteManager from './components/InviteManager/InviteManager.jsx';
 
 
 function ProtectedRoute({ children }) {
