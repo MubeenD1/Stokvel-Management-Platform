@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import GroupCard from '../components/GroupCard';
+import GroupSettingsModal from '../components/GroupSettingsModal';
 
 function Dashboard() {
     const [groups, setGroups] = useState([]);
@@ -11,7 +12,7 @@ function Dashboard() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-
+    const [selectedGroup, setSelectedGroup] = useState(null);
     useEffect(() => {
         async function fetchGroups() {
             try {
@@ -91,9 +92,13 @@ function Dashboard() {
             {/* groups list */}
             <div style={styles.groupsGrid}>
                 {groups.map((group) => (
-                    <GroupCard key={group.id} group={group} />
+                    <GroupCard key={group.id} group={group} onViewSettings={(group)=> setSelectedGroup(group)}/>
                 ))}
             </div>
+            <GroupSettingsModal
+                    group = {selectedGroup}
+                    onClose = {() => setSelectedGroup(null)}
+            />
         </div>
     );
 }

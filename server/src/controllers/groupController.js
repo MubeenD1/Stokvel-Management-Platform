@@ -73,5 +73,66 @@ async function joinGroup(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+async function getGroupSettings(req, res) {
+    const { groupId } = req.params;
 
-module.exports = { joinGroup };
+    try {
+        const group = await prisma.group.findUnique({
+            where: { id: groupId },
+        });
+
+        if (!group) {
+            return res.status(404).json({ error: 'Group not found' });
+        }
+
+        return res.status(200).json({
+            group: {
+                id: group.id,
+                name: group.name,
+                contributionAmount: group.contributionAmount,
+                meetingFrequency: group.meetingFrequency,
+                nextMeetingDate: group.nextMeetingDate,
+                payoutOrder: group.payoutOrder,
+            },
+        });
+
+    } catch (error) {
+        console.error('getGroupSettings error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+async function updateGroupSettings(req, res) {
+    const { groupId } = req.params;
+    const { contributionAmount, meetingFrequency, payoutOrder } = req.body;
+
+    try {
+        const firebaseId = req.user.uid;
+
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const updatedGroup = await prisma.group.update({
+            where: { id: groupId },
+            data: {
+                contributionAmount,
+                meetingFrequency,
+                payoutOrder,
+            },
+        });
+
+        return res.status(200).json({
+            message: 'Group settings updated successfully',
+            group: updatedGroup,
+        });
+
+    } catch (error) {
+        console.error('updateGroupSettings error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+module.exports = { joinGroup, getGroupSettings, updateGroupSettings };

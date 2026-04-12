@@ -1,4 +1,7 @@
-function GroupCard({group}){
+import { updateCurrentUser } from "firebase/auth";
+
+function GroupCard({group,onViewSettings}){
+    const isAdmin = currentUser.role === 'Admin';
     return(
         <div style = {styles.card}>
             <h3 style = {styles.name}>{group.name}</h3>
@@ -6,6 +9,12 @@ function GroupCard({group}){
             <p style = {styles.joined}>
                 Joined:{new Date(group.joinedAt).toLocaleDateString()}
             </p>
+            <button
+                style={styles.button}
+                onClick = {() => onViewSettings?.(group)}
+            >
+                View Settings
+            </button>
         </div>
 
     );
