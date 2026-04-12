@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import JoinGroup from './pages/JoinGroup';
+import CreateGroup from './pages/CreateGroup';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -23,6 +24,14 @@ export default function App() {
           }
         />
         <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreateGroup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/join"
           element={
             <ProtectedRoute>
@@ -30,7 +39,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
     </BrowserRouter>
   );

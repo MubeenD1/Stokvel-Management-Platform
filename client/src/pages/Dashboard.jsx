@@ -54,6 +54,12 @@ function Dashboard() {
                 <h1 style={styles.title}>My Dashboard</h1>
                 <div style={styles.headerButtons}>
                     <p style={styles.welcome}>Welcome, {currentUser?.email}</p>
+                     <button 
+                        style = {styles.createButton}
+                        onClick = {() => navigate('/create')}
+                        >
+                        Create a Group
+                    </button>
                     <button
                         style={styles.joinButton}
                         onClick={() => navigate('/join')}
@@ -66,6 +72,7 @@ function Dashboard() {
                     >
                         Logout
                     </button>
+
                 </div>
             </div>
 
@@ -85,6 +92,7 @@ function Dashboard() {
                     >
                         Join a Group
                     </button>
+                    
                 </div>
             )}
 
@@ -129,6 +137,15 @@ const styles = {
     joinButton: {
         padding: '12px 24px',
         backgroundColor: '#2e7d32',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '8px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+    },
+    createButton:{
+         padding: '12px 24px',
+        backgroundColor: '#276b62',
         color: '#ffffff',
         border: 'none',
         borderRadius: '8px',

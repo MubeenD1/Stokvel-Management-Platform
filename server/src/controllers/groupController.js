@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+const { v4: uuidv4 } = require('uuid');
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -74,4 +75,56 @@ async function joinGroup(req, res) {
     }
 }
 
-module.exports = { joinGroup };
+async function createGroup(req, res) {
+    const firebaseId = req.user.uid;
+    const { name } = req.body;
+
+    if (!name || name.trim().length < 2) {
+        return res.status(400).json({ error: "Group name is required" });
+    }
+
+    try {
+        // find user
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // create group + add creator as ADMIN
+        const group = await prisma.group.create({
+            data: {
+                name: name.trim(),
+                inviteCode: uuidv4().slice(0, 8),
+
+                members: {
+                    create: {
+                        userId: user.id,
+                        role: "ADMIN",
+                    },
+                },
+            },
+            include: {
+                members: true,
+            },
+        });
+
+        return res.status(201).json({
+            message: "Group created successfully",
+            group: {
+                id: group.id,
+                name: group.name,
+                inviteCode: group.inviteCode,
+                members: group.members,
+            },
+        });
+
+    } catch (error) {
+        console.error("createGroup error:", error);
+        return res.status(500).json({ error: "Failed to create group" });
+    }
+}
+
+module.exports = {createGroup , joinGroup };
