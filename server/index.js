@@ -17,8 +17,9 @@ app.get('/api/health', (req, res) => {
 // group routes
 app.use('/api/groups', groupRoutes);
 
-// auth routes
-app.use('/api/auth', authRoutes);
+const roleRoutes = require('./routes/role')
+app.use('/api/groups', roleRoutes)
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
