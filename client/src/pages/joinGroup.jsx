@@ -2,7 +2,7 @@ import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {auth} from '../firebase';
 
-function joinGroup(){
+function JoinGroup(){
     const[inviteCode, setInviteCode] = useState('');
     const[error,setError] = useState('');
     const[success, setSuccess] = useState('');

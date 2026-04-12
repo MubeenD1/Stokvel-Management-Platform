@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
 import GroupCard from '../components/GroupCard';
 
 function Dashboard() {
@@ -8,6 +10,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
 
     useEffect(() => {
         async function fetchGroups() {
@@ -40,16 +43,30 @@ function Dashboard() {
         fetchGroups();
     }, []);
 
+    const handleLogout = async () => {
+        await signOut(auth);
+        navigate('/login');
+    };
+
     return (
         <div style={styles.container}>
             <div style={styles.header}>
                 <h1 style={styles.title}>My Dashboard</h1>
-                <button
-                    style={styles.joinButton}
-                    onClick={() => navigate('/join')}
-                >
-                    + Join Group
-                </button>
+                <div style={styles.headerButtons}>
+                    <p style={styles.welcome}>Welcome, {currentUser?.email}</p>
+                    <button
+                        style={styles.joinButton}
+                        onClick={() => navigate('/join')}
+                    >
+                        + Join Group
+                    </button>
+                    <button
+                        style={styles.logoutButton}
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
 
             {/* loading state */}
@@ -93,10 +110,20 @@ const styles = {
         alignItems: 'center',
         marginBottom: '32px',
     },
+    headerButtons: {
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+    },
     title: {
         fontSize: '30px',
         fontWeight: 'bold',
         color: '#1a1a1a',
+        margin: 0,
+    },
+    welcome: {
+        fontSize: '14px',
+        color: '#666',
         margin: 0,
     },
     joinButton: {
@@ -104,6 +131,15 @@ const styles = {
         backgroundColor: '#2e7d32',
         color: '#ffffff',
         border: 'none',
+        borderRadius: '8px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+    },
+    logoutButton: {
+        padding: '12px 24px',
+        backgroundColor: 'transparent',
+        color: '#c62828',
+        border: '2px solid #c62828',
         borderRadius: '8px',
         fontWeight: 'bold',
         cursor: 'pointer',
@@ -135,3 +171,12 @@ const styles = {
 };
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+

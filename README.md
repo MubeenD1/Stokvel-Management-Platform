@@ -38,8 +38,10 @@ cd Stokvel-Management-Platform
 ```bash
 cd server
 npm install
+
+npx prisma generate
+npx prisma migrate dev
 ```
-Then open `server/.env` and fill in the values — get these from the team WhatsApp.
 
 ### 3. Set up the client
 ```bash
