@@ -3,6 +3,8 @@ import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import JoinGroup from './pages/JoinGroup';
+import InviteManager from './components/InviteManager/InviteManager.jsx';
+
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -30,13 +32,12 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/test-invite" element={<InviteManager groupId="some-group-id" />} />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
-
 
 
 
