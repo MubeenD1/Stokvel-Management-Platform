@@ -68,7 +68,7 @@ return(
         placeholder='Enter the invite code'
         value = {inviteCode}
         onChange = {(e) => setInviteCode(e.target.value.toUpperCase())}
-        maxLength={8}
+        maxLength={6}
         />
 
         {/*error message*/}
