@@ -106,8 +106,9 @@ const styles = {
     },
     header: {
         display: 'flex',
+        flexDirection : 'column',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-start',
         marginBottom: '32px',
     },
     headerButtons: {

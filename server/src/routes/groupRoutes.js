@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
-const { joinGroup } = require('../controllers/groupController');
+const { joinGroup, getUserGroups } = require('../controllers/groupController');
 
-// debug - check if functions are loaded correctly
-console.log('verifyToken:', typeof verifyToken);
-console.log('joinGroup:', typeof joinGroup);
+// GET /api/groups - fetch all groups for the logged in user
+router.get('/', verifyToken, getUserGroups);
 
 // POST /api/groups/join
 router.post('/join', verifyToken, joinGroup);
