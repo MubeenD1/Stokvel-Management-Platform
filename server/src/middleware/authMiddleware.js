@@ -1,36 +1,21 @@
-const admin = require('firebase-admin');
-const ServiceAccount = require('../../serviceAccountKey.json');
+const admin = require('../../config/firebase');
 
-//this will initialise the firebase admin 
-if(!admin.apps.length){
-    admin.initializeApp({
-        credential: admin.credential.cert(ServiceAccount),
+// this middleware checks that the user is logged in before
+// allowing them to access protected routes
+async function verifyToken(req, res, next) {
+    const token = req.headers.authorization?.split('Bearer ')[1];
 
-    });
-}
-
-//this middleware will check that the user is logged in before allowing them to access protected routes
-async function verifyTokens(req,res,next) {
-    const authHeader = req.headers.authorization;
-
-    //this will check that the header for the authorisation exists,i.e,'Bearer'
-    if(!authHeader || !authHeader.startsWith('Bearer')){
-        return res.status(401).json({error:'Unauthorized:No token provided'});
-
+    if (!token) {
+        return res.status(401).json({ error: 'No token provided' });
     }
 
-    //this will extract the token from the header 
-    const token = authHeader.split(' ')[1];
-
-    //this will verify that there is indeed a token with a firebase
-    try{
-        const decodedToken = await admin.auth().verifyTokens(token);
-        req.user = decodedToken;
+    try {
+        const decoded = await admin.auth().verifyIdToken(token);
+        req.user = decoded;
         next();
-
-    }catch(error){
-        return res.status(401).json({error:'Unauthorized:Invalid Token'});
+    } catch (err) {
+        return res.status(401).json({ error: 'Invalid token' });
     }
 }
 
-module.exports = {verifyTokens};
+module.exports = { verifyToken };
