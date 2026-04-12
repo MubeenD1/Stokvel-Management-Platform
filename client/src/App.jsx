@@ -25,6 +25,14 @@ export default function App() {
           }
         />
         <Route
+          path="/create"
+          element={
+            <ProtectedRoute>
+              <CreateGroup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/join"
           element={
             <ProtectedRoute>
