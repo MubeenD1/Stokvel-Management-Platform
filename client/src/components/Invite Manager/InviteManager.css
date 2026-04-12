@@ -1,0 +1,65 @@
+.invite-card {
+  border: 1px solid #ddd;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 400px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.invite-desc {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.gen-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.code-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.code-box {
+  background: #f8f9fa;
+  border: 2px dashed #28a745;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.code-text {
+  display: block;
+  font-size: 2rem;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  letter-spacing: 4px;
+  color: #333;
+}
+
+.copy-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  color: #666;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
