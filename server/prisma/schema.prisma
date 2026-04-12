@@ -19,4 +19,30 @@ model User {
   email      String   @unique
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  groups     GroupMember[]
+}
+
+model Group {
+  id               String        @id @default(uuid())
+  name             String
+  inviteCode       String        @unique
+  inviteCodeExpiry DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  members          GroupMember[] 
+}
+
+model GroupMember {
+  id       String   @id @default(uuid())
+  userId   String
+  groupId  String
+  role     Role     @default(MEMBER)
+  joinedAt DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id])
+  group    Group    @relation(fields: [groupId], references: [id])
+
+  @@unique([userId, groupId])
 }

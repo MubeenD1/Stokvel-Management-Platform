@@ -1,11 +1,12 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
-import Login from './pages/Login'
-import Dashboard from './pages/Dashboard'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import JoinGroup from './pages/JoinGroup';
 
 function ProtectedRoute({ children }) {
-  const { currentUser } = useAuth()
-  return currentUser ? children : <Navigate to="/login" />
+  const { currentUser } = useAuth();
+  return currentUser ? children : <Navigate to="/login" />;
 }
 
 export default function App() {
@@ -21,8 +22,22 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/join"
+          element={
+            <ProtectedRoute>
+              <JoinGroup />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
+
+
+
+
+
+
