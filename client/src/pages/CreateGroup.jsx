@@ -23,6 +23,11 @@ export default function CreateGroup() {
 
     try {
       const token = await auth.currentUser.getIdToken();
+      if (!auth.currentUser) {
+        setError("You must be logged in to create a group");
+        setLoading(false);
+        return;
+        }
 
       const response = await fetch("http://localhost:3000/api/groups/create", {
         method: "POST",
@@ -41,7 +46,7 @@ export default function CreateGroup() {
         setError(data.message || "Failed to create group");
     }
 
-      console.log("Group created:", data);
+      console.log( data);
     } catch (error) {
       console.error("Error creating group:", error);
     }finally{
@@ -135,8 +140,8 @@ const styles = {
     },
     button : {
         padding : '12px',
-        backgroundColor : '2e7d32',
-        color : 'ffffff',
+        backgroundColor : '#2e7d32',
+        color : '#ffffff',
         border : 'none',
         borderRadius : '8px',
         fontSize : '16px',

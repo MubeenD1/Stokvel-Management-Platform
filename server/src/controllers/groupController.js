@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const { v4: uuidv4 } = require('uuid');
 const prisma = new PrismaClient();
 
 // this will handle the logic for joining a group via the invite code
@@ -21,7 +22,7 @@ async function joinGroup(req, res) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // this will find the group that matches the invite code sent
+        // this will find the group that matches the invite c createGroup, ode sent
         const group = await prisma.group.findUnique({
             where: { inviteCode },
         });
@@ -156,7 +157,7 @@ async function createGroup(req, res) {
         // create group + add creator as ADMIN
         const group = await prisma.group.create({
             data: {
-                name: name.trim(),
+                "name": name.trim(),
                 inviteCode: uuidv4().slice(0, 8),
 
                 members: {
