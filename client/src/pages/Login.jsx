@@ -41,7 +41,7 @@ export default function Login() {
       const data = await response.json()
       console.log('Authenticated user:', data.user)
 
-      window.location.href = '/dashboard'
+      window.location.href = '/home'
 
     } catch (err) {
       setError(err.message)

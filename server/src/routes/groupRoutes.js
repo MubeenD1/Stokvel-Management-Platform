@@ -11,6 +11,8 @@ console.log('updateGroupSettings:', typeof updateGroupSettings);
 // POST group join and create 
 router.post('/join', verifyToken, joinGroup);
 router.post('/create', verifyToken , createGroup);
+// GET Groups
+
 // GET group settings
 router.get('/:groupId/settings', verifyToken, getGroupSettings);
 

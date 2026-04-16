@@ -86,9 +86,9 @@ export default function CreateGroup() {
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/dashboard')}
+            onClick = {() => navigate('/home')}
             >
-                Back to Dashboard
+                Back to Home
             </button>
             </div>
             </div>
