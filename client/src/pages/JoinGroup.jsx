@@ -6,7 +6,7 @@ function JoinGroup(){
     const[inviteCode, setInviteCode] = useState('');
     const[error,setError] = useState('');
     const[success, setSuccess] = useState('');
-    const[loading, setLoading] = useState('');
+    const[loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
     async function handleJoinGroup(){
@@ -15,7 +15,7 @@ function JoinGroup(){
         setSuccess('');
 
         //this will check that the user has entered a code 
-        if(inviteCode.trim()){
+        if(!inviteCode.trim()){
             setError('Please enter an invite code');
             return;
 
@@ -26,11 +26,11 @@ function JoinGroup(){
         try{
             const token = await auth.currentUser.getIdToken();
 
-            const response = await fetch('http://localhost::3000/api/groups/join',{
+            const response = await fetch('http://localhost:3000/api/groups/join',{
                 method : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ${token}',
+                    'Authorization': `Bearer ${token}`,
                 },
                 body : JSON.stringify({inviteCode}),
             });
@@ -44,7 +44,7 @@ function JoinGroup(){
             }
 
             //this will show that the attempt was successful and then be redirected to the dashboard
-            setSuccess('Successfully joined $ {data.group.name}!');
+            setSuccess(`Successfully joined ${data.group.name}!`);
             setTimeout(() => {
                 navigate('/dashboard');
             },1500);
@@ -75,7 +75,7 @@ return(
         {error && <p style ={styles.error}>{error}</p>}
 
         {/*sucess message*/}
-        {success && <p style ={style.success}>{success}</p>}
+        {success && <p style ={styles.success}>{success}</p>}
 
         <button
             style = {styles.button}
@@ -142,8 +142,8 @@ const styles = {
     },
     button : {
         padding : '12px',
-        backgroundColor : '2e7d32',
-        color : 'ffffff',
+        backgroundColor : '#2e7d32',
+        color : '#ffffff',
         border : 'none',
         borderRadius : '8px',
         fontSize : '16px',

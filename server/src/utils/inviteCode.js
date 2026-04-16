@@ -1,6 +1,6 @@
 const { PrimsaClient } = require('@prisma/client');
 const crypto = require('crypto');
-const prisma = new PrimsaClient();
+const prisma = new PrismaClient();
 
 //this will create a 8 char invite code 
 

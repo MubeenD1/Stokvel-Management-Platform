@@ -23,8 +23,9 @@ async function joinGroup(req, res) {
         }
 
         // this will find the group that matches the invite c createGroup, ode sent
+        const iC = inviteCode.trim().toLowerCase();
         const group = await prisma.group.findUnique({
-            where: { inviteCode },
+            where: { inviteCode: iC },
         });
 
         // this accounts for when no groups are found meaning an invalid code
