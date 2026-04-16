@@ -188,5 +188,43 @@ async function createGroup(req, res) {
         return res.status(500).json({ error: "Failed to create group" });
     }
 }
+async function fetchUserGroups(req, res) {
+  const firebaseUid = req.user.uid;
 
-module.exports = { createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+  try {
+    const user = await prisma.user.findUnique({
+      where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
+      select: { id: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const memberships = await prisma.groupMember.findMany({
+      where: { userId: user.id }, 
+      include: {
+        group: {
+          include: {
+            _count: { select: { members: true } },
+          },
+        },
+      },
+    });
+
+    const groups = memberships.map(m => ({
+      ...m.group,
+      myRole: m.role,
+      joinedAt: m.joinedAt,
+    }));
+
+    return res.status(200).json({
+      message: "Fetched groups successfully",
+      groups,
+    });
+  } catch (error) {
+    console.error("fetchUserGroups error:", error);
+    return res.status(500).json({ error: "Failed to fetch your groups, please refresh your page" });
+  }
+}
+module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };

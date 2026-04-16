@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
-import JoinGroup from './pages/JoinGroup';
-import CreateGroup from './pages/CreateGroup';
+import JoinGroup from './pages/Groups/JoinGroup';
+import CreateGroup from './pages/Groups/CreateGroup';
 import Home from './pages/Home/Home';
 import Navbar from './pages/Navbar/Navbar';
 import Groups from './pages/Groups/Groups';
