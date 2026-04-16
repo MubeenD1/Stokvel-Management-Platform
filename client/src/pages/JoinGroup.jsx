@@ -46,7 +46,7 @@ function JoinGroup(){
             //this will show that the attempt was successful and then be redirected to the dashboard
             setSuccess(`Successfully joined ${data.group.name}!`);
             setTimeout(() => {
-                navigate('/dashboard');
+                navigate('/home');
             },1500);
 
         }catch(err){
@@ -87,9 +87,9 @@ return(
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/dashboard')}
+            onClick = {() => navigate('/home')}
             >
-                Back to Dashboard
+                Back to Home
             </button>
             </div>
             </div>

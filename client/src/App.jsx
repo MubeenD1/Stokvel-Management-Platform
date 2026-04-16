@@ -1,14 +1,27 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard/Dashboard';
 import JoinGroup from './pages/JoinGroup';
-import CreateGroup from './pages/CreateGroup'
-
+import CreateGroup from './pages/CreateGroup';
+import Home from './pages/Home/Home';
+import Navbar from './pages/Navbar/Navbar';
+import Groups from './pages/Groups/Groups';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
   return currentUser ? children : <Navigate to="/login" />;
+}
+
+function Layout() {
+  return (
+    <div className="app-layout">
+      <Navbar />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
 }
 
 export default function App() {
@@ -16,37 +29,17 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/create"
-          element={
-            <ProtectedRoute>
-              <CreateGroup />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/join"
-          element={
-            <ProtectedRoute>
-              <JoinGroup />
-            </ProtectedRoute>
-          }
-        />
+
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/groups" element={<Groups />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create" element={<CreateGroup />} />
+          <Route path="/join" element={<JoinGroup />} />
+        </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
-
-
-
