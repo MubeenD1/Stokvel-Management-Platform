@@ -1,7 +1,9 @@
 import { updateCurrentUser } from "firebase/auth";
+import { useAuth } from '../context/AuthContext';
 
 function GroupCard({group,onViewSettings}){
-    const isAdmin = currentUser.role === 'Admin';
+    const { currentUser } = useAuth();
+    const isAdmin = group.role === 'ADMIN';
     return(
         <div style = {styles.card}>
             <h3 style = {styles.name}>{group.name}</h3>
@@ -24,11 +26,22 @@ const styles ={
         backgroundColor : '#ffffff',
         padding : '25px',
         borderRadius:'10px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0,1)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
         display: 'flex',
         flexDirection : 'column',
         gap : '10px',
     },
+    button: {
+    padding: '12px 24px',
+    backgroundColor: '#206663',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '14px',
+    marginTop: '8px',
+  },
     name : {
         fontSize : '15px',
         fontWeight: 'bold',

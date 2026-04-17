@@ -75,6 +75,36 @@ async function joinGroup(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+async function getGroups(req, res) {
+    const  firebaseId  = req.user.uid;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const memberships = await prisma.groupMember.findMany({
+            where: {userId: user.id},
+            include:{group: true},
+        });
+        const groups = memberships.map((m) => ({
+            id: m.groupId,
+            name: m.group.name,
+            role: m.role,
+            joinedAt: m.createdAt
+        }));
+
+    
+        return res.status(200).json({groups});
+
+    } catch (error) {
+        console.error('getGroups error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
 async function getGroupSettings(req, res) {
     const { groupId } = req.params;
 
@@ -191,6 +221,7 @@ async function createGroup(req, res) {
 async function fetchUserGroups(req, res) {
   const firebaseUid = req.user.uid;
 
+<<<<<<< Updated upstream
   try {
     const user = await prisma.user.findUnique({
       where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
@@ -228,3 +259,6 @@ async function fetchUserGroups(req, res) {
   }
 }
 module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+=======
+module.exports = { getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+>>>>>>> Stashed changes
