@@ -173,6 +173,8 @@ const user = await prisma.user.findUnique({
 ## Running Tests
 ```bash
 cd server
+npm install
+npm install --save-dev jest
 npm test
 ```
 
