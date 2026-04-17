@@ -221,7 +221,6 @@ async function createGroup(req, res) {
 async function fetchUserGroups(req, res) {
   const firebaseUid = req.user.uid;
 
-<<<<<<< Updated upstream
   try {
     const user = await prisma.user.findUnique({
       where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
@@ -258,7 +257,5 @@ async function fetchUserGroups(req, res) {
     return res.status(500).json({ error: "Failed to fetch your groups, please refresh your page" });
   }
 }
-module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-=======
+//module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
 module.exports = { getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
->>>>>>> Stashed changes

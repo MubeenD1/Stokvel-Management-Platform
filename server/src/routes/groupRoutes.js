@@ -1,11 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
-<<<<<<< Updated upstream
-const {fetchUserGroups, createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
-=======
+//const {fetchUserGroups, createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
 const { getGroups,createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
->>>>>>> Stashed changes
 
 // debug - check if functions are loaded correctly
 console.log('verifyToken:', typeof verifyToken);
@@ -17,7 +14,7 @@ console.log('updateGroupSettings:', typeof updateGroupSettings);
 router.post('/join', verifyToken, joinGroup);
 router.post('/create', verifyToken , createGroup);
 // GET Groups
-router.get('/me', verifyToken, fetchUserGroups);
+//router.get('/me', verifyToken, fetchUserGroups);
 // GET group settings
 router.get('/', verifyToken, getGroups);
 
