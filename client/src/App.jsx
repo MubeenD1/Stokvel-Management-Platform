@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -7,6 +7,8 @@ import CreateGroup from './pages/Groups/CreateGroup';
 import Home from './pages/Home/Home';
 import Navbar from './pages/Navbar/Navbar';
 import Groups from './pages/Groups/Groups';
+import GroupPage from './pages/Groups/GroupPage';
+import GroupNavbar from './pages/Navbar/GroupNavbar';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -17,6 +19,17 @@ function Layout() {
   return (
     <div className="app-layout">
       <Navbar />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+function GroupLayout() {
+  const { id } = useParams();
+  return (
+    <div className="group-layout">
+      <GroupNavbar groupId={id}/>
       <main>
         <Outlet />
       </main>
@@ -34,9 +47,12 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+        <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
+          <Route path="/groups/:id/members" element={<GroupPage />} />
+        </Route>
           <Route path="/create" element={<CreateGroup />} />
           <Route path="/join" element={<JoinGroup />} />
-        </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
 //const {fetchUserGroups, createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
-const { getGroups,createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
+const { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings } = require('../controllers/groupController');
 
 // debug - check if functions are loaded correctly
 console.log('verifyToken:', typeof verifyToken);
@@ -19,6 +19,7 @@ router.post('/create', verifyToken , createGroup);
 router.get('/', verifyToken, getGroups);
 
 router.get('/:groupId/settings', verifyToken, getGroupSettings);
+router.get('/:id' , verifyToken , getGroupById);
 
 // PUT group settings
 router.put('/:groupId/settings', verifyToken, updateGroupSettings);

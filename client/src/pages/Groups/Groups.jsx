@@ -5,6 +5,8 @@ import { useAuth } from '../../context/AuthContext';
 import { auth } from '../../firebase';
 import GroupCard from '../../components/GroupCard';
 import GroupSettingsModal from '../../components/GroupSettingsModal';
+
+
 export default function Groups(){
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function Groups(){
                     setError('Failed to load groups');
                     return;
                 }
-
+                console.log(data);
                 setGroups(data.groups);
 
             } catch (err) {
@@ -44,8 +46,8 @@ export default function Groups(){
     }, []);
      return (
         <div style={styles.container}>
-                <h1 style={styles.title}>Groups</h1>
-                {/* loading state */}
+
+    
             {loading && <p style={styles.message}>Loading your groups...</p>}
 
             {/* error state */}
@@ -62,7 +64,11 @@ export default function Groups(){
             {/* groups list */}
             <div style={styles.groupsGrid}>
                 {groups.map((group) => (
-                    <GroupCard key={group.id} group={group} onViewSettings={(group)=> setSelectedGroup(group)}/>
+                    <GroupCard key={group.id} 
+                        group={group} 
+                        onViewSettings={(group)=> setSelectedGroup(group)}
+                         onCardClick={(group) => navigate(`/groups/${group.id}/members`)} 
+                    />
                 ))}
             </div>
             <GroupSettingsModal

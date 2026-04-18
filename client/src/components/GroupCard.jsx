@@ -1,22 +1,18 @@
 import { updateCurrentUser } from "firebase/auth";
 import { useAuth } from '../context/AuthContext';
 
-function GroupCard({group,onViewSettings}){
+function GroupCard({ group, onViewSettings, onCardClick}){
     const { currentUser } = useAuth();
     const isAdmin = group.role === 'ADMIN';
     return(
-        <div style = {styles.card}>
+        <div style = {styles.card}
+             onClick ={() => onCardClick?.(group)}    
+        >
             <h3 style = {styles.name}>{group.name}</h3>
             <p style = {styles.role}>Role:{group.role}</p>
             <p style = {styles.joined}>
                 Joined:{new Date(group.joinedAt).toLocaleDateString()}
             </p>
-            <button
-                style={styles.button}
-                onClick = {() => onViewSettings?.(group)}
-            >
-                View Settings
-            </button>
         </div>
 
     );

@@ -94,11 +94,12 @@ async function getGroups(req, res) {
             id: m.groupId,
             name: m.group.name,
             role: m.role,
-            joinedAt: m.createdAt
+            joinedAt: m.joinedAt
         }));
 
-    
+        console.log(groups);
         return res.status(200).json({groups});
+        
 
     } catch (error) {
         console.error('getGroups error:', error);
@@ -218,44 +219,71 @@ async function createGroup(req, res) {
         return res.status(500).json({ error: "Failed to create group" });
     }
 }
-async function fetchUserGroups(req, res) {
-  const firebaseUid = req.user.uid;
+// async function fetchUserGroups(req, res) {
+//   const firebaseUid = req.user.uid;
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
-      select: { id: true },
-    });
+//   try {
+//     const user = await prisma.user.findUnique({
+//       where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
+//       select: { id: true },
+//     });
 
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     const memberships = await prisma.groupMember.findMany({
+//       where: { userId: user.id }, 
+//       include: {
+//         group: {
+//           include: {
+//             _count: { select: { members: true } },
+//           },
+//         },
+//       },
+//     });
+
+//     const groups = memberships.map(m => ({
+//       ...m.group,
+//       myRole: m.role,
+//       joinedAt: m.joinedAt,
+//     }));
+
+//     return res.status(200).json({
+//       message: "Fetched groups successfully",
+//       groups,
+//     });
+//   } catch (error) {
+//     console.error("fetchUserGroups error:", error);
+//     return res.status(500).json({ error: "Failed to fetch your groups, please refresh your page" });
+//   }
+// }
+
+async function getGroupById(req, res) {
+    const gId = req.params.id;
+
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
     }
 
-    const memberships = await prisma.groupMember.findMany({
-      where: { userId: user.id }, 
-      include: {
-        group: {
-          include: {
-            _count: { select: { members: true } },
-          },
-        },
-      },
-    });
+    try {
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId: gId },
+            include: {
+                user: {
+                    select: {
+                        email: true,
+                    },
+                },
+            },
+        });
 
-    const groups = memberships.map(m => ({
-      ...m.group,
-      myRole: m.role,
-      joinedAt: m.joinedAt,
-    }));
+        return res.status(200).json({ groupMembers });
 
-    return res.status(200).json({
-      message: "Fetched groups successfully",
-      groups,
-    });
-  } catch (error) {
-    console.error("fetchUserGroups error:", error);
-    return res.status(500).json({ error: "Failed to fetch your groups, please refresh your page" });
-  }
+    } catch (error) {
+        console.error('getGroupById error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
 }
 //module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-module.exports = { getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
