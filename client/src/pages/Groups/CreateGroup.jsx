@@ -1,74 +1,73 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
-import {auth} from '../firebase';
+import { auth } from "../../firebase"; // adjust path if needed
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function JoinGroup(){
-    const[inviteCode, setInviteCode] = useState('');
+export default function CreateGroup() {
+    const [name, setName] = useState("");
     const[error,setError] = useState('');
     const[success, setSuccess] = useState('');
     const[loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    async function handleJoinGroup(){
-        //this will clear the previous messages 
-        setError('');
-        setSuccess('');
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-        //this will check that the user has entered a code 
-        if(!inviteCode.trim()){
-            setError('Please enter an invite code');
+   if (!name.trim() || name.trim().length < 2 || name.trim().length > 20) {
+            setError('Please enter a name of 2 up to 20 characters');
             return;
 
         }
-        setLoading(true);
+    setLoading(true);
 
-        //this will get the firebase token for the user and send the invite code to the backend
-        try{
-            const token = await auth.currentUser.getIdToken();
-
-            const response = await fetch('http://localhost:3000/api/groups/join',{
-                method : 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body : JSON.stringify({inviteCode}),
-            });
-
-            const data = await response.json();
-
-            //this will display the error message that has been received from the backend 
-            if(!response.ok){
-                setError(data.error || 'Failed to join group');
-                return;
-            }
-
-            //this will show that the attempt was successful and then be redirected to the dashboard
-            setSuccess(`Successfully joined ${data.group.name}!`);
-            setTimeout(() => {
-                navigate('/home');
-            },1500);
-
-        }catch(err){
-            setError('Something went wrong. Please try again.');
-            console.error('joinGroup error:', err);
-        }finally{
-            setLoading(false);
+    try {
+      const token = await auth.currentUser.getIdToken();
+      if (!auth.currentUser) {
+        setError("You must be logged in to create a group");
+        setLoading(false);
+        return;
         }
+
+      const response = await fetch("http://localhost:3000/api/groups/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name }),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+        setSuccess("Group created successfully!");
+        setName(""); // clear input
+    } else {
+        setError(data.message || "Failed to create group");
     }
-return(
+
+      console.log( data);
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }finally{
+        setLoading(false);
+    }
+  };
+
+  return (
     <div style = {styles.container}>
         <div style ={styles.card}>
-       <h2 style ={styles.title}>Join a stokvel Group</h2>
-        <p style ={styles.subtitle}>Enter the invite code which has been sent to you by your group admin</p>
+       <h2 style ={styles.title}>Create a Stokvel Group</h2>
+        <p style ={styles.subtitle}>Enter an Appropriate Group Name</p>
         
     <input 
         style ={styles.input}
         type = "text"
-        placeholder='Enter the invite code'
-        value = {inviteCode}
-        onChange = {(e) => setInviteCode(e.target.value.toUpperCase())}
-        maxLength={8}
+        placeholder='Enter Your Group Name'
+        value = {name}
+        onChange = {(e) => setName(e.target.value)}
+        minLength={2}
+        maxLength={20}
         />
 
         {/*error message*/}
@@ -79,10 +78,10 @@ return(
 
         <button
             style = {styles.button}
-            onClick = {handleJoinGroup}
+            onClick = {handleCreate}
             disabled = {loading}
             >
-        {loading ? 'Joining...' : 'Join Group'}
+        {loading ? 'Creating...' : 'Create Group'}
         </button>
 
         <button
@@ -94,9 +93,8 @@ return(
             </div>
             </div>
         
-);
+  );
 }
-
 const styles = {
     container: {
         display : 'flex',
@@ -172,5 +170,4 @@ const styles = {
     },
 };
 
-export default JoinGroup;
 

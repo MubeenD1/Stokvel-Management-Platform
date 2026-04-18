@@ -1,7 +1,15 @@
+import { useAuth } from '../context/AuthContext';
+import { useState, useEffect } from 'react';
+
 export default function GroupSettingsModal({group,onClose}){
-    if(!group){
+    const { currentUser } = useAuth();
+    const isAdmin = group?.role === 'ADMIN';
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({contributionAmount: group?.contributionAmount || '',nextMeetingDate: group?.nextMeetingDate || '',});
+     if(!group){
         return null;
     }
+   
     const handleSave = async () => {
   try {
     const token = await auth.currentUser.getIdToken();
@@ -30,8 +38,7 @@ export default function GroupSettingsModal({group,onClose}){
     alert('Error saving settings');
   }
 };
-    const [isEditing, setIsEditing] = useState(false);
-    const [formData, setFormData] = useState({contributionAmount: group?.contributionAmount || '',nextMeetingDate: group?.nextMeetingDate || '',});
+
     return (
         <div style = {styles.overlay}>
             <div style = {styles.modal}>
@@ -41,7 +48,7 @@ export default function GroupSettingsModal({group,onClose}){
                 <p> Payout Order: {group.payoutOrder}</p>
                 <p> Meeting Frequency: {group.MeetingFrequency}</p>
                 {isAdmin && !isEditing && (
-                    <button> onClick = {() => setIsEditing(true)}
+                    <button onClick = {() => setIsEditing(true)}>
                         Edit Settings
                     </button>
                 )}
