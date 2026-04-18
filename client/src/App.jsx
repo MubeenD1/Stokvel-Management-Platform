@@ -9,6 +9,7 @@ import Navbar from './pages/Navbar/Navbar';
 import Groups from './pages/Groups/Groups';
 import GroupPage from './pages/Groups/GroupPage';
 import GroupNavbar from './pages/Navbar/GroupNavbar';
+import MeetingsPage from './pages/Meetings/MeetingsPage';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -50,6 +51,7 @@ export default function App() {
         </Route>
         <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
           <Route path="/groups/:id/members" element={<GroupPage />} />
+          <Route path ="groups/:id/meetings" element = {<MeetingsPage />}/>
         </Route>
           <Route path="/create" element={<CreateGroup />} />
           <Route path="/join" element={<JoinGroup />} />

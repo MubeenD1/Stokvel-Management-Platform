@@ -52,6 +52,9 @@ export default function GroupPage() {
                     <div className="member-info">
                         {m.user.email}
                     </div>
+                    <div className="member-Role">
+                        {m.role === "ADMIN" || m.role === "TREASURER" ? m.role : ""}
+                    </div>
 
                     <button className="member-btn">
                         Assign Role

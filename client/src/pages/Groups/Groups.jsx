@@ -66,7 +66,6 @@ export default function Groups(){
                 {groups.map((group) => (
                     <GroupCard key={group.id} 
                         group={group} 
-                        onViewSettings={(group)=> setSelectedGroup(group)}
                          onCardClick={(group) => navigate(`/groups/${group.id}/members`)} 
                     />
                 ))}

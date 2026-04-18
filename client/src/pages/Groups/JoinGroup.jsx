@@ -87,7 +87,7 @@ return(
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/home')}
+            onClick = {() => navigate('/groups')}
             >
                 Back to Home
             </button>
