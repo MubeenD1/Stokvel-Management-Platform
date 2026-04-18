@@ -32,6 +32,8 @@ model Group {
   updatedAt        DateTime      @updatedAt
 
   members          GroupMember[] 
+  contributions Contribution[]
+  
 }
 
 model GroupMember {
@@ -45,4 +47,27 @@ model GroupMember {
   group    Group    @relation(fields: [groupId], references: [id])
 
   @@unique([userId, groupId])
+  contributions          Contribution[] @relation("MemberContributions")
+confirmedContributions Contribution[] @relation("TreasurerConfirmations")
+}
+enum ContributionStatus {
+  CONFIRMED
+  MISSED
+  PENDING
+}
+
+model Contribution {
+  id          String             @id @default(uuid())
+  amount      Float
+  date        DateTime
+  status      ContributionStatus @default(PENDING)
+  memberId    String
+  groupId     String
+  confirmedBy String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  member    GroupMember  @relation("MemberContributions", fields: [memberId], references: [id])
+  group     Group        @relation(fields: [groupId], references: [id])
+  treasurer GroupMember? @relation("TreasurerConfirmations", fields: [confirmedBy], references: [id])
 }
