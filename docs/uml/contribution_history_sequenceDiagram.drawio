@@ -1,0 +1,58 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="pjLEWWGm0W4C0WmCsNtP">
+    <mxGraphModel dx="47610" dy="1565" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" value="Member" vertex="1">
+          <mxGeometry height="50" width="100" x="60" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" value="Frontend" vertex="1">
+          <mxGeometry height="50" width="100" x="240" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" value="Backend (API)" vertex="1">
+          <mxGeometry height="50" width="100" x="420" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;html=1;" value="Database" vertex="1">
+          <mxGeometry height="50" width="100" x="600" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="shape=table;startSize=20;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=left;spacingLeft=5;strokeColor=#000000;fillColor=none;dashed=0;" value="alt [authenticated]" vertex="1">
+          <mxGeometry height="260" width="680" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="7" edge="1" parent="1" source="2" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="3" value="navigate to /contributions">
+          <mxGeometry relative="1" x="160" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="8" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="4" value="GET /api/contributions/:memberId">
+          <mxGeometry relative="1" x="340" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="9" edge="1" parent="1" source="4" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="5" value="query contributions by memberId">
+          <mxGeometry relative="1" x="520" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="5" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="4" value="return contributions data">
+          <mxGeometry relative="1" x="520" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="4" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="3" value="return 200 OK + contributions list">
+          <mxGeometry relative="1" x="340" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="12" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="2" value="display contributions table">
+          <mxGeometry relative="1" x="160" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="shape=table;startSize=20;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;align=left;spacingLeft=5;strokeColor=#000000;fillColor=none;dashed=0;" value="alt [not authenticated]" vertex="1">
+          <mxGeometry height="180" width="680" x="40" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" source="2" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="3" value="navigate to /contributions">
+          <mxGeometry relative="1" x="160" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="4" value="GET /api/contributions/:memberId (no token)">
+          <mxGeometry relative="1" x="340" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" source="4" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="3" value="return 401 Unauthorized">
+          <mxGeometry relative="1" x="340" y="530" as="geometry" />
+        </mxCell>
+        <mxCell id="17" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;html=1;dashed=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="2" value="redirect to login page">
+          <mxGeometry relative="1" x="160" y="570" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
