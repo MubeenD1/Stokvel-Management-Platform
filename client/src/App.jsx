@@ -7,6 +7,7 @@ import CreateGroup from './pages/Groups/CreateGroup';
 import Home from './pages/Home/Home';
 import Navbar from './pages/Navbar/Navbar';
 import Groups from './pages/Groups/Groups';
+import Contributions from './pages/Contributions/Contributions';
 import GroupPage from './pages/Groups/GroupPage';
 import GroupNavbar from './pages/Navbar/GroupNavbar';
 import MeetingsPage from './pages/Meetings/MeetingsPage';
@@ -26,6 +27,7 @@ function Layout() {
     </div>
   );
 }
+
 function GroupLayout() {
   const { id } = useParams();
   return (
@@ -43,19 +45,18 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/home" element={<Home />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create" element={<CreateGroup />} />
+          <Route path="/join" element={<JoinGroup />} />
+          <Route path="/contributions/:groupId" element={<Contributions />} />
         </Route>
         <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
           <Route path="/groups/:id/members" element={<GroupPage />} />
-          <Route path ="groups/:id/meetings" element = {<MeetingsPage />}/>
+          <Route path="groups/:id/meetings" element={<MeetingsPage />} />
         </Route>
-          <Route path="/create" element={<CreateGroup />} />
-          <Route path="/join" element={<JoinGroup />} />
-
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
