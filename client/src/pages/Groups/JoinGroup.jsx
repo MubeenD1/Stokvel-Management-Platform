@@ -26,7 +26,7 @@ function JoinGroup(){
         try{
             const token = await auth.currentUser.getIdToken();
 
-            const response = await fetch('http://localhost:3000/api/groups/join',{
+            const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups/join',{
                 method : 'POST',
                 headers: {
                     'Content-Type': 'application/json',

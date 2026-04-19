@@ -40,7 +40,8 @@ export default function GroupPage() {
     const handleRoleChange = async (mId, newRole) => {
         try {
             const token = await auth.currentUser.getIdToken();
-            const res = await fetch(`http://localhost:3000/api/groups/${id}/members/${mId}/role`, {
+            //const res = await fetch(`http://localhost:3000/api/groups/${id}/members/${mId}/role`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -29,7 +29,7 @@ export default function CreateGroup() {
         return;
         }
 
-      const response = await fetch("http://localhost:3000/api/groups/create", {
+      const response = await fetch(import.meta.env.VITE_API_URL + "/api/groups/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

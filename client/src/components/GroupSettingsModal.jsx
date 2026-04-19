@@ -14,7 +14,7 @@ export default function GroupSettingsModal({group,onClose}){
   try {
     const token = await auth.currentUser.getIdToken();
 
-    const response = await fetch(`http://localhost:3000/api/groups/${group.id}/settings`,
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`,
       {
         method: 'PUT',
         headers: {
