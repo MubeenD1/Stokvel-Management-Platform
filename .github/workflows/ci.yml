@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install server dependencies
-        run: cd server && npm install
+        run: cd server && npm install --include=dev
 
       - name: Run server tests
         run: cd server && npm test
