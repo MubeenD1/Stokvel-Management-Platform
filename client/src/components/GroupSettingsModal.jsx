@@ -10,7 +10,8 @@ export default function GroupSettingsModal(){
     const [isEditing, setIsEditing] = useState(false);
     const [formData, setFormData] = useState({});
     const[loading, setLoading] = useState(false);
-
+    const[members, setMembers] = useState([]);
+    const[payoutOrder, setPayoutOrder] = useState([]);
     useEffect(() => {
         async function fetchGroup() {
             setLoading(true);
@@ -22,9 +23,20 @@ export default function GroupSettingsModal(){
                 const data = await response.json();
                 console.log('Fetched group data:', data);
                 setGroup({ ...data.group, role: data.role });
+                
+                setMembers(data.groupMembers || []);
+                const saved = data.group?.payoutOrder;
+                if (saved){
+                    const savedEmails = saved.split(',').map(email => email.trim());
+                    const orderedMembers = savedEmails.map(email => data.groupMembers.find(m => m.user.email === email)).filter(Boolean);
+                    const remainingMembers = data.groupMembers.filter(m => !savedEmails.includes(m.user.email)) || [];
+                    setPayoutOrder([...orderedMembers, ...remainingMembers]);
+                }else{
+                    setPayoutOrder(data.groupMembers || []);
+                }
                 setFormData({
                     contributionAmount: data.contributionAmount,
-                    meetingFrequency: data.meetingFrequency,
+                    meetingFrequency: data.meetingFrequency
                 });
             } catch (err) {
                 console.error('Error fetching group:', err);
@@ -39,10 +51,26 @@ export default function GroupSettingsModal(){
         return null;
     }
    const isAdmin = group?.role === 'ADMIN';
+   const moveUp = (index) => {
+    if (index === 0) return;
+    const newOrder = [...payoutOrder];
+    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+    setPayoutOrder(newOrder);
+  }
+  const moveDown = (index) => { 
+    if (index === payoutOrder.length - 1) return;
+    const newOrder = [...payoutOrder];
+    [newOrder[index + 1], newOrder[index]] = [newOrder[index], newOrder[index + 1]];
+    setPayoutOrder(newOrder);
+  }
     const handleSave = async () => {
   try {
     const token = await currentUser.getIdToken();
-
+    const updatedPayoutOrder = payoutOrder.map(m => m.user.email).join(',');
+    const formDataToSend = {
+      ...formData,
+      payoutOrder: updatedPayoutOrder,
+    };
     const response = await fetch(`http://localhost:3000/api/groups/${group.id}/settings`,
       {
         method: 'PUT',
@@ -50,13 +78,13 @@ export default function GroupSettingsModal(){
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formDataToSend)
       }
     );
 
     if (!response.ok) throw new Error('Failed to update settings');
-
-    const data = await response.json();
+    setGroup(prev => ({ ...prev, ...formDataToSend }));
+    // const data = await response.json();
 
     alert('Settings updated successfully');
 
@@ -72,11 +100,14 @@ export default function GroupSettingsModal(){
    
             <div style = {styles.container}>
                 <h2 style={styles.heading}>{group.name} Settings</h2>
-                <div styles= {styles.card}>
-                    <p style = {styles.info}><strong>Contribution: R</strong> {group.contributionAmount}</p>
-                    <p style = {styles.info}><strong>Payout Order:</strong> {group.payoutOrder}</p>
-                    <p style = {styles.info}><strong>Meeting Frequency:</strong> {group.meetingFrequency}</p>
-                </div>
+
+               {!isEditing && (
+                    <div styles= {styles.card}>
+                        <p style = {styles.info}><strong>Contribution: R</strong> {group.contributionAmount}</p>
+                        <p style = {styles.info}><strong>Payout Order:</strong> {group.payoutOrder}</p>
+                        <p style = {styles.info}><strong>Meeting Frequency:</strong> {group.meetingFrequency}</p>
+                    </div>
+                )}
 
                 {isAdmin && !isEditing && (
                     <button style = {styles.editButton} onClick = {() => setIsEditing(true)}>
@@ -96,15 +127,21 @@ export default function GroupSettingsModal(){
                         placeholder="Contribution Amount (R)"
                         />
                         <label style = {styles.label}>Payout Order</label>
-                        <input
-                        style = {styles.input}
-                            type="text"
-                            value={formData.payoutOrder}
-                            onChange={(e) =>
-                                setFormData({ ...formData, payoutOrder: e.target.value })
-                            }
-                            placeholder="e.g. Simphiwe,Mubeen ,Thabiso"
-                        />
+                        <div style = {{display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px',marginBottom: '16px'}}>
+                            {payoutOrder.map((m, index) => (
+                                <div key={m.id} style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+                                    <span>{index +1}</span>
+                                    <span>{m.user.email}</span>
+                                    <div style={styles.arrowButtons}>
+                                        <button style={{...styles.arrowButton, opacity: index === 0? 0.3:1}} onClick={() => moveUp(index)} disabled={index === 0}>↑</button>
+                                        <button style={{...styles.arrowButton, opacity: index ===payoutOrder.length-1? 0.3:1}} onClick={() => moveDown(index)} disabled={index === payoutOrder.length - 1}>↓</button>
+                                    </div>
+
+
+                                </div>
+                            ))}
+                        </div>
+
                         <label style = {styles.label}>Meeting Frequency</label>
                         <select
                         style = {styles.select}
@@ -116,8 +153,10 @@ export default function GroupSettingsModal(){
                         <option value="weekly">Weekly</option>
                         <option value="monthly">Monthly</option>
                         </select>
+                        <div style = {styles.buttonRow}>
                         <button style = {styles.saveButton} onClick={handleSave}>Save Changes</button>
                         <button style = {styles.cancelButton} onClick={() => setIsEditing(false)}>Cancel</button>
+                        </div>
                     </div>
                 )}
                
@@ -224,6 +263,22 @@ export default function GroupSettingsModal(){
 //     },
 // };
 const styles = {
+    arrowButtons:{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '4px',
+        marginLeft: 'auto'
+    },
+    arrowButton:{
+        padding: '4px 8px',
+        backgroundColor: '#ddd',
+        border: 'none',
+        color: "#fff",
+        border: "none",
+        borderRadius: "4px",
+        cursor: "pointer",
+        fontSize: "12px"
+    },
   container: {
     padding: "2.5rem",
     maxWidth: "640px",
