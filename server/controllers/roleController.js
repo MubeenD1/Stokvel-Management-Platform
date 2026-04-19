@@ -1,4 +1,4 @@
-const { PrismaClient } = require("@prisma/client")
+const { PrismaClient } = require("../lib/prisma")
 const prisma = new PrismaClient
 
 const assignRole = async (req, res) => {

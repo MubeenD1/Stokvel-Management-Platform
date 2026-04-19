@@ -1,4 +1,4 @@
-const { PrismaClient } = require('../../generated/prisma');
+const { PrismaClient } = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
 const prisma = new PrismaClient();
 
