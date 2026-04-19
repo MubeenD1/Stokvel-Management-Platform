@@ -297,5 +297,36 @@ async function getGroupById(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+const getGroupContributions = async (req, res) => {
+    const { groupId } = req.params;
+
+    try {
+        const contributions = await prisma.contribution.findMany({
+            where: { 
+                groupId: groupId 
+            },
+            include: {
+                // Fetches email of person who owes money
+                member: { 
+                    include: { user: true } 
+                },
+                // Fetches email of Treasurer who verified it (if any)
+                treasurer: { 
+                    include: { user: true } 
+                }
+            },
+            orderBy: {
+                date: 'asc' // Sorts by due date
+            }
+        });
+
+        res.json(contributions);
+
+    } catch (error) {
+        console.error('🔥 Fetch Contributions Error:', error);
+        res.status(500).json({ error: "Failed to load group contributions." });
+    }
+};
 //module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };

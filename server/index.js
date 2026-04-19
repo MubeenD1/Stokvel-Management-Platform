@@ -1,4 +1,4 @@
-// THE TRAP: Find out who is killing the server
+//TRAP: Find out who is killing the server
 const originalExit = process.exit;
 process.exit = function(code) {
     console.error(`\n🚨 PROCESS.EXIT CALLED WITH CODE: ${code} 🚨`);
