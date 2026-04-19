@@ -7,6 +7,7 @@ import CreateGroup from './pages/CreateGroup';
 import Home from './pages/Home/Home';
 import Navbar from './pages/Navbar/Navbar';
 import Groups from './pages/Groups/Groups';
+import Contributions from './pages/Contributions/Contributions';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -29,15 +30,14 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-
         <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route path="/home" element={<Home />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create" element={<CreateGroup />} />
           <Route path="/join" element={<JoinGroup />} />
+          <Route path="/contributions/:groupId" element={<Contributions />} />
         </Route>
-
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
