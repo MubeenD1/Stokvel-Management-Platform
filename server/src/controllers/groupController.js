@@ -124,7 +124,6 @@ async function getGroupSettings(req, res) {
                 name: group.name,
                 contributionAmount: group.contributionAmount,
                 meetingFrequency: group.meetingFrequency,
-                nextMeetingDate: group.nextMeetingDate,
                 payoutOrder: group.payoutOrder,
             },
         });
@@ -152,9 +151,9 @@ async function updateGroupSettings(req, res) {
         const updatedGroup = await prisma.group.update({
             where: { id: groupId },
             data: {
-                contributionAmount,
-                meetingFrequency,
-                payoutOrder,
+                contributionAmount: contributionAmount ? parseFloat(contributionAmount) : null,
+        meetingFrequency,
+        payoutOrder,
             },
         });
 
@@ -267,6 +266,12 @@ async function getGroupById(req, res) {
     }
 
     try {
+         const group = await prisma.group.findUnique({
+            where: { id: gId },
+        });
+         const role = await prisma.group.findUnique({
+            where: { id: gId },
+        });
         const groupMembers = await prisma.groupMember.findMany({
             where: { groupId: gId },
             include: {
@@ -277,8 +282,13 @@ async function getGroupById(req, res) {
                 },
             },
         });
+        const firebaseId = req.user.uid;
+        const user = await prisma.user.findUnique({ where: { firebaseId } });
 
-        return res.status(200).json({ groupMembers });
+        const membership = await prisma.groupMember.findFirst({
+            where: { groupId: gId, userId: user.id }
+        });
+        return res.status(200).json({ groupMembers, group,role:membership?.role });
 
     } catch (error) {
         console.error('getGroupById error:', error);

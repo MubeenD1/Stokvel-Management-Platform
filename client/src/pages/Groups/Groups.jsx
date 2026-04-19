@@ -70,10 +70,7 @@ export default function Groups(){
                     />
                 ))}
             </div>
-            <GroupSettingsModal
-                    group = {selectedGroup}
-                    onClose = {() => setSelectedGroup(null)}
-            />
+           
         </div>
     );
 }

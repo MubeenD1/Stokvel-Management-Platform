@@ -7,53 +7,44 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  TREASURER 
-  MEMBER
-}
-
 model User {
-  id         String   @id @default(uuid())
-  firebaseId String   @unique
-  email      String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  groups     GroupMember[]
+  id           String         @id @default(uuid())
+  firebaseId   String         @unique
+  email        String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  groups       GroupMember[]
+  Meeting      Meeting[]
+  Notification Notification[]
 }
 
 model Group {
-  id               String        @id @default(uuid())
-  name             String
-  inviteCode       String        @unique
-  inviteCodeExpiry DateTime?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  members          GroupMember[] 
-  contributions Contribution[]
-  
+  id                 String         @id @default(uuid())
+  name               String
+  inviteCode         String         @unique
+  inviteCodeExpiry   DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  contributionAmount Float?
+  payoutOrder        String?
+  meetingFrequency   String?
+  contributions      Contribution[]
+  members            GroupMember[]
+  Meeting            Meeting[]
 }
 
 model GroupMember {
-  id       String   @id @default(uuid())
-  userId   String
-  groupId  String
-  role     Role     @default(MEMBER)
-  joinedAt DateTime @default(now())
-
-  user     User     @relation(fields: [userId], references: [id])
-  group    Group    @relation(fields: [groupId], references: [id])
+  id                     String         @id @default(uuid())
+  userId                 String
+  groupId                String
+  role                   Role           @default(MEMBER)
+  joinedAt               DateTime       @default(now())
+  confirmedContributions Contribution[] @relation("TreasurerConfirmations")
+  contributions          Contribution[] @relation("MemberContributions")
+  group                  Group          @relation(fields: [groupId], references: [id])
+  user                   User           @relation(fields: [userId], references: [id])
 
   @@unique([userId, groupId])
-  contributions          Contribution[] @relation("MemberContributions")
-confirmedContributions Contribution[] @relation("TreasurerConfirmations")
-}
-enum ContributionStatus {
-  CONFIRMED
-  MISSED
-  PENDING
 }
 
 model Contribution {
@@ -66,8 +57,55 @@ model Contribution {
   confirmedBy String?
   createdAt   DateTime           @default(now())
   updatedAt   DateTime           @updatedAt
+  treasurer   GroupMember?       @relation("TreasurerConfirmations", fields: [confirmedBy], references: [id])
+  group       Group              @relation(fields: [groupId], references: [id])
+  member      GroupMember        @relation("MemberContributions", fields: [memberId], references: [id])
+}
 
-  member    GroupMember  @relation("MemberContributions", fields: [memberId], references: [id])
-  group     Group        @relation(fields: [groupId], references: [id])
-  treasurer GroupMember? @relation("TreasurerConfirmations", fields: [confirmedBy], references: [id])
+model Meeting {
+  id           String         @id
+  groupId      String
+  date         DateTime
+  location     String
+  agenda       String?
+  minutes      String?
+  createdAt    DateTime       @default(now())
+  createdById  String
+  User         User           @relation(fields: [createdById], references: [id])
+  Group        Group          @relation(fields: [groupId], references: [id])
+  Notification Notification[]
+}
+
+model Notification {
+  id          String           @id
+  type        NotificationType
+  recipientId String
+  meetingId   String
+  sentAt      DateTime         @default(now())
+  success     Boolean          @default(true)
+  error       String?
+  Meeting     Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  User        User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([recipientId])
+  @@index([type])
+}
+
+enum Role {
+  MEMBER
+  TREASURER
+  ADMIN
+}
+
+enum ContributionStatus {
+  CONFIRMED
+  MISSED
+  PENDING
+}
+
+enum NotificationType {
+  MEETING_CREATED
+  MEETING_UPDATED
+  MEETING_DELETED
 }
