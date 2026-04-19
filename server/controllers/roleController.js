@@ -13,7 +13,7 @@ const assignRole = async (req, res) => {
         // Bulletproof update using the primary key!
         const updated = await prisma.groupMember.update({
             where: {
-                id: userId  // <-- THE MAGIC FIX: We search the 'id' column, not 'userId'
+                id: userId  
             },
             data: { role }
         });
