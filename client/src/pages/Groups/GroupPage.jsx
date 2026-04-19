@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
+import ContributionsSection from '../../components/ContributionsSection';
 
 export default function GroupPage() {
     const { id } = useParams();
@@ -112,6 +113,8 @@ export default function GroupPage() {
                     );
                 })}
             </div>
+            <ContributionsSection groupId={id} members={members} />
         </div>
+        
     );
 }
