@@ -41,7 +41,7 @@ export default function CreateGroup() {
     const data = await response.json();
     if (response.ok) {
         setSuccess("Group created successfully!");
-        setName(""); // clear input
+        setName("");
     } else {
         setError(data.message || "Failed to create group");
     }
@@ -164,7 +164,7 @@ const styles = {
         margin : 0,
     },
     success : {
-        color : '2e7d32',
+        color : '#2e7d32',
         fontSize : '14px',
         margin : 0,
     },

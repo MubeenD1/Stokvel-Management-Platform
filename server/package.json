@@ -17,7 +17,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "firebase-admin": "^13.7.0",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "react-datetime-picker": "^7.0.2"
   },
   "devDependencies": {
     "jest": "^30.3.0",

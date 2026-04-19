@@ -21,6 +21,7 @@ model User {
   updatedAt  DateTime @updatedAt
 
   groups     GroupMember[]
+  meetingsCreated Meeting[] 
 }
 
 model Group {
@@ -33,6 +34,7 @@ model Group {
 
   members          GroupMember[] 
   contributions Contribution[]
+  meetings         Meeting[]  
   
 }
 
@@ -49,6 +51,7 @@ model GroupMember {
   @@unique([userId, groupId])
   contributions          Contribution[] @relation("MemberContributions")
 confirmedContributions Contribution[] @relation("TreasurerConfirmations")
+
 }
 enum ContributionStatus {
   CONFIRMED
@@ -70,4 +73,19 @@ model Contribution {
   member    GroupMember  @relation("MemberContributions", fields: [memberId], references: [id])
   group     Group        @relation(fields: [groupId], references: [id])
   treasurer GroupMember? @relation("TreasurerConfirmations", fields: [confirmedBy], references: [id])
+}
+model Meeting {
+  id           String   @id @default(uuid())
+
+  groupId      String
+  date         DateTime
+  location     String
+  agenda       String?
+  minutes      String?
+
+  createdAt    DateTime @default(now())
+  createdById  String
+
+  group        Group    @relation(fields: [groupId], references: [id])
+  createdBy    User     @relation(fields: [createdById], references: [id])
 }

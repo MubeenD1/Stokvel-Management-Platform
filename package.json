@@ -10,5 +10,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "react-datetime-picker": "^7.0.2"
+  }
 }
