@@ -1,6 +1,6 @@
-const { PrismaClient } = require('../../lib/prisma');
+const prisma = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {

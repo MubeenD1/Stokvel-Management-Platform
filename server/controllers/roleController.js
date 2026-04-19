@@ -1,5 +1,5 @@
-const { PrismaClient } = require("../lib/prisma")
-const prisma = new PrismaClient
+const prisma = require("../lib/prisma")
+//const prisma = new PrismaClient
 
 const assignRole = async (req, res) => {
     const {groupId, userId } = req.params
