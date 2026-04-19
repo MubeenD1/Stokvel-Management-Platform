@@ -158,6 +158,17 @@ async function updateGroupSettings(req, res) {
             },
         });
 
+        const membership = await prisma.groupMember.findFirst({
+            where: {
+                groupId: groupId,
+                userId: user.id,
+                role: 'ADMIN'
+            }
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: "Only admins can change group settings" });
+        }
         return res.status(200).json({
             message: 'Group settings updated successfully',
             group: updatedGroup,
@@ -273,6 +284,7 @@ async function getGroupById(req, res) {
                 user: {
                     select: {
                         email: true,
+                        firebaseId: true, //Added for email comparison for assigning roles
                     },
                 },
             },
