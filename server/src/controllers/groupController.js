@@ -1,6 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -157,6 +157,17 @@ async function updateGroupSettings(req, res) {
             },
         });
 
+        const membership = await prisma.groupMember.findFirst({
+            where: {
+                groupId: groupId,
+                userId: user.id,
+                role: 'ADMIN'
+            }
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: "Only admins can change group settings" });
+        }
         return res.status(200).json({
             message: 'Group settings updated successfully',
             group: updatedGroup,
@@ -278,6 +289,7 @@ async function getGroupById(req, res) {
                 user: {
                     select: {
                         email: true,
+                        firebaseId: true, //Added for email comparison for assigning roles
                     },
                 },
             },
@@ -295,5 +307,36 @@ async function getGroupById(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+const getGroupContributions = async (req, res) => {
+    const { groupId } = req.params;
+
+    try {
+        const contributions = await prisma.contribution.findMany({
+            where: { 
+                groupId: groupId 
+            },
+            include: {
+                // Fetches email of person who owes money
+                member: { 
+                    include: { user: true } 
+                },
+                // Fetches email of Treasurer who verified it (if any)
+                treasurer: { 
+                    include: { user: true } 
+                }
+            },
+            orderBy: {
+                date: 'asc' // Sorts by due date
+            }
+        });
+
+        res.json(contributions);
+
+    } catch (error) {
+        console.error('🔥 Fetch Contributions Error:', error);
+        res.status(500).json({ error: "Failed to load group contributions." });
+    }
+};
 //module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
+module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };

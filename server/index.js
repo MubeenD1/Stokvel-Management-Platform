@@ -1,3 +1,18 @@
+//TRAP: Find out who is killing the server
+const originalExit = process.exit;
+process.exit = function(code) {
+    console.error(`\n🚨 PROCESS.EXIT CALLED WITH CODE: ${code} 🚨`);
+    console.trace('Here is the trace of exactly what file killed the server:');
+    originalExit(code);
+};
+
+// CATCH SILENT ERRORS
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('🚨 UNHANDLED PROMISE REJECTION:', reason);
+});
+process.on('uncaughtException', (err) => {
+    console.error('🚨 UNCAUGHT EXCEPTION:', err);
+});
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -16,8 +31,9 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/groups', groupRoutes);
 app.use('/api/groups', roleRoutes);
+app.use('/api/groups', groupRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

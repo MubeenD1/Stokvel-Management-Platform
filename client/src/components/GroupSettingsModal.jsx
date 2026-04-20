@@ -71,7 +71,10 @@ export default function GroupSettingsModal(){
       ...formData,
       payoutOrder: updatedPayoutOrder,
     };
-    const response = await fetch(`http://localhost:3000/api/groups/${group.id}/settings`,
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`,
+    const token = await auth.currentUser.getIdToken();
+
+    
       {
         method: 'PUT',
         headers: {

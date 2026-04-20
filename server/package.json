@@ -5,7 +5,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +18,10 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "firebase-admin": "^13.7.0",
-    "prisma": "^5.22.0"
+    "prisma": "^5.22.0",
+    "jest": "^30.3.0"
   },
   "devDependencies": {
-    "jest": "^30.3.0",
     "nodemon": "^3.1.14"
   }
 }
