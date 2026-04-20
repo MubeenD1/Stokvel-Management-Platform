@@ -25,9 +25,9 @@ model Group {
   inviteCodeExpiry   DateTime?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
-  MeetingFrequency   String?
   contributionAmount Float?
   payoutOrder        String?
+  meetingFrequency   String?
   contributions      Contribution[]
   members            GroupMember[]
   Meeting            Meeting[]

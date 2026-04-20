@@ -21,12 +21,12 @@ export default function GroupNavbar( {groupId} ) {
             </NavLink>
           </li>
           <li>
-            <NavLink to={`/groups/${groupId}/settings`} className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to={`/groups/${groupId}/payouts`} className={({ isActive }) => isActive ? "active" : ""}>
               Payouts
             </NavLink>
           </li>
           <li>
-            <NavLink to={`/groups/${groupId}/Payout`} className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to={`/groups/${groupId}/settings`} className={({ isActive }) => isActive ? "active" : ""}>
               Settings
             </NavLink>
           </li>
