@@ -11,7 +11,7 @@ import GroupPage from './pages/Groups/GroupPage';
 import GroupNavbar from './pages/Navbar/GroupNavbar';
 import MeetingsPage from './pages/Meetings/MeetingsPage';
 import GroupSettingsModal from './components/GroupSettingsModal';
-
+import CreateMeeting from './pages/Meetings/CreateMeeting';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -55,6 +55,7 @@ export default function App() {
           <Route path="/groups/:id/members" element={<GroupPage />} />
           <Route path ="/groups/:id/meetings" element = {<MeetingsPage />}/>
           <Route path ="/groups/:id/settings" element = {<GroupSettingsModal />}/>
+          <Route path = "groups/:id/meetings/create" element = {<CreateMeeting />}/>
           
         </Route>
           <Route path="/create" element={<CreateGroup />} />
