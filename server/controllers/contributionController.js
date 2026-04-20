@@ -19,7 +19,7 @@ const updateContributionStatus = async (req, res) => {
         });
 
         if (!requester || (requester.role !== 'TREASURER' && requester.role !== 'ADMIN')) {
-            return res.status(403).json({error: "Access Denied: Only Admins or Treasurersn can verify contributions"})
+            return res.status(403).json({error: "Access Denied: Only Admins or Treasurers can verify contributions"})
         }
 
         const updatedContribution = await prisma.contribution.update({

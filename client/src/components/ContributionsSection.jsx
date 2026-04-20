@@ -43,7 +43,7 @@ export default function ContributionsSection({ groupId, members }) {
     const handleVerify = async (contributionId, newStatus) => {
         try {
             const token = await currentUser.getIdToken();
-            const res = await fetch(`http://localhost:3000/api/groups/${groupId}/contributions/${contributionId}/status`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/contributions/${contributionId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
