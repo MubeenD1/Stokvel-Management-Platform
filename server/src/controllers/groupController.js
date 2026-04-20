@@ -2,6 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const { v4: uuidv4 } = require('uuid');
 const prisma = new PrismaClient();
 const { generateUniqueInviteCode } = require('../utils/inviteCode');
+const { sendMeetingNotification } = require('../utils/notificationService');
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -119,7 +120,7 @@ async function getGroupSettings(req, res) {
 }
 async function updateGroupSettings(req, res) {
     const { groupId } = req.params;
-    const { contributionAmount, meetingFrequency, payoutOrder } = req.body;
+    const { nextMeetingDate, contributionAmount, meetingFrequency, payoutOrder } = req.body;
 
     try {
         const firebaseId = req.user.uid;
@@ -132,14 +133,35 @@ async function updateGroupSettings(req, res) {
             return res.status(404).json({ error: 'User not found' });
         }
 
+        const currentGroup = await prisma.group.findUnique({
+            where: { id: groupId },
+            include: { members: { include: { user: true } } }
+        });
+
+        // 2. Check if meeting details actually changed
+        const isDateChanged = currentGroup.nextMeetingDate !== nextMeetingDate;
+        const isFreqChanged = currentGroup.meetingFrequency !== meetingFrequency;
+
         const updatedGroup = await prisma.group.update({
             where: { id: groupId },
             data: {
+                nextMeetingDate,
                 contributionAmount,
                 meetingFrequency,
                 payoutOrder,
             },
         });
+
+        if (isDateChanged || isFreqChanged) {
+            const memberEmails = currentGroup.members.map(m => m.user.email);
+            
+            await sendMeetingNotification(
+                memberEmails, 
+                updatedGroup.name, 
+                { date: nextMeetingDate, frequency: meetingFrequency },
+                isDateChanged ? "update" : "schedule"
+            );
+        }
 
         return res.status(200).json({
             message: 'Group settings updated successfully',

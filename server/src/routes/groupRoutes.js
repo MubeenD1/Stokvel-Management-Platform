@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
 const { createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
-const { joinGroup,refreshInviteCode}=require('../controllers/groupController');
+const { refreshInviteCode}=require('../controllers/groupController');
 
 // debug - check if functions are loaded correctly
 console.log('verifyToken:', typeof verifyToken);
@@ -17,7 +17,7 @@ console.log('refreshInviteCode:', typeof refreshInviteCode);
 
 // POST /api/groups/join
 router.post('/join', verifyToken, joinGroup);
-router.post('/:groupId/invite', verifyToken, groupController.refreshInviteCode);
+router.post('/:groupId/invite', verifyToken, refreshInviteCode);
 
 // GET group settings
 router.get('/:groupId/settings', verifyToken, getGroupSettings);
