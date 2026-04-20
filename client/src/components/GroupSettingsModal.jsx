@@ -18,7 +18,8 @@ export default function GroupSettingsModal(){
             try {
                 
                 const token = await currentUser.getIdToken();
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`, {
+const response = await fetch(`http://localhost:3000/api/groups/${id}`,
+      {                //const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`, {
                     headers: {'Authorization': `Bearer ${token}`},
                 });
                 const data = await response.json();
@@ -72,8 +73,9 @@ export default function GroupSettingsModal(){
       ...formData,
       payoutOrder: updatedPayoutOrder,
     };
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`,
-    
+    // const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`,
+    const response = await fetch(`http://localhost:3000/api/groups/${id}/settings`,
+
 
     
       {

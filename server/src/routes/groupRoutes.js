@@ -13,7 +13,6 @@ console.log('joinGroup:', typeof joinGroup);
 console.log('getGroupSettings:', typeof getGroupSettings);
 console.log('updateGroupSettings:', typeof updateGroupSettings);
 // POST group join and create 
-router.post('/join', verifyToken, joinGroup);
 router.post('/create', verifyToken , createGroup);
 // GET Groups
 console.log('refreshInviteCode:', typeof refreshInviteCode);
@@ -27,8 +26,8 @@ router.post('/:groupId/invite', verifyToken, refreshInviteCode);
 router.get('/', verifyToken, getGroups);
 
 router.get('/:groupId/settings', verifyToken, getGroupSettings);
-router.get('/:id' , verifyToken , getGroupById);
 router.get('/:groupId/contributions', verifyToken, getGroupContributions);
+router.get('/:id' , verifyToken , getGroupById);
 
 // PUT group settings
 router.put('/:groupId/settings', verifyToken, updateGroupSettings);

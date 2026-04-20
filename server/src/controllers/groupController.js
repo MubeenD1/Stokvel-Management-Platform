@@ -1,9 +1,10 @@
 const prisma = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
 //const prisma = new PrismaClient();
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 const { generateUniqueInviteCode } = require('../utils/inviteCode');
 const { sendMeetingNotification } = require('../utils/notificationService');
+const { updateContributionStatus } = require('../../controllers/contributionController');
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -133,20 +134,7 @@ async function getGroupSettings(req, res) {
 
     } catch (error) {
         console.error('getGroupSettings error:', error);
-        return 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        res.status(500).json({ error: 'Internal server error' });
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }
 async function updateGroupSettings(req, res) {
@@ -339,9 +327,15 @@ async function getGroupById(req, res) {
         const firebaseId = req.user.uid;
         const user = await prisma.user.findUnique({ where: { firebaseId } });
 
+        // const membership = await prisma.groupMember.findFirst({
+        //     where: { groupId: gId, userId: user.id }
+        // });
         const membership = await prisma.groupMember.findFirst({
-            where: { groupId: gId, userId: user.id }
-        });
+        where: { 
+            groupId: gId, 
+            userId: user.id 
+        }
+});
         return res.status(200).json({ groupMembers, group,role:membership?.role });
 
     } catch (error) {
@@ -381,7 +375,7 @@ const getGroupContributions = async (req, res) => {
     }
 };
 //module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };
+//module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };
 
 
 async function refreshInviteCode(req, res) {
@@ -412,4 +406,4 @@ async function refreshInviteCode(req, res) {
     }
 }
 
-module.exports = {createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode };
+module.exports = {getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};

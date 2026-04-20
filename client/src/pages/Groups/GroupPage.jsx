@@ -18,7 +18,8 @@ export default function GroupPage() {
                 setLoading(true);
                 try {
                     const token = await firebaseUser.getIdToken();
-                    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}`, {
+                    //const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}`, {
+                                const response = await fetch(`http://localhost:3000/api/groups/${id}`, {
                         headers: { 'Authorization': `Bearer ${token}` },
                     });
                     const data = await response.json();
@@ -40,8 +41,8 @@ export default function GroupPage() {
     const handleRoleChange = async (mId, newRole) => {
         try {
             const token = await auth.currentUser.getIdToken();
-            //const res = await fetch(`http://localhost:3000/api/groups/${id}/members/${mId}/role`, {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}/members/${mId}/role`, {
+            const res = await fetch(`http://localhost:3000/api/groups/${id}/members/${mId}/role`, {
+            //const res = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}/members/${mId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
