@@ -1,6 +1,9 @@
 const prisma = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
 //const prisma = new PrismaClient();
+const prisma = new PrismaClient();
+const { generateUniqueInviteCode } = require('../utils/inviteCode');
+const { sendMeetingNotification } = require('../utils/notificationService');
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -130,12 +133,25 @@ async function getGroupSettings(req, res) {
 
     } catch (error) {
         console.error('getGroupSettings error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        return 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        res.status(500).json({ error: 'Internal server error' });
     }
 }
 async function updateGroupSettings(req, res) {
     const { groupId } = req.params;
-    const { contributionAmount, meetingFrequency, payoutOrder } = req.body;
+    const { nextMeetingDate, contributionAmount, meetingFrequency, payoutOrder } = req.body;
 
     try {
         const firebaseId = req.user.uid;
@@ -148,6 +164,15 @@ async function updateGroupSettings(req, res) {
             return res.status(404).json({ error: 'User not found' });
         }
 
+        const currentGroup = await prisma.group.findUnique({
+            where: { id: groupId },
+            include: { members: { include: { user: true } } }
+        });
+
+        // 2. Check if meeting details actually changed
+        const isDateChanged = currentGroup.nextMeetingDate !== nextMeetingDate;
+        const isFreqChanged = currentGroup.meetingFrequency !== meetingFrequency;
+
         const updatedGroup = await prisma.group.update({
             where: { id: groupId },
             data: {
@@ -156,6 +181,17 @@ async function updateGroupSettings(req, res) {
         payoutOrder,
             },
         });
+
+        if (isDateChanged || isFreqChanged) {
+            const memberEmails = currentGroup.members.map(m => m.user.email);
+            
+            await sendMeetingNotification(
+                memberEmails, 
+                updatedGroup.name, 
+                { date: nextMeetingDate, frequency: meetingFrequency },
+                isDateChanged ? "update" : "schedule"
+            );
+        }
 
         const membership = await prisma.groupMember.findFirst({
             where: {
@@ -182,6 +218,7 @@ async function createGroup(req, res) {
     const firebaseId = req.user.uid;
     const { name } = req.body;
 
+
     if (!name || name.trim().length < 2) {
         return res.status(400).json({ error: "Group name is required" });
     }
@@ -196,12 +233,16 @@ async function createGroup(req, res) {
             return res.status(404).json({ error: "User not found" });
         }
 
+        //generate code and set expiry
+        const inviteCode = await generateUniqueInviteCode();
+        const inviteCodeExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
         // create group + add creator as ADMIN
         const group = await prisma.group.create({
             data: {
                 "name": name.trim(),
-                inviteCode: uuidv4().slice(0, 8),
-
+                inviteCode,
+                inviteCodeExpiry,
                 members: {
                     create: {
                         userId: user.id,
@@ -220,6 +261,7 @@ async function createGroup(req, res) {
                 id: group.id,
                 name: group.name,
                 inviteCode: group.inviteCode,
+                inviteCodeExpiry: group.inviteCodeExpiry,
                 members: group.members,
             },
         });
@@ -340,3 +382,34 @@ const getGroupContributions = async (req, res) => {
 };
 //module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
 module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };
+
+
+async function refreshInviteCode(req, res) {
+
+    const {groupId} =req.params;
+    const firebaseId=req.user.uid;
+    try {
+        // Verify user is ADMIN of this specific group 
+        const group = await prisma.group.findUnique({
+            where: { id: groupId },
+            include: { members: true }
+        });
+
+        const isAdmin = group.members.some(m => m.userId === firebaseId && m.role === 'ADMIN');
+        if (!isAdmin) return res.status(403).json({ error: "Only admins can do this" });
+
+        const newCode = await generateUniqueInviteCode();
+        const newExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+
+        const updatedGroup = await prisma.group.update({
+            where: { id: groupId },
+            data: { inviteCode: newCode, inviteCodeExpiry: newExpiry },
+        });
+
+        res.json({ inviteCode: updatedGroup.inviteCode, expiresAt: updatedGroup.inviteCodeExpiry });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to refresh code" });
+    }
+}
+
+module.exports = {createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode };

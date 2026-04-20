@@ -1,13 +1,13 @@
+const { PrismaClient } = require('@prisma/client');
 const prisma = require('../../lib/prisma');
 const crypto = require('crypto');
 //const prisma = new PrismaClient();
 
-//this will create a 8 char invite code 
-
+//this will create a 6 char invite code
+const CHARACTERS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+const CODE_LENGTH = 6
 async function generateUniqueInviteCode() {
-    const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    const CODE_LENGTH = 8;
-
+    
     let isUnique = false;
     let code = '';
 
@@ -23,43 +23,11 @@ async function generateUniqueInviteCode() {
             isUnique = true;
 
         }
-
     }
-
     return code;
 }
 
-//this will assign a new invite code to a group once it has been created 
-async function assignInviteCodeToGroup(groupId, expiryDays = null){
-    const inviteCode = await generateUniqueInviteCode();
-    const inviteCodeExpiry = expiryDays
-    ? new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000)
-    : null;
-
-    const updatedGroup = await prisma.group.update({
-        where : {id:groupId},
-        data : {
-            inviteCode,
-            inviteCodeExpiry,
-        },
-
-    });
-
-    return{
-        inviteCode: updatedGroup.inviteCode,
-        inviteCodeExpiry: updatedGroup.inviteCodeExpiry,
-    };
-
-
-}
-
-//this will regenerate an invite code for an existing group 
-async function regenerateInviteCode(groupId, expiryDays = null){
-    return assignInviteCodeToGroup(groupId, expiryDays);
-}
 
 module.exports = {
-    generateUniqueInviteCode,
-    assignInviteCodeToGroup,
-    regenerateInviteCode,
+    generateUniqueInviteCode
 };

@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(uuid())
-  firebaseId   String         @unique
-  email        String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  groups       GroupMember[]
-  Meeting      Meeting[]
-  Notification Notification[]
+  id         String        @id @default(uuid())
+  firebaseId String        @unique
+  email      String        @unique
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  groups     GroupMember[]
+  Meeting    Meeting[]
+  notifications Notification[]
 }
 
 model Group {
@@ -63,32 +63,33 @@ model Contribution {
 }
 
 model Meeting {
-  id           String         @id
-  groupId      String
-  date         DateTime
-  location     String
-  agenda       String?
-  minutes      String?
-  createdAt    DateTime       @default(now())
-  createdById  String
-  User         User           @relation(fields: [createdById], references: [id])
-  Group        Group          @relation(fields: [groupId], references: [id])
-  Notification Notification[]
+  id          String   @id
+  groupId     String
+  date        DateTime
+  location    String
+  agenda      String?
+  minutes     String?
+  createdAt   DateTime @default(now())
+  createdById String
+  User        User     @relation(fields: [createdById], references: [id])
+  Group       Group    @relation(fields: [groupId], references: [id])
+  notifications Notification[]
 }
 
 model Notification {
-  id          String           @id
+  id          String           @id @default(uuid())
   type        NotificationType
   recipientId String
   meetingId   String
   sentAt      DateTime         @default(now())
   success     Boolean          @default(true)
   error       String?
-  Meeting     Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
-  User        User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
-  @@index([meetingId])
+  recipient User    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
   @@index([recipientId])
+  @@index([meetingId])
   @@index([type])
 }
 
