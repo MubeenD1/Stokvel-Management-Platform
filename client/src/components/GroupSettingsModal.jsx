@@ -16,8 +16,9 @@ export default function GroupSettingsModal(){
         async function fetchGroup() {
             setLoading(true);
             try {
-                const token = await currentUser.getIdToken();
-                const response = await fetch(`http://localhost:3000/api/groups/${id}`, {
+                
+                const token = await auth.currentUser.getIdToken();
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${group.id}/settings`, {
                     headers: {'Authorization': `Bearer ${token}`},
                 });
                 const data = await response.json();
