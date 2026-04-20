@@ -406,4 +406,129 @@ async function refreshInviteCode(req, res) {
     }
 }
 
-module.exports = {getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};
+async function createMeeting(req,res){
+    const gId = req.params.id;
+    const firebaseId = req.user.uid;
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
+    }
+
+    const { rDate , rLocation , rAgenda } = req.body;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const membership = await prisma.groupMember.findUnique({
+        where: {
+            userId_groupId: {
+                userId: user.id,
+                groupId: gId,
+                },
+            },
+        });
+
+        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
+        return res.status(403).json({ error: "Not authorized to create meetings" });
+        }
+
+      const meeting = await prisma.meeting.create({
+        data: {
+            groupId: gId,
+            date: new Date(rDate),
+            location: rLocation,
+            agenda: rAgenda,
+            createdById: user.id,
+        },
+        include: {
+            Group: true,      // matches schema relation name
+            User: true,       // matches schema relation name
+        },
+        });
+        return res.status(201).json({
+            message : "Meeting Created Successfully",
+            meeting,
+        });
+
+    } catch (error) {
+        console.error("createMeeting error:", error);
+        return res.status(500).json({ error: error.message });
+    }
+
+}
+
+async function getMeetings(req,res){
+    console.log("params:", req.params);
+    console.log("gId:", req.params.id);
+    const gId = req.params.id;
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
+    }
+    try {
+        const meetings = await prisma.meeting.findMany({
+            where: { groupId: gId },
+            include: {
+                User: {
+                    select: {
+                        email: true,
+                    },
+                },
+            },
+        });
+
+        return res.status(200).json({ meetings });
+    } catch (error) {
+        console.error('getMeetings error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+
+}
+
+async function addMinutes(req,res){
+    const { id: gId, meetingId } = req.params;
+    const { minutes } = req.body;
+
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
+    }
+    const firebaseId = req.user.uid;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }        
+
+        const membership = await prisma.groupMember.findUnique({
+        where: {
+            userId_groupId: {
+                userId: user.id,
+                groupId: gId,
+                },
+            },
+        });
+
+        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
+            return res.status(403).json({ error: "Not authorized to create add meeting minutes" });
+        }
+        
+        const meeting = await prisma.meeting.update({
+            where: { id: meetingId },
+            data: { minutes },
+        });
+        return res.status(200).json({ meeting });
+
+    } catch (error) {
+        console.error('addMinutes error:', error);
+    return res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};

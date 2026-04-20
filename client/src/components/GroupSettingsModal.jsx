@@ -126,6 +126,7 @@ const response = await fetch(`http://localhost:3000/api/groups/${id}`,
                         <input
                         style = {styles.input}
                         type="number"
+                        min = "1"
                         value={formData.contributionAmount}
                         onChange={(e) =>
                             setFormData({ ...formData, contributionAmount: e.target.value })
