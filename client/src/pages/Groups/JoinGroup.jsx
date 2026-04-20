@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useNavigate} from 'react-router-dom';
-import {auth} from '../firebase';
+import {auth} from '../../firebase';
 
 function JoinGroup(){
     const[inviteCode, setInviteCode] = useState('');
@@ -26,7 +26,7 @@ function JoinGroup(){
         try{
             const token = await auth.currentUser.getIdToken();
 
-            const response = await fetch('http://localhost:3000/api/groups/join',{
+            const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups/join',{
                 method : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ return(
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/home')}
+            onClick = {() => navigate('/groups')}
             >
                 Back to Home
             </button>

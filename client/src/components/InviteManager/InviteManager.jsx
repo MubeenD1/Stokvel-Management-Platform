@@ -10,7 +10,7 @@ const InviteManager = ({ groupId = "test-group-123", adminId = "admin-456" }) =>
     setLoading(true);
     
     try {
-      const response = await fetch(`http://localhost:3000/api/groups/${groupId}/invite`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/invite`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: adminId }), 

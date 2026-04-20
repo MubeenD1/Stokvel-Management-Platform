@@ -1,20 +1,18 @@
 import { updateCurrentUser } from "firebase/auth";
+import { useAuth } from '../context/AuthContext';
 
-function GroupCard({group,onViewSettings}){
-    const isAdmin = currentUser.role === 'Admin';
+function GroupCard({ group, onViewSettings, onCardClick}){
+    const { currentUser } = useAuth();
+    const isAdmin = group.role === 'ADMIN';
     return(
-        <div style = {styles.card}>
+        <div style = {styles.card}
+             onClick ={() => onCardClick?.(group)}    
+        >
             <h3 style = {styles.name}>{group.name}</h3>
             <p style = {styles.role}>Role:{group.role}</p>
             <p style = {styles.joined}>
                 Joined:{new Date(group.joinedAt).toLocaleDateString()}
             </p>
-            <button
-                style={styles.button}
-                onClick = {() => onViewSettings?.(group)}
-            >
-                View Settings
-            </button>
         </div>
 
     );
@@ -24,11 +22,22 @@ const styles ={
         backgroundColor : '#ffffff',
         padding : '25px',
         borderRadius:'10px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0,1)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
         display: 'flex',
         flexDirection : 'column',
         gap : '10px',
     },
+    button: {
+    padding: '12px 24px',
+    backgroundColor: '#206663',
+    color: '#ffffff',
+    border: 'none',
+    borderRadius: '8px',
+    fontWeight: 'bold',
+    cursor: 'pointer',
+    fontSize: '14px',
+    marginTop: '8px',
+  },
     name : {
         fontSize : '15px',
         fontWeight: 'bold',
