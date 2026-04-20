@@ -87,7 +87,7 @@ const response = await fetch(`http://localhost:3000/api/groups/${id}`,
         body: JSON.stringify(formDataToSend)
       }
     );
-
+  
     if (!response.ok) throw new Error('Failed to update settings');
     setGroup(prev => ({ ...prev, ...formDataToSend }));
     // const data = await response.json();
@@ -108,11 +108,22 @@ const response = await fetch(`http://localhost:3000/api/groups/${id}`,
                 <h2 style={styles.heading}>{group.name} Settings</h2>
 
                {!isEditing && (
-                    <div styles= {styles.card}>
-                        <p style = {styles.info}><strong>Contribution: R</strong> {group.contributionAmount}</p>
-                        <p style = {styles.info}><strong>Payout Order:</strong> {group.payoutOrder}</p>
-                        <p style = {styles.info}><strong>Meeting Frequency:</strong> {group.meetingFrequency}</p>
-                    </div>
+                    <div style={styles.card}>
+        <div style={styles.fieldRow}>
+            <span style={styles.fieldLabel}>Contribution</span>
+            <span style={styles.fieldValue}>R{group.contributionAmount ?? '—'}</span>
+        </div>
+        <div style={styles.divider} />
+        <div style={styles.fieldRow}>
+            <span style={styles.fieldLabel}>Meeting Frequency</span>
+            <span style={styles.fieldValue}>{group.meetingFrequency ?? '—'}</span>
+        </div>
+        <div style={styles.divider} />
+        <div style={styles.fieldRow}>
+            <span style={styles.fieldLabel}>Payout Order</span>
+            <span style={styles.fieldValue}>{group.payoutOrder ?? '—'}</span>
+        </div>
+    </div>
                 )}
 
                 {isAdmin && !isEditing && (
@@ -126,6 +137,7 @@ const response = await fetch(`http://localhost:3000/api/groups/${id}`,
                         <input
                         style = {styles.input}
                         type="number"
+                        min = "1"
                         value={formData.contributionAmount}
                         onChange={(e) =>
                             setFormData({ ...formData, contributionAmount: e.target.value })

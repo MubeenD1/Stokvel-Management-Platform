@@ -156,6 +156,17 @@ async function updateGroupSettings(req, res) {
             where: { id: groupId },
             include: { members: { include: { user: true } } }
         });
+        const membership = await prisma.groupMember.findFirst({
+            where: {
+                groupId: groupId,
+                userId: user.id,
+                role: 'ADMIN'
+            }
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: "Only admins can change group settings" });
+        }
 
         // 2. Check if meeting details actually changed
         const isDateChanged = currentGroup.nextMeetingDate !== nextMeetingDate;
@@ -172,26 +183,20 @@ async function updateGroupSettings(req, res) {
 
         if (isDateChanged || isFreqChanged) {
             const memberEmails = currentGroup.members.map(m => m.user.email);
-            
-            await sendMeetingNotification(
+            try{
+                await sendMeetingNotification(
                 memberEmails, 
                 updatedGroup.name, 
                 { date: nextMeetingDate, frequency: meetingFrequency },
                 isDateChanged ? "update" : "schedule"
-            );
-        }
-
-        const membership = await prisma.groupMember.findFirst({
-            where: {
-                groupId: groupId,
-                userId: user.id,
-                role: 'ADMIN'
+                );
+            }catch(emailError){
+                console.error('Email notification failed:', emailError);
             }
-        });
-
-        if (!membership) {
-            return res.status(403).json({ error: "Only admins can change group settings" });
+            
         }
+
+        
         return res.status(200).json({
             message: 'Group settings updated successfully',
             group: updatedGroup,
