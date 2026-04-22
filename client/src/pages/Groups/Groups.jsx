@@ -56,7 +56,7 @@ export default function Groups(){
             {/* empty state */}
             {!loading && !error && groups.length === 0 && (
                     <p style={styles.emptyText}>You are not part of any groups yet.</p>
-            )};
+            )}
             
 
            

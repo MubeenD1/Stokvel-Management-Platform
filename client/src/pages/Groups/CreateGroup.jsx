@@ -9,6 +9,8 @@ export default function CreateGroup() {
     const[loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
+    const delay = (ms) => new Promise(res => setTimeout(res, ms));
+
   const handleCreate = async (e) => {
     e.preventDefault();
     setError('');
@@ -22,12 +24,14 @@ export default function CreateGroup() {
     setLoading(true);
 
     try {
-      const token = await auth.currentUser.getIdToken();
+      
       if (!auth.currentUser) {
         setError("You must be logged in to create a group");
         setLoading(false);
         return;
         }
+
+        const token = await auth.currentUser.getIdToken();
 
       //const response = await fetch(import.meta.env.VITE_API_URL + "/api/groups/create", {
             const response = await fetch("http://localhost:3000/api/groups/create", {
@@ -40,10 +44,20 @@ export default function CreateGroup() {
     });
 
     const data = await response.json();
-    if (response.ok) {
-        setSuccess("Group created successfully!");
-        setName(""); // clear input
-    } else {
+      if (response.ok) {
+    setSuccess("Group created successfully! Redirecting ...");
+    setName("");
+
+    console.log("data=", data);
+
+    await delay(1000);
+
+    navigate(`/groups/${data.group.id}/settings`, {
+        state: { message: "Configure the group settings" }
+    });
+
+    return; 
+    }else {
         setError(data.message || "Failed to create group");
     }
 
@@ -136,7 +150,6 @@ const styles = {
         border : '2px solid #ddd',
         borderRadius : '8px',
         textAlign : 'center',
-        textTransform : 'uppercase',
         outline : 'none',
     },
     button : {
@@ -165,7 +178,7 @@ const styles = {
         margin : 0,
     },
     success : {
-        color : '2e7d32',
+        color : '#2e7d32',
         fontSize : '14px',
         margin : 0,
     },

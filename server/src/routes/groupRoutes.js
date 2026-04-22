@@ -22,7 +22,6 @@ router.post('/join', verifyToken, joinGroup);
 router.post('/:groupId/invite', verifyToken, refreshInviteCode);
 router.post('/:id/create-meeting' , verifyToken , createMeeting);
 
-//router.get('/me', verifyToken, fetchUserGroups);
 // GET group settings
 router.get('/', verifyToken, getGroups);
 

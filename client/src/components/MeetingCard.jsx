@@ -1,9 +1,9 @@
 import { useState } from "react";
 import "./MeetingCard.css";
-import { useParams } from "react-router-dom";
+import { replace, useParams } from "react-router-dom";
 import { auth } from '../firebase';
 
-export default function MeetingCard({ meeting }) {
+export default function MeetingCard({ meeting , role}) {
   const [showEditor, setShowEditor] = useState(false);
   const [minutes, setMinutes] = useState(meeting.minutes || "");
   const [draft, setDraft] = useState(minutes);
@@ -51,12 +51,15 @@ export default function MeetingCard({ meeting }) {
 
   return (
     <div className="meeting-card">
+      {role !== "MEMBER" && (
       <button
         className="edit-btn"
         onClick={() => setShowEditor(!showEditor)}
       >
         Edit minutes
       </button>
+      )}
+      
 
       <h2 className="meeting-agenda">{meeting.agenda}</h2>
 

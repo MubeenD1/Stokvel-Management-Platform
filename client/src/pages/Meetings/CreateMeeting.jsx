@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { auth } from "../../firebase"; 
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate} from "react-router-dom";
 import "./CreateMeeting.css";
 
 export default function CreateMeeting({ onSubmit }) {
 
   const { id } = useParams(); 
+  const navigate = useNavigate();
   console.log("groupId:", id);
 
   const [agenda, setAgenda] = useState("");
@@ -118,6 +119,10 @@ export default function CreateMeeting({ onSubmit }) {
       <button id="submit-btn" type="submit">
         {loading ? 'Creating...' : 'Create Meeting'}
       </button>
+      <button id = "back-btn" onClick={()=> navigate(`/groups/${id}/meetings`)}>
+        Cancel
+      </button>
+    
     </form>
   );
 }

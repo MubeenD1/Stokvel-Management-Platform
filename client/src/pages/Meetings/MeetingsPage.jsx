@@ -9,6 +9,7 @@ export default function MeetingsPage(){
 
 
     const [meetings, setMeetings] = useState([]);
+    const[role , setRole ] = useState(null);
         const[error,setError] = useState('');
         const[loading, setLoading] = useState(false);
     
@@ -40,6 +41,7 @@ export default function MeetingsPage(){
                  const data = await response.json();
                     console.log(data);
                     setMeetings(Array.isArray(data.meetings) ? data.meetings : []);
+                    setRole(data.role);
     
                 } catch (err) {
                     setError('Something went wrong. Please refresh the page.');
@@ -54,13 +56,25 @@ export default function MeetingsPage(){
 
    return (
     <div className="meeting">
-        <button className="floating-btn" onClick={() => navigate(`/groups/${id}/meetings/create`)}>+</button>
+        {role && role !== "MEMBER" && (
+        <button
+            className="floating-btn"
+            onClick={() => navigate(`/groups/${id}/meetings/create`)}
+        >
+            Create A Meeting
+        </button>
+        )}
 
         {loading && <p>Loading...</p>}
         {error && <p className="error">{error}</p>}
 
+       
+        {!loading && meetings.length === 0 && (
+            <p>There are currently no meetings scheduled for this group</p>
+        )}
+
         {meetings.map((meeting) => (
-        <MeetingCard key={meeting.id} meeting={meeting} />
+        <MeetingCard key={meeting.id} meeting={meeting} role = {role}/>
         ))}
     </div>
     );

@@ -12,6 +12,9 @@ import GroupNavbar from './pages/Navbar/GroupNavbar';
 import MeetingsPage from './pages/Meetings/MeetingsPage';
 import GroupSettingsModal from './components/GroupSettingsModal';
 import CreateMeeting from './pages/Meetings/CreateMeeting';
+import InviteManager from './components/InviteManager/InviteManager';
+import Notifications from './pages/Notifications/Notifications';
+import Contributions from './pages/Contributions/Contributions';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -28,6 +31,7 @@ function Layout() {
     </div>
   );
 }
+
 function GroupLayout() {
   const { id } = useParams();
   return (
@@ -50,16 +54,20 @@ export default function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/groups" element={<Groups />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create" element={<CreateGroup />} />
+          <Route path="/join" element={<JoinGroup />} />
+          <Route path = "/notifications" element = {<Notifications/>}/>
         </Route>
         <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
           <Route path="/groups/:id/members" element={<GroupPage />} />
           <Route path ="/groups/:id/meetings" element = {<MeetingsPage />}/>
           <Route path ="/groups/:id/settings" element = {<GroupSettingsModal />}/>
-          <Route path = "groups/:id/meetings/create" element = {<CreateMeeting />}/>
-          
+          <Route path = "/groups/:id/meetings/create" element = {<CreateMeeting />}/>
+          <Route path = "/groups/:id/invite" element = {<InviteManager/>}/>
+          <Route path = "/groups/:id/contributions" element = {<Contributions/>}/>
+      
         </Route>
-          <Route path="/create" element={<CreateGroup />} />
-          <Route path="/join" element={<JoinGroup />} />
+
 
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>

@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
 import ContributionsSection from '../../components/ContributionsSection';
+import './Group.css'
 
 export default function GroupPage() {
     const { id } = useParams();
@@ -10,7 +11,7 @@ export default function GroupPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [editingMemberId, setEditingMemberId] = useState(null);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
             setCurrentUser(firebaseUser); // Save to state immediately
@@ -56,11 +57,26 @@ export default function GroupPage() {
             }
         } catch (e) { console.error(e); }
     };
+        const myMembership = members.find(m =>
+        currentUser && (
+        m.user?.firebaseId === currentUser.uid ||
+        m.user?.email?.toLowerCase() === currentUser.email?.toLowerCase()
+        )
+    );
+
+    const myRole = myMembership?.role;
+
 
     return (
         <div className="members-container" style={{ padding: '30px', background: '#111', minHeight: '100vh', color: 'white' }}>
             <h2 style={{ borderBottom: '1px solid #333', paddingBottom: '10px' }}>Stokvel Members</h2>
-            
+            {myRole === "ADMIN" && (
+            <button className="invite-btn"
+            onClick={()=> navigate(`/groups/${id}/invite`)}
+            >
+                Invite Others
+            </button>
+            )}
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: "orange" }}>{error}</p>}
 

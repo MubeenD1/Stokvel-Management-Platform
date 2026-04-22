@@ -20,6 +20,7 @@ require('dotenv').config();
 const groupRoutes = require('./src/routes/groupRoutes');
 const authRoutes = require('./routes/auth');
 const roleRoutes = require('./routes/role');
+const contributionRoutes = require('./routes/contribution');
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/groups', roleRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/contributions', contributionRoutes);
 
 
 const PORT = process.env.PORT || 3000;

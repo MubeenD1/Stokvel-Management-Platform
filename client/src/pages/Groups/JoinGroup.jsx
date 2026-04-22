@@ -46,8 +46,8 @@ function JoinGroup(){
             //this will show that the attempt was successful and then be redirected to the dashboard
             setSuccess(`Successfully joined ${data.group.name}!`);
             setTimeout(() => {
-                navigate('/home');
-            },1500);
+                navigate(`/groups`);
+            },2000);
 
         }catch(err){
             setError('Something went wrong. Please try again.');
@@ -87,7 +87,7 @@ return(
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/groups')}
+            onClick = {() => navigate('/home')}
             >
                 Back to Home
             </button>

@@ -1,6 +1,6 @@
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
-import { useParams,useNavigate } from "react-router-dom";
+import { useParams,useNavigate , useLocation} from "react-router-dom";
 
 
 export default function GroupSettingsModal(){
@@ -12,6 +12,15 @@ export default function GroupSettingsModal(){
     const[loading, setLoading] = useState(false);
     const[members, setMembers] = useState([]);
     const[payoutOrder, setPayoutOrder] = useState([]);
+     const location = useLocation();
+    const [successMessage, setSuccessMessage] = useState('');
+    useEffect(() => {
+    if (location.state?.message) {
+        setSuccessMessage(location.state.message);
+
+        setTimeout(() => setSuccessMessage(''), 6000);
+    }
+}, [location.state]);
     useEffect(() => {
         async function fetchGroup() {
             setLoading(true);
@@ -102,13 +111,19 @@ const response = await fetch(`http://localhost:3000/api/groups/${id}`,
   }
 };
 
+
+
     return (
    
             <div style = {styles.container}>
                 <h2 style={styles.heading}>{group.name} Settings</h2>
-
+                 {successMessage && (
+                  <div style={styles.successBanner}>
+                  {successMessage}
+                </div>
+                )}
                {!isEditing && (
-                    <div styles= {styles.card}>
+                    <div style = {styles.card}>
                         <p style = {styles.info}><strong>Contribution: R</strong> {group.contributionAmount}</p>
                         <p style = {styles.info}><strong>Payout Order:</strong> {group.payoutOrder}</p>
                         <p style = {styles.info}><strong>Meeting Frequency:</strong> {group.meetingFrequency}</p>
