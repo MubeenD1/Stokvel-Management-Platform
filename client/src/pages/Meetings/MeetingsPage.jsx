@@ -39,7 +39,7 @@ export default function MeetingsPage(){
                     return;
                 }
                  const data = await response.json();
-                    console.log(data);
+                    //console.log(data);
                     setMeetings(Array.isArray(data.meetings) ? data.meetings : []);
                     setRole(data.role);
     

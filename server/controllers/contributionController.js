@@ -1,9 +1,11 @@
-const { PrismaClient } = require("@prisma/client")
-const prisma = new PrismaClient();
+const prisma = require('../lib/prisma');
 
 async function getMemberContributions(req, res) {
   try {
-    const { groupId } = req.params
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const  groupId  = req.params.id
     const firebaseId = req.user.uid
 
     const user = await prisma.user.findUnique({

@@ -80,6 +80,9 @@ async function joinGroup(req, res) {
     }
 }
 async function getGroups(req, res) {
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const  firebaseId  = req.user.uid;
 
     try {
@@ -203,6 +206,9 @@ async function updateGroupSettings(req, res) {
     }
 }
 async function createGroup(req, res) {
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const firebaseId = req.user.uid;
     const { name } = req.body;
 
@@ -292,11 +298,11 @@ async function getGroupById(req, res) {
         //     where: { groupId: gId, userId: user.id }
         // });
         const membership = await prisma.groupMember.findFirst({
-        where: { 
-            groupId: gId, 
-            userId: user.id 
-        }
-});
+            where: { 
+                groupId: gId, 
+                userId: user.id 
+            }
+        });
         return res.status(200).json({ groupMembers, group,role:membership?.role });
 
     } catch (error) {
@@ -425,14 +431,16 @@ async function createMeeting(req,res){
 }
 
 async function getMeetings(req, res) {
-    console.log("params:", req.params);
-    console.log("gId:", req.params.id);
+    // console.log("params:", req.params);
+    // console.log("gId:", req.params.id);
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    if (!req.params?.id) {
+        return res.status(400).json({ error: "Group ID is required" });
+    }
 
     const gId = req.params.id;
-
-    if (!gId) {
-        return res.status(400).json({ error: 'Group ID is required' });
-    }
 
     try {
         // 1. Get user from request (IMPORTANT FIX)
