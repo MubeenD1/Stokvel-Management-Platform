@@ -171,13 +171,21 @@ const user = await prisma.user.findUnique({
 ---
 
 ## Running Tests
+
+### To add server tests
+
 ```bash
 cd server
 npm install
 npm install --save-dev jest
 npm test
-```
-
+````
+### To add frontend Tests
+````bash
+cd client
+npm install --save-dev @testing-library/react @testing-library/jest-dom
+npm install
+````
 ## Team
 - Zakithi Shube
 - Sivunile Mlambo
