@@ -184,7 +184,7 @@ npm test
 ````bash
 cd client
 npm install --save-dev @testing-library/react @testing-library/jest-dom
-npm install
+npm test
 ````
 ## Team
 - Zakithi Shube
