@@ -265,8 +265,12 @@ async function createGroup(req, res) {
         return res.status(500).json({ error: "Failed to create group" });
     }
 }
-
 async function getGroupById(req, res) {
+
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const gId = req.params.id;
 
     if (!gId) {
@@ -310,7 +314,6 @@ async function getGroupById(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
-
 const getGroupContributions = async (req, res) => {
     const { groupId } = req.params;
 
@@ -341,7 +344,6 @@ const getGroupContributions = async (req, res) => {
         res.status(500).json({ error: "Failed to load group contributions." });
     }
 };
-
 async function refreshInviteCode(req, res) {
 
     const {groupId} =req.params;
@@ -373,7 +375,6 @@ async function refreshInviteCode(req, res) {
         res.status(500).json({ error: "Failed to refresh code" });
     }
 }
-
 async function createMeeting(req,res){
     const gId = req.params.id;
     const firebaseId = req.user.uid;
@@ -429,7 +430,6 @@ async function createMeeting(req,res){
     }
 
 }
-
 async function getMeetings(req, res) {
     // console.log("params:", req.params);
     // console.log("gId:", req.params.id);
@@ -491,8 +491,11 @@ async function getMeetings(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
-
 async function addMinutes(req,res){
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const { id: gId, meetingId } = req.params;
     const { minutes } = req.body;
 
@@ -526,7 +529,10 @@ async function addMinutes(req,res){
             where: { id: meetingId },
             data: { minutes },
         });
-        return res.status(200).json({ meeting });
+        return res.status(201).json({
+            message : "successful", 
+            meeting
+         });
 
     } catch (error) {
         console.error('addMinutes error:', error);
