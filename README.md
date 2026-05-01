@@ -183,6 +183,7 @@ npm test
 ### To add frontend Tests
 ````bash
 cd client
+npm install
 npm install --save-dev @testing-library/react @testing-library/jest-dom
 npm test
 ````
