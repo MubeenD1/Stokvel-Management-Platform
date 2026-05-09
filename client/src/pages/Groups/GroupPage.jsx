@@ -119,12 +119,14 @@ export default function GroupPage() {
                                         <option value="MEMBER">Member</option>
                                     </select>
                                 ) : (
-                                    <button 
-                                        onClick={() => setEditingMemberId(m.id)}
-                                        style={{ padding: '6px 12px', cursor: 'pointer' }}
-                                    >
-                                        Change Role
-                                    </button>
+                                    myRole === "ADMIN" && (
+                                        <button 
+                                            onClick={() => setEditingMemberId(m.id)}
+                                            style={{ padding: '6px 12px', cursor: 'pointer' }}
+                                        >
+                                            Change Role
+                                        </button>
+                                    )
                                 )}
                             </div>
                         </div>

@@ -25,7 +25,7 @@ function JoinGroup(){
         //this will get the firebase token for the user and send the invite code to the backend
         try{
             const token = await auth.currentUser.getIdToken();
-                        const response = await fetch('http://localhost:3000/api/groups/join',{
+            const response = await fetch('http://localhost:3000/api/groups/join',{
             //const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups/join',{
                 method : 'POST',
                 headers: {
@@ -39,6 +39,7 @@ function JoinGroup(){
 
             //this will display the error message that has been received from the backend 
             if(!response.ok){
+                console.log(response)
                 setError(data.error || 'Failed to join group');
                 return;
             }

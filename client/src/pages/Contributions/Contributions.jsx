@@ -20,8 +20,10 @@ function Contributions() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to fetch contributions');
-        }
+  const errorBody = await response.text(); // or response.json()
+  console.log('Error body:', errorBody);
+  throw new Error('Failed to fetch contributions');
+}
 
         const data = await response.json();
         setContributions(data.contributions);

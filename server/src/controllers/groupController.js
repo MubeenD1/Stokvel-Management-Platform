@@ -27,7 +27,7 @@ async function joinGroup(req, res) {
         }
 
         // this will find the group that matches the invite c createGroup, ode sent
-        const iC = inviteCode.trim().toLowerCase();
+        const iC = inviteCode.trim();
         const group = await prisma.group.findUnique({
             where: { inviteCode: iC },
         });
@@ -78,7 +78,7 @@ async function joinGroup(req, res) {
         console.error('joinGroup error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 async function getGroups(req, res) {
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -112,7 +112,7 @@ async function getGroups(req, res) {
         console.error('getGroups error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 async function getGroupSettings(req, res) {
     const { groupId } = req.params;
 
@@ -139,7 +139,7 @@ async function getGroupSettings(req, res) {
         //console.error('getGroupSettings error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 async function updateGroupSettings(req, res) {
     const { groupId } = req.params;
     const { nextMeetingDate, contributionAmount, meetingFrequency, payoutOrder } = req.body;
@@ -204,7 +204,7 @@ async function updateGroupSettings(req, res) {
         console.error('updateGroupSettings error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 async function createGroup(req, res) {
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -264,7 +264,7 @@ async function createGroup(req, res) {
         console.error("createGroup error:", error);
         return res.status(500).json({ error: "Failed to create group" });
     }
-}
+};
 async function getGroupById(req, res) {
 
     if (!req.user || !req.user.uid) {
@@ -313,7 +313,7 @@ async function getGroupById(req, res) {
         console.error('getGroupById error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 const getGroupContributions = async (req, res) => {
     const { groupId } = req.params;
 
@@ -374,7 +374,7 @@ async function refreshInviteCode(req, res) {
     } catch (error) {
         res.status(500).json({ error: "Failed to refresh code" });
     }
-}
+};
 async function createMeeting(req,res){
     const gId = req.params.id;
     const firebaseId = req.user.uid;
@@ -429,7 +429,7 @@ async function createMeeting(req,res){
         return res.status(500).json({ error: error.message });
     }
 
-}
+};
 async function getMeetings(req, res) {
     // console.log("params:", req.params);
     // console.log("gId:", req.params.id);
@@ -490,7 +490,7 @@ async function getMeetings(req, res) {
         console.error('getMeetings error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-}
+};
 async function addMinutes(req,res){
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -538,6 +538,6 @@ async function addMinutes(req,res){
         console.error('addMinutes error:', error);
     return res.status(500).json({ error: error.message });
     }
-}
+};
 
 module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};

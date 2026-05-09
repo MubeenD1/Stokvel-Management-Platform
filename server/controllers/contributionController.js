@@ -1,17 +1,17 @@
 const prisma = require('../lib/prisma');
 
 async function getMemberContributions(req, res) {
+
   try {
     if (!req.user || !req.user.uid) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
-    const  groupId  = req.params.id
+    const groupId = req.params.groupId
     const firebaseId = req.user.uid
 
     const user = await prisma.user.findUnique({
       where: { firebaseId }
     })
-
     if (!user) {
       return res.status(404).json({ error: 'User not found' })
     }
@@ -24,7 +24,6 @@ async function getMemberContributions(req, res) {
         }
       }
     })
-
     if (!groupMember) {
       return res.status(403).json({ error: 'You are not a member of this group' })
     }
@@ -36,7 +35,7 @@ async function getMemberContributions(req, res) {
           include: { user: true }
         }
       },
-      orderBy: { date: 'desc' }
+     orderBy: { date: 'desc' }
     })
 
     const formatted = contributions.map(c => ({
