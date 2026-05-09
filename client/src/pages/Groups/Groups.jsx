@@ -18,8 +18,8 @@ export default function Groups(){
         async function fetchGroups() {
             try {
                 const token = await auth.currentUser.getIdToken();
-
-                const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups', {
+                const response = await fetch('http://localhost:3000/api/groups', {
+                //const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -56,7 +56,7 @@ export default function Groups(){
             {/* empty state */}
             {!loading && !error && groups.length === 0 && (
                     <p style={styles.emptyText}>You are not part of any groups yet.</p>
-            )};
+            )}
             
 
            

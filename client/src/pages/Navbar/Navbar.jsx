@@ -21,6 +21,11 @@ export default function Navbar() {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/notifications" className={({ isActive }) => isActive ? "active" : ""}>
+              Notifications
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>
               Dashboard
             </NavLink>

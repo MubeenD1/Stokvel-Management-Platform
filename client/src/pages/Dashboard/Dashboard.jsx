@@ -33,7 +33,7 @@ function Dashboard() {
 const styles = {
   container: {
     padding: '32px',
-    margin: 0,
+    margin: '0 auto',
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
@@ -43,13 +43,13 @@ const styles = {
     fontSize: '30px',
     fontWeight: 'bold',
     color: '#1a1a1a',
-    margin: 0,
+    margin: '0 auto',
   },
 
   welcome: {
     fontSize: '14px',
     color: '#666',
-    margin: 0,
+    margin: '0 auto',
   },
 
   logoutButton: {

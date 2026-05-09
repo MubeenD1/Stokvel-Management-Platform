@@ -187,6 +187,7 @@ npm install
 npm install --save-dev @testing-library/react @testing-library/jest-dom
 npm test
 ````
+
 ## Team
 - Zakithi Shube
 - Sivunile Mlambo

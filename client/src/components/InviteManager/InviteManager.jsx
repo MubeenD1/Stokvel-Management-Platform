@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
 import './InviteManager.css';
+import { useParams } from 'react-router-dom';
+import { auth } from '../../firebase';
 
-const InviteManager = ({ groupId = "test-group-123", adminId = "admin-456" }) => {
+const InviteManager = () => {
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const {id} = useParams();
 
   const generateCode = async () => {
     setLoading(true);
     
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/invite`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: adminId }), 
-      });
+      //const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/invite`, {
+      
+      const token = await auth.currentUser.getIdToken();
+      const response = await fetch(`http://localhost:3000/api/groups/${id}/invite`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
       const data = await response.json();
       if (data.inviteCode) setInviteCode(data.inviteCode);
     } catch (err) {

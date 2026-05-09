@@ -25,8 +25,8 @@ function JoinGroup(){
         //this will get the firebase token for the user and send the invite code to the backend
         try{
             const token = await auth.currentUser.getIdToken();
-
-            const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups/join',{
+                        const response = await fetch('http://localhost:3000/api/groups/join',{
+            //const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups/join',{
                 method : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -46,8 +46,8 @@ function JoinGroup(){
             //this will show that the attempt was successful and then be redirected to the dashboard
             setSuccess(`Successfully joined ${data.group.name}!`);
             setTimeout(() => {
-                navigate('/home');
-            },1500);
+                navigate(`/groups`);
+            },2000);
 
         }catch(err){
             setError('Something went wrong. Please try again.');
@@ -87,7 +87,7 @@ return(
 
         <button
             style = {styles.backButton}
-            onClick = {() => navigate('/groups')}
+            onClick = {() => navigate('/home')}
             >
                 Back to Home
             </button>

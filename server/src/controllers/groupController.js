@@ -1,9 +1,10 @@
 const prisma = require('../../lib/prisma');
 const { v4: uuidv4 } = require('uuid');
 //const prisma = new PrismaClient();
-const prisma = new PrismaClient();
+//const prisma = new PrismaClient();
 const { generateUniqueInviteCode } = require('../utils/inviteCode');
 const { sendMeetingNotification } = require('../utils/notificationService');
+const { updateContributionStatus } = require('../../controllers/contributionController');
 
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
@@ -79,6 +80,9 @@ async function joinGroup(req, res) {
     }
 }
 async function getGroups(req, res) {
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const  firebaseId  = req.user.uid;
 
     try {
@@ -100,7 +104,7 @@ async function getGroups(req, res) {
             joinedAt: m.joinedAt
         }));
 
-        console.log(groups);
+        //console.log(groups);
         return res.status(200).json({groups});
         
 
@@ -132,21 +136,8 @@ async function getGroupSettings(req, res) {
         });
 
     } catch (error) {
-        console.error('getGroupSettings error:', error);
-        return 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        res.status(500).json({ error: 'Internal server error' });
+        //console.error('getGroupSettings error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }
 async function updateGroupSettings(req, res) {
@@ -215,6 +206,9 @@ async function updateGroupSettings(req, res) {
     }
 }
 async function createGroup(req, res) {
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
     const firebaseId = req.user.uid;
     const { name } = req.body;
 
@@ -271,47 +265,12 @@ async function createGroup(req, res) {
         return res.status(500).json({ error: "Failed to create group" });
     }
 }
-// async function fetchUserGroups(req, res) {
-//   const firebaseUid = req.user.uid;
-
-//   try {
-//     const user = await prisma.user.findUnique({
-//       where: { firebaseId: firebaseUid }, // whatever this field is called in your User model
-//       select: { id: true },
-//     });
-
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     const memberships = await prisma.groupMember.findMany({
-//       where: { userId: user.id }, 
-//       include: {
-//         group: {
-//           include: {
-//             _count: { select: { members: true } },
-//           },
-//         },
-//       },
-//     });
-
-//     const groups = memberships.map(m => ({
-//       ...m.group,
-//       myRole: m.role,
-//       joinedAt: m.joinedAt,
-//     }));
-
-//     return res.status(200).json({
-//       message: "Fetched groups successfully",
-//       groups,
-//     });
-//   } catch (error) {
-//     console.error("fetchUserGroups error:", error);
-//     return res.status(500).json({ error: "Failed to fetch your groups, please refresh your page" });
-//   }
-// }
-
 async function getGroupById(req, res) {
+
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
     const gId = req.params.id;
 
     if (!gId) {
@@ -339,8 +298,14 @@ async function getGroupById(req, res) {
         const firebaseId = req.user.uid;
         const user = await prisma.user.findUnique({ where: { firebaseId } });
 
+        // const membership = await prisma.groupMember.findFirst({
+        //     where: { groupId: gId, userId: user.id }
+        // });
         const membership = await prisma.groupMember.findFirst({
-            where: { groupId: gId, userId: user.id }
+            where: { 
+                groupId: gId, 
+                userId: user.id 
+            }
         });
         return res.status(200).json({ groupMembers, group,role:membership?.role });
 
@@ -349,7 +314,6 @@ async function getGroupById(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }
-
 const getGroupContributions = async (req, res) => {
     const { groupId } = req.params;
 
@@ -380,10 +344,6 @@ const getGroupContributions = async (req, res) => {
         res.status(500).json({ error: "Failed to load group contributions." });
     }
 };
-//module.exports = { fetchUserGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings };
-module.exports = { getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, updateGroupSettings, getGroupContributions  };
-
-
 async function refreshInviteCode(req, res) {
 
     const {groupId} =req.params;
@@ -392,10 +352,14 @@ async function refreshInviteCode(req, res) {
         // Verify user is ADMIN of this specific group 
         const group = await prisma.group.findUnique({
             where: { id: groupId },
-            include: { members: true }
+            include: { 
+                members:{
+                    include :{user : true}
+                }
+            }
         });
 
-        const isAdmin = group.members.some(m => m.userId === firebaseId && m.role === 'ADMIN');
+       const isAdmin = group.members.some(m =>m.user.firebaseId === firebaseId && m.role === 'ADMIN');
         if (!isAdmin) return res.status(403).json({ error: "Only admins can do this" });
 
         const newCode = await generateUniqueInviteCode();
@@ -411,5 +375,169 @@ async function refreshInviteCode(req, res) {
         res.status(500).json({ error: "Failed to refresh code" });
     }
 }
+async function createMeeting(req,res){
+    const gId = req.params.id;
+    const firebaseId = req.user.uid;
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
+    }
 
-module.exports = {createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode };
+    const { rDate , rLocation , rAgenda } = req.body;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const membership = await prisma.groupMember.findUnique({
+        where: {
+            userId_groupId: {
+                userId: user.id,
+                groupId: gId,
+                },
+            },
+        });
+
+        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
+        return res.status(403).json({ error: "Not authorized to create meetings" });
+        }
+
+      const meeting = await prisma.meeting.create({
+        data: {
+            groupId: gId,
+            date: new Date(rDate),
+            location: rLocation,
+            agenda: rAgenda,
+            createdById: user.id,
+        },
+        include: {
+            Group: true,     
+            User: true, 
+        },
+        });
+        return res.status(201).json({
+            message : "Meeting Created Successfully",
+            meeting,
+        });
+
+    } catch (error) {
+        console.error("createMeeting error:", error);
+        return res.status(500).json({ error: error.message });
+    }
+
+}
+async function getMeetings(req, res) {
+    // console.log("params:", req.params);
+    // console.log("gId:", req.params.id);
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+    if (!req.params?.id) {
+        return res.status(400).json({ error: "Group ID is required" });
+    }
+
+    const gId = req.params.id;
+
+    try {
+        // 1. Get user from request (IMPORTANT FIX)
+        const firebaseId = req.user.uid;
+
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+            select: { id: true },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // 2. Fetch meetings
+        const meetings = await prisma.meeting.findMany({
+            where: { groupId: gId },
+            orderBy : { date : 'desc'},
+            include: {
+                User: {
+                    select: {
+                        email: true,
+                    },
+                },
+            },
+        });
+
+        // 3. Fetch role in group
+        const membership = await prisma.groupMember.findUnique({
+            where: {
+                userId_groupId: {
+                    userId: user.id,
+                    groupId: gId,
+                },
+            },
+            select: {
+                role: true,
+            },
+        });
+
+        return res.status(200).json({
+            meetings,
+            role: membership?.role || "MEMBER", // safe fallback
+        });
+
+    } catch (error) {
+        console.error('getMeetings error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+async function addMinutes(req,res){
+    if (!req.user || !req.user.uid) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const { id: gId, meetingId } = req.params;
+    const { minutes } = req.body;
+
+    if (!gId) {
+        return res.status(400).json({ error: 'Group ID is required' });
+    }
+    const firebaseId = req.user.uid;
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }        
+
+        const membership = await prisma.groupMember.findUnique({
+        where: {
+            userId_groupId: {
+                userId: user.id,
+                groupId: gId,
+                },
+            },
+        });
+
+        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
+            return res.status(403).json({ error: "Not authorized to create add meeting minutes" });
+        }
+        
+        const meeting = await prisma.meeting.update({
+            where: { id: meetingId },
+            data: { minutes },
+        });
+        return res.status(201).json({
+            message : "successful", 
+            meeting
+         });
+
+    } catch (error) {
+        console.error('addMinutes error:', error);
+    return res.status(500).json({ error: error.message });
+    }
+}
+
+module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};
