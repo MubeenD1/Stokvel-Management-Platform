@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
+import MakeContributionButton from '../../components/MakeContributtionButton';
+import './MyContributions.css';
 
 export default function ContributionsSection({ groupId, myRole , members }) {
     const [contributions, setContributions] = useState([]);
@@ -68,14 +70,29 @@ export default function ContributionsSection({ groupId, myRole , members }) {
     if (loading) return <p style={{ color: '#fbbf24' }}>Loading contributions...</p>;
     if (error) return <p style={{ color: '#ef4444' }}>{error}</p>;
 
- 
+const myContribution = contributions.find(c =>
+    c.member?.user?.firebaseId === currentUser?.uid ||
+    c.member?.user?.email?.toLowerCase() === currentUser?.email?.toLowerCase()
+);
 
-    return (
-        <div style={{ marginTop: '40px', background: '#111', padding: '20px', borderRadius: '8px', color: 'white' }}>
-            <h3 style={{ borderBottom: '1px solid #333', paddingBottom: '10px' }}>
-                Group Contributions
-            </h3>
-
+return (
+    <div style={{ marginTop: '40px', background: '#111', padding: '20px', borderRadius: '8px', color: 'white' }}>
+        
+        {/* Floating Pay Button — same as MyContributions */}
+        {myContribution && (
+            <MakeContributionButton
+                groupId={groupId}
+                groupMemberId={myContribution.member?.id}
+                role={myRole}
+                amount={myContribution.amount}
+                user={{
+                    firstName: myContribution.member?.user?.firstName || currentUser.displayName?.split(' ')[0] || '',
+                    lastName: myContribution.member?.user?.lastName || currentUser.displayName?.split(' ')[1] || '',
+                    email: myContribution.member?.user?.email || currentUser.email,
+                }}
+            />
+        )}
+            
             {contributions.length === 0 ? (
                 <p style={{ color: 'gray', fontStyle: 'italic' }}>No contributions found for this group.</p>
             ) : (
