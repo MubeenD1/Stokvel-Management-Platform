@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
 
-export default function ContributionsSection({ groupId, role , members }) {
+export default function ContributionsSection({ groupId, myRole , members }) {
     const [contributions, setContributions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     // 1. Find out who the current user is in this group to check their role
     const currentUser = auth.currentUser;
-    const isTreasurerOrAdmin = role === 'TREASURER' || role === 'ADMIN';
+    const isTreasurerOrAdmin = myRole === 'TREASURER' || myRole === 'ADMIN';
 
     // 2. Fetch the contributions when the component loads
     useEffect(() => {

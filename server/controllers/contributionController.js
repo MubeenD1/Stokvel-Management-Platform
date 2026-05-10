@@ -56,7 +56,7 @@ async function getMemberContributions(req, res) {
       groupMemberId: groupMember.id,
       contributionAmount: group.contributionAmount,
     });
-    
+
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch contributions' })
@@ -84,15 +84,14 @@ const updateContributionStatus = async (req, res) => {
         }
 
         const updatedContribution = await prisma.contribution.update({
-            where: {id: contributionId},
+            where: { id: contributionId },
             data: {
                 status: status,
                 confirmedBy: requester.id,
             },
             include: {
-                treasurer: {
-                    include: {user: true}
-                }
+                member: { include: { user: true } },  // ← add this
+                treasurer: { include: { user: true } }
             }
         });
 

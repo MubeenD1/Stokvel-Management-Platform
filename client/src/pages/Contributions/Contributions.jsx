@@ -31,7 +31,7 @@ function Contributions() {
         };
         fetchGroup();
     }, [id]);
-
+    console.log(members);
     return isTreasurerOrAdmin
         ? <ContributionsSection groupId={id} myRole={role} members={members} />
         : <MyContributions />;
