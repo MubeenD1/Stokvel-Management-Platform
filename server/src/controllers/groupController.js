@@ -540,6 +540,7 @@ async function addMinutes(req,res){
     }
 };
 
+
 const getNotifications = async (req, res) => {
     try {
         const user = await prisma.user.findUnique({

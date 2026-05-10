@@ -22,9 +22,9 @@ router.post('/join', verifyToken, joinGroup);
 router.post('/:groupId/invite', verifyToken, refreshInviteCode);
 router.post('/:id/create-meeting' , verifyToken , createMeeting);
 
-
 // GET notifications for current user
-router.get('/notifications', verifyToken, getNotifications);
+router.get('/notifications', verifyToken, getNotifications);  
+router.get('/', verifyToken, getGroups);
 
 // GET group settings
 router.get('/', verifyToken, getGroups);
@@ -33,6 +33,7 @@ router.get('/:groupId/settings', verifyToken, getGroupSettings);
 router.get('/:groupId/contributions', verifyToken, getGroupContributions);
 router.get('/:id/meetings', verifyToken ,getMeetings);
 router.get('/:id' , verifyToken , getGroupById);
+
 
 
 // PUT group settings
