@@ -540,4 +540,31 @@ async function addMinutes(req,res){
     }
 };
 
-module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};
+const getNotifications = async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId: req.user.uid },
+        });
+
+        if (!user) return res.status(404).json({ error: 'User not found' });
+
+        const notifications = await prisma.notification.findMany({
+            where: { recipientId: user.id },
+            orderBy: { sentAt: 'desc' },
+            include: {
+                meeting: {
+                    include: {
+                        Group: true,
+                    },
+                },
+            },
+        });
+
+        res.json({ notifications });
+    } catch (err) {
+        console.error('getNotifications error:', err);
+        res.status(500).json({ error: 'Failed to fetch notifications' });
+    }
+};
+
+module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus ,getNotifications};
