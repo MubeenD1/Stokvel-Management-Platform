@@ -11,6 +11,8 @@ function Contributions() {
     const isTreasurerOrAdmin = role === 'TREASURER' || role === 'ADMIN';
 
     const [members, setMembers] = useState([]);
+    const [groupMemberId, setGroupMemberId] = useState(null);
+    const [amount, setAmount] = useState(null);
 
     useEffect(() => {
         const fetchGroup = async () => {
@@ -23,7 +25,14 @@ function Contributions() {
                 });
                 const data = await res.json();
                 if (res.ok) {
-                    setMembers(data.members || []);
+                    setMembers(data.groupMembers || []);
+                    setAmount(data.group?.contributionAmount || null);
+
+                    const me = data.groupMembers?.find(m =>
+                        m.user?.firebaseId === currentUser.uid ||
+                        m.user?.email?.toLowerCase() === currentUser.email?.toLowerCase()
+                    );
+                    setGroupMemberId(me?.id || null);
                 }
             } catch (err) {
                 console.error('Failed to fetch group:', err);
@@ -31,9 +40,15 @@ function Contributions() {
         };
         fetchGroup();
     }, [id]);
-    console.log(members);
+
     return isTreasurerOrAdmin
-        ? <ContributionsSection groupId={id} myRole={role} members={members} />
+        ? <ContributionsSection
+                groupId={id}
+                myRole={role}
+                members={members}
+                groupMemberId={groupMemberId}
+                amount={amount}
+            />
         : <MyContributions />;
 }
 
