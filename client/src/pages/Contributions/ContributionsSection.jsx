@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { auth } from '../firebase';
+import { auth } from '../../firebase';
 
 export default function ContributionsSection({ groupId, members }) {
     const [contributions, setContributions] = useState([]);
