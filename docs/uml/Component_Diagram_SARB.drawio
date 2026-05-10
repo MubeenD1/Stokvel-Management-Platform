@@ -1,0 +1,99 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="62bMY90fWHmPFjpkVS_7">
+    <mxGraphModel dx="1075" dy="624" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="text;fontSize=16;fontStyle=1;align=center;" value="Component Diagram — SARB Interest Rate Integration" vertex="1">
+          <mxGeometry height="30" width="550" x="150" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="swimlane;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;startSize=30;" value="Frontend (React)" vertex="1">
+          <mxGeometry height="380" width="280" x="40" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;component&gt;&gt;&#xa;App.jsx" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;component&gt;&gt;&#xa;Group.jsx" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;component&gt;&gt;&#xa;SarbRates.jsx" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;component&gt;&gt;&#xa;GroupCard.jsx" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="16" edge="1" parent="3" source="4" style="endArrow=open;endFill=0;" target="5" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="17" edge="1" parent="3" source="5" style="endArrow=open;endFill=0;" target="6" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="swimlane;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;startSize=30;" value="Backend (Node.js + Express)" vertex="1">
+          <mxGeometry height="380" width="280" x="380" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="8" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;component&gt;&gt;&#xa;index.js" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="8" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;component&gt;&gt;&#xa;sarbRoutes.js" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="8" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;component&gt;&gt;&#xa;sarbController.js" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="8" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;component&gt;&gt;&#xa;authMiddleware.js" vertex="1">
+          <mxGeometry height="50" width="160" x="60" y="310" as="geometry" />
+        </mxCell>
+        <mxCell id="18" edge="1" parent="8" source="9" style="endArrow=open;endFill=0;" target="10" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="19" edge="1" parent="8" source="10" style="endArrow=open;endFill=0;" target="11" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="20" edge="1" parent="8" source="10" style="endArrow=open;endFill=0;" target="12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="1" style="swimlane;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;startSize=30;" value="Database (PostgreSQL)" vertex="1">
+          <mxGeometry height="180" width="200" x="720" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="14" parent="13" style="rounded=1;fillColor=#ffffff;strokeColor=#b85450;" value="&lt;&lt;table&gt;&gt;&#xa;SarbRate" vertex="1">
+          <mxGeometry height="50" width="140" x="30" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="15" parent="13" style="rounded=1;fillColor=#ffffff;strokeColor=#b85450;" value="&lt;&lt;table&gt;&gt;&#xa;User" vertex="1">
+          <mxGeometry height="50" width="140" x="30" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="21" edge="1" parent="1" style="endArrow=block;endFill=1;dashed=1;" value="HTTP /api/sarb/rates">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="305" />
+              <mxPoint x="380" y="305" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="22" edge="1" parent="1" style="endArrow=block;endFill=1;dashed=1;" value="Prisma ORM">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="305" />
+              <mxPoint x="720" y="145" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5emA1nq63zgOjyl8PfAq-22" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5emA1nq63zgOjyl8PfAq-23" connectable="0" parent="5emA1nq63zgOjyl8PfAq-22" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="HTTP /api/sarb/rates" vertex="1">
+          <mxGeometry relative="1" y="-7" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5emA1nq63zgOjyl8PfAq-24" edge="1" parent="1" source="11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5emA1nq63zgOjyl8PfAq-25" connectable="0" parent="5emA1nq63zgOjyl8PfAq-24" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Prisma ORM" vertex="1">
+          <mxGeometry relative="1" x="0.781" y="4" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

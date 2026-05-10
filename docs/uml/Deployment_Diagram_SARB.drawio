@@ -1,0 +1,96 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="giYqqoBKBRuihW_jro-7">
+    <mxGraphModel dx="1012" dy="587" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="text;fontSize=16;fontStyle=1;align=center;" value="Deployment Diagram — SARB Interest Rate Integration" vertex="1">
+          <mxGeometry height="30" width="580" x="150" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-19" edge="1" parent="1" source="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;dashed=1;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="320" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-20" connectable="0" parent="Yl7AoDHf5eg_Urdo4Rsd-19" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="HTTP Rest" vertex="1">
+          <mxGeometry relative="1" x="0.0571" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="3" parent="1" style="swimlane;fontStyle=1;fillColor=#dae8fc;strokeColor=#6c8ebf;startSize=40;" value="&lt;&lt;device&gt;&gt;&#xa;User Browser" vertex="1">
+          <mxGeometry height="220" width="200" x="20" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;artifact&gt;&gt;&#xa;React App (Vite)" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="3" style="rounded=1;fillColor=#ffffff;strokeColor=#6c8ebf;" value="&lt;&lt;artifact&gt;&gt;&#xa;Group.jsx + SarbRates.jsx" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-21" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;dashed=1;" target="9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-22" connectable="0" parent="Yl7AoDHf5eg_Urdo4Rsd-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Prisma ORM" vertex="1">
+          <mxGeometry relative="1" x="0.2" y="-3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-23" edge="1" parent="1" source="6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;" target="12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Yl7AoDHf5eg_Urdo4Rsd-24" connectable="0" parent="Yl7AoDHf5eg_Urdo4Rsd-23" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="HTTPS(fallback)" vertex="1">
+          <mxGeometry relative="1" x="-0.1549" as="geometry">
+            <mxPoint y="-1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" parent="1" style="swimlane;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;startSize=40;" value="&lt;&lt;server&gt;&gt;&#xa;Azure App Service" vertex="1">
+          <mxGeometry height="220" width="200" x="320" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="6" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;artifact&gt;&gt;&#xa;Node.js + Express" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="6" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;artifact&gt;&gt;&#xa;sarbController + NodeCache" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="swimlane;fontStyle=1;fillColor=#f8cecc;strokeColor=#b85450;startSize=40;" value="&lt;&lt;database&gt;&gt;&#xa;Neon PostgreSQL" vertex="1">
+          <mxGeometry height="220" width="200" x="630" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="10" parent="9" style="rounded=1;fillColor=#ffffff;strokeColor=#b85450;" value="&lt;&lt;table&gt;&gt;&#xa;SarbRate" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="11" parent="9" style="rounded=1;fillColor=#ffffff;strokeColor=#b85450;" value="&lt;&lt;table&gt;&gt;&#xa;User" vertex="1">
+          <mxGeometry height="50" width="160" x="20" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="12" parent="1" style="swimlane;fontStyle=1;fillColor=#e1d5e7;strokeColor=#9673a6;startSize=40;" value="&lt;&lt;external system&gt;&gt;&#xa;SARB Data Source" vertex="1">
+          <mxGeometry height="120" width="200" x="320" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="13" parent="12" style="rounded=1;fillColor=#ffffff;strokeColor=#9673a6;" value="&lt;&lt;artifact&gt;&gt;&#xa;Trading Economics API" vertex="1">
+          <mxGeometry height="40" width="160" x="20" y="55" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" style="endArrow=block;endFill=1;dashed=1;" value="HTTPS REST">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="180" />
+              <mxPoint x="320" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" style="endArrow=block;endFill=1;dashed=1;" value="Prisma ORM">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="520" y="180" />
+              <mxPoint x="600" y="180" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" style="endArrow=block;endFill=1;dashed=1;" value="HTTPS (fallback)">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="290" />
+              <mxPoint x="420" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

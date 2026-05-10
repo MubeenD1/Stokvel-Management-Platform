@@ -1,0 +1,55 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="BhHR5CKMZrONfQp17RHm">
+    <mxGraphModel dx="860" dy="465" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" parent="1" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.flowchart.start_2;fillColor=none;strokeColor=#000000;fontSize=14;fontStyle=1;verticalLabelPosition=top;verticalAlign=bottom;" value="Stokvel Management Platform" vertex="1">
+          <mxGeometry height="400" width="500" x="150" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="3" parent="1" style="shape=mxgraph.flowchart.actor;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="Member" vertex="1">
+          <mxGeometry height="80" width="60" x="30" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="4" parent="1" style="shape=mxgraph.flowchart.actor;fillColor=#d5e8d4;strokeColor=#82b366;" value="System" vertex="1">
+          <mxGeometry height="80" width="60" x="730" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="5" parent="1" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" value="View Group Page" vertex="1">
+          <mxGeometry height="60" width="160" x="200" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="6" parent="1" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" value="View SA Interest Rates" vertex="1">
+          <mxGeometry height="60" width="180" x="420" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="7" parent="1" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" value="Fetch SARB Rates" vertex="1">
+          <mxGeometry height="60" width="180" x="420" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="8" parent="1" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" value="Cache Interest Rates" vertex="1">
+          <mxGeometry height="60" width="180" x="420" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="9" parent="1" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" value="Log In" vertex="1">
+          <mxGeometry height="60" width="160" x="200" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="10" edge="1" parent="1" source="3" target="5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11" edge="1" parent="1" source="3" target="9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="12" edge="1" parent="1" source="3" target="6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="13" edge="1" parent="1" source="4" target="7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="14" edge="1" parent="1" source="4" target="8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="15" edge="1" parent="1" source="6" style="dashed=1;" target="7" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="16" edge="1" parent="1" source="7" style="dashed=1;" target="8" value="&lt;&lt;include&gt;&gt;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
