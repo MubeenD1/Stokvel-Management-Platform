@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
-import ContributionsSection from '../../components/ContributionsSection';
+import ContributionsSection from "../Contributions/ContributionsSection";
 import './Group.css'
 
 export default function GroupPage() {
@@ -68,8 +68,7 @@ export default function GroupPage() {
 
 
     return (
-        <div className="members-container" style={{ padding: '30px', background: '#111', minHeight: '100vh', color: 'white' }}>
-            <h2 style={{ borderBottom: '1px solid #333', paddingBottom: '10px' }}>Stokvel Members</h2>
+        <div className="members-container" style={{ padding: '30px', background: '#fff', minHeight: '100vh', color: 'white' }}>
             {myRole === "ADMIN" && (
             <button className="invite-btn"
             onClick={()=> navigate(`/groups/${id}/invite`)}
@@ -133,7 +132,6 @@ export default function GroupPage() {
                     );
                 })}
             </div>
-            <ContributionsSection groupId={id} members={members} />
         </div>
         
     );

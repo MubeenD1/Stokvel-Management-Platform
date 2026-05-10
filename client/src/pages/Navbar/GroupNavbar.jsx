@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import "./GroupNavbar.css";
 
-export default function GroupNavbar( {groupId} ) {
+export default function GroupNavbar( {groupId,myRole} ) {
   return (
     <nav>
       <div className="group-nav-container">
@@ -21,7 +21,7 @@ export default function GroupNavbar( {groupId} ) {
             </NavLink>
           </li>
           <li>
-            <NavLink to={`/groups/${groupId}/contributions`} className={({ isActive }) => isActive ? "active" : ""}>
+            <NavLink to={`/groups/${groupId}/contributions?role=${myRole}`}>
               Contributions
             </NavLink>
           </li>

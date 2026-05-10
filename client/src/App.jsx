@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -34,12 +35,32 @@ function Layout() {
 
 function GroupLayout() {
   const { id } = useParams();
+  const { currentUser } = useAuth();
+  const [myRole, setMyRole] = useState(null); // ← null initially
+
+  useEffect(() => {
+    async function fetchRole() {
+      try {
+        const token = await currentUser.getIdToken();
+        const res = await fetch(`http://localhost:3000/api/groups`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const myGroup = data.groups?.find(g => g.id === id);
+        setMyRole(myGroup?.role || 'MEMBER');
+      } catch (err) {
+        setMyRole('MEMBER');
+      }
+    }
+    fetchRole();
+  }, [id, currentUser]);
+
+  if (!myRole) return null; // ← wait until role is fetched before rendering navbar
+
   return (
     <div className="group-layout">
-      <GroupNavbar groupId={id}/>
-      <main>
-        <Outlet />
-      </main>
+      <GroupNavbar groupId={id} myRole={myRole} />
+      <main><Outlet /></main>
     </div>
   );
 }

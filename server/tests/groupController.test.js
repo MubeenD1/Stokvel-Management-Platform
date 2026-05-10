@@ -6,7 +6,7 @@ jest.mock('../lib/prisma', () => ({
   group: { create: jest.fn() , findUnique : jest.fn()},
   meeting: {findMany: jest.fn() , findUnique :jest.fn() , create : jest.fn() , update : jest.fn()},
   groupMember: { findMany: jest.fn() , findUnique :jest.fn() , findFirst : jest.fn()},
-  contribution: {findMany: jest.fn()}
+  contribution: {findMany: jest.fn() , create: jest.fn()}
 }));
 
 jest.mock('uuid', () => ({
@@ -21,7 +21,7 @@ jest.mock('../src/utils/inviteCode', () => ({
 const prisma = require('../lib/prisma');
 const { addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus } = require('../src/controllers/groupController');
 const { generateUniqueInviteCode } = require('../src/utils/inviteCode');
-const { getMemberContributions } = require('../controllers/contributionController')
+const { getMemberContributions, createContribution } = require('../controllers/contributionController')
 // =========================
 // 3. RESET
 // =========================
@@ -68,34 +68,37 @@ describe('getMemberContributions', () => {
   });
 });
   test('returns contributions for a valid member', async () => {
-    prisma.user.findUnique.mockResolvedValue({ id: 'user-123' })
-    prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' })
-    prisma.contribution.findMany.mockResolvedValue([
+  prisma.user.findUnique.mockResolvedValue({ id: 'user-123' });
+  prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' });
+  prisma.group.findUnique.mockResolvedValue({ contributionAmount: 200 });
+  prisma.contribution.findMany.mockResolvedValue([
+    {
+      id: 'contrib-1',
+      amount: 500,
+      date: new Date('2026-01-01'),
+      status: 'CONFIRMED',
+      treasurer: { user: { email: 'treasurer@test.com' } },
+      createdAt: new Date('2026-01-01'),
+    },
+  ]);
+
+  await getMemberContributions(req, res);
+
+  expect(res.json).toHaveBeenCalledWith({
+    contributions: [
       {
         id: 'contrib-1',
         amount: 500,
         date: new Date('2026-01-01'),
         status: 'CONFIRMED',
-        treasurer: { user: { email: 'treasurer@test.com' } },
-        createdAt: new Date('2026-01-01')
-      }
-    ])
-
-    await getMemberContributions(req, res)
-
-    expect(res.json).toHaveBeenCalledWith({
-      contributions: [
-        {
-          id: 'contrib-1',
-          amount: 500,
-          date: new Date('2026-01-01'),
-          status: 'CONFIRMED',
-          confirmedBy: 'treasurer@test.com',
-          createdAt: new Date('2026-01-01')
-        }
-      ]
-    })
-  })
+        confirmedBy: 'treasurer@test.com',
+        createdAt: new Date('2026-01-01'),
+      },
+    ],
+    groupMemberId: 'member-123',   
+    contributionAmount: 200,    
+  });
+});
 
   test('returns 401 if no token is provided', async () => {
   req.user = null;
@@ -107,6 +110,80 @@ describe('getMemberContributions', () => {
     error: 'Unauthorized'
   });
 });
+});
+describe("createContribution", () => {
+  
+  it("should return 401 if user is not authenticated", async () => {
+    const req = {
+      user: null,
+      params: { groupId: "group-123" },
+      body: { amount: 150 },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await createContribution(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.json).toHaveBeenCalledWith({ error: "Unauthorized" });
+  });
+
+  it("should return 400 if amount is invalid", async () => {
+    const req = {
+      user: { uid: "firebase-uid-123" },
+      params: { groupId: "group-123" },
+      body: { amount: -50 },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    await createContribution(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: "A valid amount is required" });
+  });
+
+  it("should create a contribution and return 201", async () => {
+    const req = {
+      user: { uid: "firebase-uid-123" },
+      params: { groupId: "group-123" },
+      body: { amount: 150 },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    prisma.user.findUnique.mockResolvedValue({ id: "user-123" });
+    prisma.groupMember.findUnique.mockResolvedValue({ id: "member-123" });
+    prisma.contribution.create.mockResolvedValue({
+      id: "contribution-123",
+      amount: 150,
+      date: new Date(),
+      status: "PENDING",
+      memberId: "member-123",
+      groupId: "group-123",
+    });
+
+    await createContribution(req, res);
+
+    expect(prisma.contribution.create).toHaveBeenCalledWith({
+      data: {
+        amount: 150,
+        date: expect.any(Date),
+        status: "PENDING",
+        memberId: "member-123",
+        groupId: "group-123",
+      },
+    });
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ id: "contribution-123" }));
+  });
+
 });
 describe("createGroup", () => {
   beforeEach(() => {

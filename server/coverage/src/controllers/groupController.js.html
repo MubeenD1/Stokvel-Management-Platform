@@ -1178,7 +1178,7 @@ async function <span class="fstat-no" title="function not covered" >joinGroup(</
         }
 &nbsp;
         // this will find the group that matches the invite c createGroup, ode sent
-        const iC = <span class="cstat-no" title="statement not covered" >inviteCode.trim().toLowerCase();</span>
+        const iC = <span class="cstat-no" title="statement not covered" >inviteCode.trim();</span>
         const group = <span class="cstat-no" title="statement not covered" >await prisma.group.findUnique({</span>
             where: { inviteCode: iC },
         });
@@ -1229,7 +1229,7 @@ async function <span class="fstat-no" title="function not covered" >joinGroup(</
 <span class="cstat-no" title="statement not covered" >        console.error('joinGroup error:', error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 async function getGroups(req, res) {
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -1263,7 +1263,7 @@ async function getGroups(req, res) {
 <span class="cstat-no" title="statement not covered" >        console.error('getGroups error:', error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 async function <span class="fstat-no" title="function not covered" >getGroupSettings(</span>req, res) {
     const { groupId } = <span class="cstat-no" title="statement not covered" >req.params;</span>
 &nbsp;
@@ -1290,7 +1290,7 @@ async function <span class="fstat-no" title="function not covered" >getGroupSett
         //console.error('getGroupSettings error:', error);
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 async function <span class="fstat-no" title="function not covered" >updateGroupSettings(</span>req, res) {
     const { groupId } = <span class="cstat-no" title="statement not covered" >req.params;</span>
     const { nextMeetingDate, contributionAmount, meetingFrequency, payoutOrder } = <span class="cstat-no" title="statement not covered" >req.body;</span>
@@ -1355,7 +1355,7 @@ async function <span class="fstat-no" title="function not covered" >updateGroupS
 <span class="cstat-no" title="statement not covered" >        console.error('updateGroupSettings error:', error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 async function createGroup(req, res) {
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -1415,7 +1415,7 @@ async function createGroup(req, res) {
 <span class="cstat-no" title="statement not covered" >        console.error("createGroup error:", error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: "Failed to create group" });</span>
     }
-}
+};
 async function getGroupById(req, res) {
 &nbsp;
     if (!req.user || !req.user.uid) {
@@ -1464,7 +1464,7 @@ async function getGroupById(req, res) {
 <span class="cstat-no" title="statement not covered" >        console.error('getGroupById error:', error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 const getGroupContributions = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
     const { groupId } = <span class="cstat-no" title="statement not covered" >req.params;</span>
 &nbsp;
@@ -1525,7 +1525,7 @@ async function <span class="fstat-no" title="function not covered" >refreshInvit
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >        res.status(500).json({ error: "Failed to refresh code" });</span>
     }
-}
+};
 async function <span class="fstat-no" title="function not covered" >createMeeting(</span>req,res){
     const gId = <span class="cstat-no" title="statement not covered" >req.params.id;</span>
     const firebaseId = <span class="cstat-no" title="statement not covered" >req.user.uid;</span>
@@ -1580,7 +1580,7 @@ async function <span class="fstat-no" title="function not covered" >createMeetin
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: error.message });</span>
     }
 &nbsp;
-}
+};
 async function getMeetings(req, res) {
     // console.log("params:", req.params);
     // console.log("gId:", req.params.id);
@@ -1641,7 +1641,7 @@ async function getMeetings(req, res) {
 <span class="cstat-no" title="statement not covered" >        console.error('getMeetings error:', error);</span>
 <span class="cstat-no" title="statement not covered" >        return res.status(500).json({ error: 'Internal server error' });</span>
     }
-}
+};
 async function addMinutes(req,res){
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -1689,7 +1689,7 @@ async function addMinutes(req,res){
 <span class="cstat-no" title="statement not covered" >        console.error('addMinutes error:', error);</span>
 <span class="cstat-no" title="statement not covered" >    return res.status(500).json({ error: error.message });</span>
     }
-}
+};
 &nbsp;
 module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus};
 &nbsp;</pre></td></tr></table></pre>
@@ -1699,7 +1699,7 @@ module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGr
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-09T15:30:22.937Z
+                at 2026-05-10T12:03:10.926Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
