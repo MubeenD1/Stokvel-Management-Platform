@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import './MyContributions.css'
 
 function MyContributions() {
   const { id } = useParams();
@@ -33,6 +34,9 @@ function MyContributions() {
 
   return (
     <div style={styles.container}>
+      <button className='pay-btn'>
+        Make Contribution
+      </button>
       <h1 style={styles.title}>My Contributions</h1>
       {contributions.length === 0 ? (
         <p style={styles.message}>No contributions found.</p>

@@ -1,4 +1,5 @@
 const prisma = require('../lib/prisma');
+const { saveContribution } = require('./contributionService');
 
 async function getMemberContributions(req, res) {
 
@@ -94,5 +95,55 @@ const updateContributionStatus = async (req, res) => {
     }
 };
 
-module.exports = { getMemberContributions, updateContributionStatus }
+async function createContribution(req, res){
+
+
+  try {
+    if (!req.user || !req.user.uid) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const groupId = req.params.groupId
+    const firebaseId = req.user.uid
+
+    const user = await prisma.user.findUnique({
+      where: { firebaseId }
+    })
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const groupMember = await prisma.groupMember.findUnique({
+      where: {
+        userId_groupId: {
+          userId: user.id,
+          groupId
+        }
+      }
+    })
+    if (!groupMember) {
+      return res.status(403).json({ error: 'You are not a member of this group' })
+    }
+
+    const { amount } = req.body;
+
+  if (!amount || isNaN(amount) || amount <= 0) {
+    return res.status(400).json({ error: 'A valid amount is required' });
+  }
+
+  const contribution = await saveContribution({
+      amount,
+      groupId,
+      groupMemberId: groupMember.id,
+    });
+
+  res.status(201).json(contribution);
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to fetch contributions' })
+  }
+
+};
+
+module.exports = { getMemberContributions, updateContributionStatus, createContribution }
 

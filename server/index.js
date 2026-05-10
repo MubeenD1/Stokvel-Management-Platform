@@ -21,6 +21,7 @@ const groupRoutes = require('./src/routes/groupRoutes');
 const authRoutes = require('./routes/auth');
 const roleRoutes = require('./routes/role');
 const contributionRoutes = require('./routes/contribution');
+const payfastRoutes = require('./routes/payfast');
 
 const app = express();
 
@@ -35,7 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/groups', roleRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/contributions', contributionRoutes);
-
+//app.use('/api/payfast', payfastRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
