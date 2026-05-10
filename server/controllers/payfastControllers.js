@@ -1,77 +1,68 @@
 const crypto = require('crypto');
-const axios = require('axios');
 const { saveContribution } = require('./contributionService');
 
 const {
   PAYFAST_MERCHANT_ID,
   PAYFAST_MERCHANT_KEY,
   PAYFAST_PASS_KEY,
-  PAYFAST_TEST_MODE,
   NOTIFY_URL
 } = process.env;
 
-const PAYFAST_PROCESS_URL = 'https://sandbox.payfast.co.za/onsite/process'
+// Using the standard redirect engine
+const PAYFAST_URL = 'https://sandbox.payfast.co.za/eng/process';
 
-const dataToString = (data) => {
-  let pfParamString = '';
-  for (let key in data) {
-    if (data.hasOwnProperty(key)) {
-      pfParamString += `${key}=${encodeURIComponent(data[key].trim()).replace(/%20/g, '+')}&`;
-    }
-  }
-  return pfParamString.slice(0, -1);
-};
-
-const generateSignature = (data, passPhrase) => {
-  let sigString = dataToString(data);
-  if (passPhrase) {
-    sigString += `&passphrase=${encodeURIComponent(passPhrase.trim()).replace(/%20/g, '+')}`;
-  }
-  return crypto.createHash('md5').update(sigString).digest('hex');
-};
 
 const initiatePayment = async (req, res) => {
-  const { name_first, name_last, email_address, amount, item_name, groupId, role, groupMemberId } = req.body;
-
-  const mydata = {
-    merchant_id: PAYFAST_MERCHANT_ID,
-    merchant_key: PAYFAST_MERCHANT_KEY,
-    return_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=success`,
-cancel_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=cancelled`, // will change to modals
-    notify_url: process.env.NOTIFY_URL,
-    name_first, // get from user
-    name_last, //  // get from user
-    email_address, //  // get from user
-    amount: parseFloat(amount).toFixed(2), // get from group settings
-    item_name, // Stokvel Contribution
-  };
-
-  mydata['signature'] = generateSignature(mydata, PAYFAST_PASS_KEY);
-  const pfParamString = dataToString(mydata);
-
   try {
-    const response = await axios.post(PAYFAST_PROCESS_URL, pfParamString);
-    const uuid = response.data.uuid || null;
+    const { name_first, name_last, email_address, amount, item_name, groupId, role, groupMemberId } = req.body;
 
-    if (!uuid) {
-      return res.status(500).json({ error: 'No UUID returned from PayFast' });
+    // 1. Define the data in the EXACT order PayFast expects
+    const myData = {
+      merchant_id: PAYFAST_MERCHANT_ID.trim(),
+      merchant_key: PAYFAST_MERCHANT_KEY.trim(),
+      return_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=success`,
+      cancel_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=cancelled`,
+      notify_url: NOTIFY_URL.trim(),
+      name_first: (name_first || '').trim(),
+      name_last: (name_last || '').trim(),
+      email_address: email_address.trim(),
+      m_payment_id: groupMemberId.trim(),
+      amount: parseFloat(amount).toFixed(2),
+      item_name: item_name.trim(),
+      custom_str1: groupId.trim(),
+      custom_str2: groupMemberId.trim(),
+    };
+
+    // 2. Create the signature string
+    // IMPORTANT: Only include fields that are NOT empty
+    let pfOutput = '';
+    for (let key in myData) {
+      if (myData[key] !== '') {
+        pfOutput += `${key}=${encodeURIComponent(myData[key]).replace(/%20/g, '+')}&`;
+      }
     }
 
-    res.json({ uuid, return_url: mydata.return_url, cancel_url: mydata.cancel_url });
+    // 3. Append the Passphrase (if it exists in your PayFast dashboard)
+    let getString = pfOutput.slice(0, -1);
+    if (PAYFAST_PASS_KEY && PAYFAST_PASS_KEY.trim() !== '') {
+      getString += `&passphrase=${encodeURIComponent(PAYFAST_PASS_KEY.trim()).replace(/%20/g, '+')}`;
+    }
+
+    // 4. Hash it
+    const signature = crypto.createHash('md5').update(getString).digest('hex');
+
+    // 5. Build the Final URL
+    // We reuse the same logic to ensure the URL parameters match the signature string exactly
+    const redirectUrl = `${PAYFAST_URL}?${pfOutput}signature=${signature}`;
+
+    console.log('Final Redirect URL:', redirectUrl); // Check this in your terminal
+    res.json({ redirectUrl });
+
   } catch (error) {
-    console.error('PayFast error:', error.response?.data || error.message);
-    res.status(500).json({ error: 'Failed to get PayFast UUID' });
+    console.error('PayFast Error:', error);
+    res.status(500).json({ error: 'Failed to initiate payment' });
   }
 };
-
-// const handleNotify = (req, res) => {
-//   console.log('ITN received:', req.body);
-//   // TODO: verify and update your DB here
-//   // create notification and add to DB
-//   // notify all treasurers
-//   // create contribution
-//   res.sendStatus(200);
-// };
 
 const handleNotify = async (req, res) => {
   const {
@@ -81,17 +72,22 @@ const handleNotify = async (req, res) => {
     custom_str2: groupMemberId,
   } = req.body;
 
+  // PayFast sends many types of notifications; only act on COMPLETE
   if (payment_status !== 'COMPLETE') {
     return res.sendStatus(200);
   }
 
-  await saveContribution({
-    amount: amount_gross,
-    groupId,
-    groupMemberId,
-  });
-
-  res.sendStatus(200);
+  try {
+    await saveContribution({
+      amount: amount_gross,
+      groupId,
+      groupMemberId,
+    });
+    res.sendStatus(200);
+  } catch (err) {
+    console.error('Notify Error:', err);
+    res.sendStatus(500);
+  }
 };
 
 module.exports = { initiatePayment, handleNotify };

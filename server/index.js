@@ -36,7 +36,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/groups', roleRoutes);
 app.use('/api/groups', groupRoutes);
 app.use('/api/contributions', contributionRoutes);
-//app.use('/api/payfast', payfastRoutes);
+app.use('/api/payfast', payfastRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

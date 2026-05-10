@@ -68,34 +68,37 @@ describe('getMemberContributions', () => {
   });
 });
   test('returns contributions for a valid member', async () => {
-    prisma.user.findUnique.mockResolvedValue({ id: 'user-123' })
-    prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' })
-    prisma.contribution.findMany.mockResolvedValue([
+  prisma.user.findUnique.mockResolvedValue({ id: 'user-123' });
+  prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' });
+  prisma.group.findUnique.mockResolvedValue({ contributionAmount: 200 });
+  prisma.contribution.findMany.mockResolvedValue([
+    {
+      id: 'contrib-1',
+      amount: 500,
+      date: new Date('2026-01-01'),
+      status: 'CONFIRMED',
+      treasurer: { user: { email: 'treasurer@test.com' } },
+      createdAt: new Date('2026-01-01'),
+    },
+  ]);
+
+  await getMemberContributions(req, res);
+
+  expect(res.json).toHaveBeenCalledWith({
+    contributions: [
       {
         id: 'contrib-1',
         amount: 500,
         date: new Date('2026-01-01'),
         status: 'CONFIRMED',
-        treasurer: { user: { email: 'treasurer@test.com' } },
-        createdAt: new Date('2026-01-01')
-      }
-    ])
-
-    await getMemberContributions(req, res)
-
-    expect(res.json).toHaveBeenCalledWith({
-      contributions: [
-        {
-          id: 'contrib-1',
-          amount: 500,
-          date: new Date('2026-01-01'),
-          status: 'CONFIRMED',
-          confirmedBy: 'treasurer@test.com',
-          createdAt: new Date('2026-01-01')
-        }
-      ]
-    })
-  })
+        confirmedBy: 'treasurer@test.com',
+        createdAt: new Date('2026-01-01'),
+      },
+    ],
+    groupMemberId: 'member-123',   
+    contributionAmount: 200,    
+  });
+});
 
   test('returns 401 if no token is provided', async () => {
   req.user = null;
@@ -108,7 +111,6 @@ describe('getMemberContributions', () => {
   });
 });
 });
-
 describe("createContribution", () => {
   
   it("should return 401 if user is not authenticated", async () => {
@@ -183,10 +185,6 @@ describe("createContribution", () => {
   });
 
 });
-
-
-
-
 describe("createGroup", () => {
   beforeEach(() => {
     jest.clearAllMocks();

@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import './PaymentModal.css'
+
 
 function SuccessModal({ amount, reference, onClose }) {
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ function SuccessModal({ amount, reference, onClose }) {
 
         <p className="modal-title">Payment successful</p>
         <p className="modal-sub">
-          Your stokvel contribution has been received and confirmed.
+          Your stokvel contribution has been received. A treasurer from the group will confirm the payment shortly.
         </p>
 
         <div className="amount-badge">
@@ -60,13 +62,6 @@ function CancelledModal({ amount, onClose }) {
         </div>
 
         <div className="divider" />
-
-        <button
-          className="modal-btn primary cancel"
-          onClick={() => navigate(-1)}
-        >
-          Try again
-        </button>
 
       </div>
     </div>

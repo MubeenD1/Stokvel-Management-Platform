@@ -1,14 +1,27 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import MakeContributionButton from '../../components/MakeContributtionButton';
+import PaymentModal from '../../components/paymentModals/PaymentModal';
 import './MyContributions.css'
 
-function MyContributions() {
-  const { id } = useParams();
+export default function MyContributions() {
+  const { id } = useParams();                    // groupId
+  const [searchParams] = useSearchParams();
+  const role = searchParams.get('role');
   const { currentUser } = useAuth();
   const [contributions, setContributions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [groupMemberId, setGroupMemberId] = useState(null);
+  const [amount, setAmount] = useState(null);
+
+  // load PayFast script once
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://sandbox.payfast.co.za/onsite/engine.js';
+    document.body.appendChild(script);
+  }, []);
 
   useEffect(() => {
     const fetchContributions = async () => {
@@ -19,7 +32,10 @@ function MyContributions() {
         });
         if (!response.ok) throw new Error('Failed to fetch contributions');
         const data = await response.json();
+        console.log(data)
         setContributions(data.contributions);
+        setGroupMemberId(data.groupMemberId);  // return this from your API
+        setAmount(data.contributionAmount);    // return this from your API (group settings)
       } catch (err) {
         setError(err.message);
       } finally {
@@ -34,9 +50,21 @@ function MyContributions() {
 
   return (
     <div style={styles.container}>
-      <button className='pay-btn'>
-        Make Contribution
-      </button>
+
+      <MakeContributionButton
+        groupId={id}
+        groupMemberId={groupMemberId}
+        role={role}
+        amount={amount}
+        user={{
+          firstName: currentUser.displayName?.split(' ')[0] || '',
+          lastName: currentUser.displayName?.split(' ')[1] || '',
+          email: currentUser.email,
+        }}
+      />
+
+      <PaymentModal amount={amount} reference={null} />
+
       <h1 style={styles.title}>My Contributions</h1>
       {contributions.length === 0 ? (
         <p style={styles.message}>No contributions found.</p>
@@ -76,6 +104,8 @@ function MyContributions() {
       )}
     </div>
   );
+
+
 }
 
 const styles = {
@@ -90,4 +120,3 @@ const styles = {
   error: { fontSize: '14px', color: '#c62828', padding: '32px' },
 };
 
-export default MyContributions;
