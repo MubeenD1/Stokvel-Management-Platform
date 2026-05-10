@@ -13,7 +13,7 @@ export default function MakeContributionButton({ groupId, groupMemberId, role, u
 
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3000/api/payfast/initiate', {
+      const res = await fetch(import.meta.env.VITE_API_URL + '/api/payfast/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

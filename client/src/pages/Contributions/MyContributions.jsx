@@ -27,7 +27,7 @@ export default function MyContributions() {
     const fetchContributions = async () => {
       try {
         const token = await currentUser.getIdToken();
-        const response = await fetch(`http://localhost:3000/api/contributions/${id}`, {
+        const response = await fetch(import.meta.env.VITE_API_URL + `/api/contributions/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (!response.ok) throw new Error('Failed to fetch contributions');

@@ -42,7 +42,7 @@ function GroupLayout() {
     async function fetchRole() {
       try {
         const token = await currentUser.getIdToken();
-        const res = await fetch(`http://localhost:3000/api/groups`, {
+        const res = await fetch(import.meta.env.VITE_API_URL + `/api/groups`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
