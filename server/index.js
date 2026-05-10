@@ -5,6 +5,8 @@ require('dotenv').config();
 const groupRoutes = require('./src/routes/groupRoutes');
 const authRoutes = require('./routes/auth');
 const roleRoutes = require('./routes/role');
+const contributionRoutes = require('./routes/contributions');
+const sarbRoutes = require('./src/routes/sarbRoutes');
 
 const app = express();
 
@@ -15,14 +17,11 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
-// auth routes
 app.use('/api/auth', authRoutes);
-
-// group routes
 app.use('/api/groups', groupRoutes);
-
-// role routes
 app.use('/api/roles', roleRoutes);
+app.use('/api/contributions', contributionRoutes);
+app.use('/api/sarb', sarbRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

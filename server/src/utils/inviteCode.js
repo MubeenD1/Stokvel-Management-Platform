@@ -2,7 +2,7 @@ const { PrimsaClient } = require('@prisma/client');
 const crypto = require('crypto');
 const prisma = new PrimsaClient();
 
-//this will create a 8 char invite code 
+//this will create a 6 char invite code 
 
 async function generateUniqueInviteCode() {
     const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

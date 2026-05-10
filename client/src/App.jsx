@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import JoinGroup from './pages/JoinGroup';
+import Group from './pages/Group';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -30,14 +31,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/group/:groupId"
+          element={
+            <ProtectedRoute>
+              <Group />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
 }
-
-
-
-
-
-
