@@ -27,6 +27,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+// REQUIRED to parse the Notify POST from PayFast
+app.use(express.urlencoded({ extended: true }));
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });

@@ -19,6 +19,9 @@ function SuccessModal({ amount, reference, onClose }) {
         <p className="modal-sub">
           Your stokvel contribution has been received. A treasurer from the group will confirm the payment shortly.
         </p>
+        <p className="modal-sub">
+            If the contribution does not show immediately, close the popup and kindly refresh the page
+        </p>
 
         <div className="amount-badge">
           <div className="label">Amount paid</div>

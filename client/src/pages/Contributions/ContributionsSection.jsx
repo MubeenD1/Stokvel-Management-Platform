@@ -1,19 +1,14 @@
 import { useState, useEffect } from 'react';
 import { auth } from '../../firebase';
 
-export default function ContributionsSection({ groupId, members }) {
+export default function ContributionsSection({ groupId, role , members }) {
     const [contributions, setContributions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     // 1. Find out who the current user is in this group to check their role
     const currentUser = auth.currentUser;
-    const myMemberProfile = members.find(m => 
-        m.user?.firebaseId === currentUser?.uid || 
-        m.user?.email?.toLowerCase() === currentUser?.email?.toLowerCase()
-    );
-    const myRole = myMemberProfile?.role || 'MEMBER';
-    const isTreasurerOrAdmin = myRole === 'TREASURER' || myRole === 'ADMIN';
+    const isTreasurerOrAdmin = role === 'TREASURER' || role === 'ADMIN';
 
     // 2. Fetch the contributions when the component loads
     useEffect(() => {
@@ -44,7 +39,8 @@ export default function ContributionsSection({ groupId, members }) {
     const handleVerify = async (contributionId, newStatus) => {
         try {
             const token = await currentUser.getIdToken();
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/contributions/${contributionId}/status`, {
+            // const res = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${groupId}/contributions/${contributionId}/status`, {
+                 const res = await fetch(`http://localhost:3000/api/groups/${groupId}/contributions/${contributionId}/status`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -71,6 +67,8 @@ export default function ContributionsSection({ groupId, members }) {
 
     if (loading) return <p style={{ color: '#fbbf24' }}>Loading contributions...</p>;
     if (error) return <p style={{ color: '#ef4444' }}>{error}</p>;
+
+ 
 
     return (
         <div style={{ marginTop: '40px', background: '#111', padding: '20px', borderRadius: '8px', color: 'white' }}>

@@ -11,7 +11,6 @@ const {
 // Using the standard redirect engine
 const PAYFAST_URL = 'https://sandbox.payfast.co.za/eng/process';
 
-
 const initiatePayment = async (req, res) => {
   try {
     const { name_first, name_last, email_address, amount, item_name, groupId, role, groupMemberId } = req.body;
@@ -65,27 +64,28 @@ const initiatePayment = async (req, res) => {
 };
 
 const handleNotify = async (req, res) => {
-  const {
-    payment_status,
-    amount_gross,
-    custom_str1: groupId,
-    custom_str2: groupMemberId,
-  } = req.body;
+  
+  const pfData = req.body;
 
-  // PayFast sends many types of notifications; only act on COMPLETE
-  if (payment_status !== 'COMPLETE') {
-    return res.sendStatus(200);
+  console.log('PayFast ITN Received:', pfData);
+
+  if (pfData.payment_status !== 'COMPLETE') {
+    console.log(`Transaction not complete (Status: ${pfData.payment_status}). Skipping DB save.`);
+    return res.sendStatus(200); 
   }
 
   try {
+    // 3. Save to Database
     await saveContribution({
-      amount: amount_gross,
-      groupId,
-      groupMemberId,
+      amount: pfData.amount_gross, // The actual amount paid
+      groupId: pfData.custom_str1, // We stored groupId here
+      groupMemberId: pfData.custom_str2 // We stored groupMemberId here
     });
+
+    
     res.sendStatus(200);
   } catch (err) {
-    console.error('Notify Error:', err);
+    console.error('Error saving contribution to DB:', err);
     res.sendStatus(500);
   }
 };
