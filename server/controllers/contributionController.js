@@ -28,6 +28,9 @@ async function getMemberContributions(req, res) {
     if (!groupMember) {
       return res.status(403).json({ error: 'You are not a member of this group' })
     }
+    const group = await prisma.group.findUnique({
+      where: { id: groupId },
+    });
 
     const contributions = await prisma.contribution.findMany({
       where: { memberId: groupMember.id },
@@ -48,7 +51,12 @@ async function getMemberContributions(req, res) {
       createdAt: c.createdAt
     }))
 
-    res.json({ contributions: formatted })
+    res.json({
+      contributions: formatted,
+      groupMemberId: groupMember.id,
+      contributionAmount: group.contributionAmount,
+    });
+    
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch contributions' })
