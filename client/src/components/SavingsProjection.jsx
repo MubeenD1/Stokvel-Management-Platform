@@ -20,7 +20,9 @@ function SavingsProjection({ groupId }) {
                 const token = await auth.currentUser.getIdToken();
 
                 const response = await fetch(
-                    `http://localhost:3000/api/contributions/${groupId}/projection`,
+                 //   `http://localhost:3000/api/contributions/${groupId}/projection`,
+                `${import.meta.env.VITE_API_URL}/api/groups/${groupId}/contributions`,
+
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,

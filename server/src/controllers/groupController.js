@@ -306,55 +306,55 @@ async function createGroup(req, res) {
         return res.status(500).json({ error: "Failed to create group" });
     }
 };
-async function getGroupById(req, res) {
+// async function getGroupById(req, res) {
 
-    if (!req.user || !req.user.uid) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+//     if (!req.user || !req.user.uid) {
+//         return res.status(401).json({ error: "Unauthorized" });
+//     }
 
-    const gId = req.params.id;
+//     const gId = req.params.id;
 
-    if (!gId) {
-        return res.status(400).json({ error: 'Group ID is required' });
-    }
+//     if (!gId) {
+//         return res.status(400).json({ error: 'Group ID is required' });
+//     }
 
-    try {
-         const group = await prisma.group.findUnique({
-            where: { id: gId },
-        });
-         const role = await prisma.group.findUnique({
-            where: { id: gId },
-        });
-        const groupMembers = await prisma.groupMember.findMany({
-            where: { groupId: gId },
-            include: {
-                user: {
-                    select: {
-                        email: true,
-                        firebaseId: true, //Added for email comparison for assigning roles
-                    },
-                },
-            },
-        });
-        const firebaseId = req.user.uid;
-        const user = await prisma.user.findUnique({ where: { firebaseId } });
+//     try {
+//          const group = await prisma.group.findUnique({
+//             where: { id: gId },
+//         });
+//          const role = await prisma.group.findUnique({
+//             where: { id: gId },
+//         });
+//         const groupMembers = await prisma.groupMember.findMany({
+//             where: { groupId: gId },
+//             include: {
+//                 user: {
+//                     select: {
+//                         email: true,
+//                         firebaseId: true, //Added for email comparison for assigning roles
+//                     },
+//                 },
+//             },
+//         });
+//         const firebaseId = req.user.uid;
+//         const user = await prisma.user.findUnique({ where: { firebaseId } });
 
-        // const membership = await prisma.groupMember.findFirst({
-        //     where: { groupId: gId, userId: user.id }
-        // });
-        const membership = await prisma.groupMember.findFirst({
-            where: { 
-                groupId: gId, 
-                userId: user.id 
-            }
-        });
-        return res.status(200).json({ groupMembers, group,role:membership?.role });
+//         // const membership = await prisma.groupMember.findFirst({
+//         //     where: { groupId: gId, userId: user.id }
+//         // });
+//         const membership = await prisma.groupMember.findFirst({
+//             where: { 
+//                 groupId: gId, 
+//                 userId: user.id 
+//             }
+//         });
+//         return res.status(200).json({ groupMembers, group,role:membership?.role });
 
-    } catch (error) {
-        console.error('getGroupById error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-};
+//     } catch (error) {
+//         console.error('getGroupById error:', error);
+//         return res.status(500).json({ error: 'Internal server error' });
+//     }
+// };
 const getGroupContributions = async (req, res) => {
     const { groupId } = req.params;
 
