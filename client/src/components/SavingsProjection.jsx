@@ -21,7 +21,7 @@ function SavingsProjection({ groupId }) {
 
                 const response = await fetch(
                  //   `http://localhost:3000/api/contributions/${groupId}/projection`,
-                `${import.meta.env.VITE_API_URL}/api/groups/${groupId}/contributions`,
+                `${import.meta.env.VITE_API_URL}/api/contributions/${groupId}/projection`,
 
                     {
                         headers: {
