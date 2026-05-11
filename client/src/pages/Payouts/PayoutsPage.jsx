@@ -22,11 +22,11 @@ export default function PayoutsPage() {
 
       const [histRes, eligRes, groupRes] = await Promise.all([
        //fetch(`http://localhost:3000/api/groups/${id}/payouts/history`, { headers }),
-        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}/payouts/history', { headers }), 
+        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/history`, { headers }), 
         //fetch(`http://localhost:3000/api/groups/${id}/payouts/eligible`, { headers }),
-        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}/payouts/eligible', { headers }),
+        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/eligible`, { headers }),
         //fetch(`http://localhost:3000/api/groups/${id}`, { headers })
-        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}', { headers })
+        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}`, { headers })
       ]);
       
       //Safety check to prevent the "Unexpected token <" crash
@@ -54,7 +54,8 @@ export default function PayoutsPage() {
     try {
       const token = await currentUser.getIdToken(); 
       
-      const res = await fetch(`http://localhost:3000/api/groups/${id}/payouts/initiate`, {
+      const res = await fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/initiate`, { 
+        //fetch(`http://localhost:3000/api/groups/${id}/payouts/initiate`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
