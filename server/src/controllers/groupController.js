@@ -117,13 +117,42 @@ async function getGroupSettings(req, res) {
     const { groupId } = req.params;
 
     try {
+        const firebaseId = req.user.uid;
+
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const group = await prisma.group.findUnique({
             where: { id: groupId },
+            include: {
+                members: {
+                    include: {
+                        user: {
+                            select: {
+                                email: true,
+                                firebaseId: true,
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         if (!group) {
             return res.status(404).json({ error: 'Group not found' });
         }
+
+        const membership = await prisma.groupMember.findFirst({
+            where: {
+                groupId,
+                userId: user.id,
+            },
+        });
 
         return res.status(200).json({
             group: {
@@ -133,13 +162,15 @@ async function getGroupSettings(req, res) {
                 meetingFrequency: group.meetingFrequency,
                 payoutOrder: group.payoutOrder,
             },
+            groupMembers: group.members,
+            role: membership?.role || 'MEMBER',
         });
 
     } catch (error) {
-        //console.error('getGroupSettings error:', error);
+        console.error('getGroupSettings error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-};
+}
 async function updateGroupSettings(req, res) {
     const { groupId } = req.params;
     const { nextMeetingDate, contributionAmount, meetingFrequency, payoutOrder } = req.body;
