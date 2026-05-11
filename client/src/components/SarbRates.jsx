@@ -11,7 +11,8 @@ function SarbRates() {
             try {
                 const token = await auth.currentUser.getIdToken();
 
-                const response = await fetch('http://localhost:3000/api/sarb/rates', {
+                //const response = await fetch('http://localhost:3000/api/sarb/rates', {
+                    const res = await fetch(import.meta.env.VITE_API_URL + `/api/sarb/rates`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
