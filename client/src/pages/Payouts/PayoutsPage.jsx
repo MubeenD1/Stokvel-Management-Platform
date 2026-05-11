@@ -21,9 +21,12 @@ export default function PayoutsPage() {
       };
 
       const [histRes, eligRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/groups/${id}/payouts/history`, { headers }),
-        fetch(`http://localhost:3000/api/groups/${id}/payouts/eligible`, { headers }),
-        fetch(`http://localhost:3000/api/groups/${id}`, { headers })
+       //fetch(`http://localhost:3000/api/groups/${id}/payouts/history`, { headers }),
+        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}/payouts/history', { headers }), 
+        //fetch(`http://localhost:3000/api/groups/${id}/payouts/eligible`, { headers }),
+        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}/payouts/eligible', { headers }),
+        //fetch(`http://localhost:3000/api/groups/${id}`, { headers })
+        fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}', { headers })
       ]);
       
       //Safety check to prevent the "Unexpected token <" crash
