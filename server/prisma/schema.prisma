@@ -115,13 +115,6 @@ model SarbRate {
   source    String   @default("Trading Economics")
 }
 
-model SarbRate {
-  id        String   @id
-  repoRate  Float
-  primeRate Float
-  fetchedAt DateTime @default(now())
-  source    String   @default("Trading Economics")
-}
 
 enum Role {
   MEMBER
