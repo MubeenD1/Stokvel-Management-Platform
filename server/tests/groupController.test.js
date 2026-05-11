@@ -6,7 +6,8 @@ jest.mock('../lib/prisma', () => ({
   group: { create: jest.fn() , findUnique : jest.fn(),  update: jest.fn()},
   meeting: {findMany: jest.fn() , findUnique :jest.fn() , create : jest.fn() , update : jest.fn()},
   groupMember: { findMany: jest.fn(), findUnique: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
-  contribution: {findMany: jest.fn() , create: jest.fn()}
+  contribution: {findMany: jest.fn() , create: jest.fn()},
+  notification: { findMany: jest.fn()},
 }));
 
 jest.mock('uuid', () => ({
@@ -19,7 +20,7 @@ jest.mock('../src/utils/inviteCode', () => ({
 // 2. IMPORTS
 // =========================
 const prisma = require('../lib/prisma');
-const { addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus } = require('../src/controllers/groupController');
+const { addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus, getNotifications} = require('../src/controllers/groupController');
 const { generateUniqueInviteCode } = require('../src/utils/inviteCode');
 const { getMemberContributions, createContribution } = require('../controllers/contributionController')
 // =========================
