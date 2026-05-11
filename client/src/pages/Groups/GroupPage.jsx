@@ -68,7 +68,7 @@ export default function GroupPage() {
 
 
     return (
-        <div className="members-container" style={{ padding: '30px', background: '#fff', minHeight: '100vh', color: 'white' }}>
+        <div className="members-container" style={{ padding: '30px', background: '#111', minHeight: '100vh', color: 'white' }}>
             {myRole === "ADMIN" && (
             <button className="invite-btn"
             onClick={()=> navigate(`/groups/${id}/invite`)}
@@ -88,8 +88,8 @@ export default function GroupPage() {
                     );
                     return (
                         <div key={m.id} style={{ 
-                            background: isMe ? '#1e3a8a' : '#222', // Blue for you, dark for others
-                            border: isMe ? '2px solid #3b82f6' : '1px solid #333',
+                            background: isMe ? '#2e7d32' : '#222', // Green for you, dark for others
+                            border: isMe ? '2px solid #215200' : '1px solid #333',
                             padding: '15px', 
                             borderRadius: '8px',
                             display: 'flex',
@@ -98,7 +98,7 @@ export default function GroupPage() {
                         }}>
                             <div>
                                 <strong style={{ fontSize: '1.1em' }}>{m.user?.email || "No Email"}</strong>
-                                {isMe && <span style={{ marginLeft: '10px', color: '#60a5fa', fontSize: '0.8em' }}>(YOU)</span>}
+                                {isMe && <span style={{ marginLeft: '10px', color: '#edf0f4', fontSize: '0.8em' }}>(YOU)</span>}
                                 <div style={{ opacity: 0.7, marginTop: '4px' }}>Current Role: {m.role}</div>
                             </div>
 

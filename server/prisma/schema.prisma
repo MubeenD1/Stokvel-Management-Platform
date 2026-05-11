@@ -8,13 +8,13 @@ datasource db {
 }
 
 model User {
-  id         String        @id @default(uuid())
-  firebaseId String        @unique
-  email      String        @unique
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  groups     GroupMember[]
-  Meeting    Meeting[]
+  id            String         @id @default(uuid())
+  firebaseId    String         @unique
+  email         String         @unique
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  groups        GroupMember[]
+  Meeting       Meeting[]
   notifications Notification[]
 }
 
@@ -29,6 +29,7 @@ model Group {
   payoutOrder        String?
   meetingFrequency   String?
   contributions      Contribution[]
+  payouts            Payout[]
   members            GroupMember[]
   Meeting            Meeting[]
 }
@@ -41,6 +42,7 @@ model GroupMember {
   joinedAt               DateTime       @default(now())
   confirmedContributions Contribution[] @relation("TreasurerConfirmations")
   contributions          Contribution[] @relation("MemberContributions")
+  payouts                Payout[]
   group                  Group          @relation(fields: [groupId], references: [id])
   user                   User           @relation(fields: [userId], references: [id])
 
@@ -62,17 +64,31 @@ model Contribution {
   member      GroupMember        @relation("MemberContributions", fields: [memberId], references: [id])
 }
 
+model Payout {
+  id        String       @id @default(uuid())
+  amount    Float
+  status    PayoutStatus @default(PENDING)
+  reference String? // To store the PayFast Batch ID
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  memberId  String
+  groupId   String
+
+  group  Group       @relation(fields: [groupId], references: [id])
+  member GroupMember @relation(fields: [memberId], references: [id])
+}
+
 model Meeting {
-  id          String   @id @default(uuid())
-  groupId     String
-  date        DateTime
-  location    String
-  agenda      String?
-  minutes     String?
-  createdAt   DateTime @default(now())
-  createdById String
-  User        User     @relation(fields: [createdById], references: [id])
-  Group       Group    @relation(fields: [groupId], references: [id])
+  id            String         @id @default(uuid())
+  groupId       String
+  date          DateTime
+  location      String
+  agenda        String?
+  minutes       String?
+  createdAt     DateTime       @default(now())
+  createdById   String
+  User          User           @relation(fields: [createdById], references: [id])
+  Group         Group          @relation(fields: [groupId], references: [id])
   notifications Notification[]
 }
 
@@ -84,13 +100,20 @@ model Notification {
   sentAt      DateTime         @default(now())
   success     Boolean          @default(true)
   error       String?
-
-  recipient User    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meeting     Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
   @@index([meetingId])
   @@index([type])
+}
+
+model SarbRate {
+  id        String   @id
+  repoRate  Float
+  primeRate Float
+  fetchedAt DateTime @default(now())
+  source    String   @default("Trading Economics")
 }
 
 enum Role {
@@ -103,6 +126,12 @@ enum ContributionStatus {
   CONFIRMED
   MISSED
   PENDING
+}
+
+enum PayoutStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 enum NotificationType {
