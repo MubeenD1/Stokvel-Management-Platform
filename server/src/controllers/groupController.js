@@ -1,5 +1,5 @@
 const prisma = require('../../lib/prisma');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 //const prisma = new PrismaClient();
 //const prisma = new PrismaClient();
 const { generateUniqueInviteCode } = require('../utils/inviteCode');

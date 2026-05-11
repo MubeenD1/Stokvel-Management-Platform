@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  id            String         @id @default(uuid())
-  firebaseId    String         @unique
-  email         String         @unique
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  groups        GroupMember[]
-  Meeting       Meeting[]
-  notifications Notification[]
+  id           String         @id @default(uuid())
+  firebaseId   String         @unique
+  email        String         @unique
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  groups       GroupMember[]
+  Meeting      Meeting[]
+  Notification Notification[]
 }
 
 model Group {
@@ -79,21 +79,21 @@ model Payout {
 }
 
 model Meeting {
-  id            String         @id @default(uuid())
-  groupId       String
-  date          DateTime
-  location      String
-  agenda        String?
-  minutes       String?
-  createdAt     DateTime       @default(now())
-  createdById   String
-  User          User           @relation(fields: [createdById], references: [id])
-  Group         Group          @relation(fields: [groupId], references: [id])
-  notifications Notification[]
+  id           String         @id
+  groupId      String
+  date         DateTime
+  location     String
+  agenda       String?
+  minutes      String?
+  createdAt    DateTime       @default(now())
+  createdById  String
+  User         User           @relation(fields: [createdById], references: [id])
+  Group        Group          @relation(fields: [groupId], references: [id])
+  Notification Notification[]
 }
 
 model Notification {
-  id          String           @id @default(uuid())
+  id          String           @id
   type        NotificationType
   recipientId String
   meetingId   String
@@ -106,6 +106,13 @@ model Notification {
   @@index([recipientId])
   @@index([meetingId])
   @@index([type])
+}
+model SarbRate {
+  id        String   @id @default(uuid())
+  repoRate  Float
+  primeRate Float
+  fetchedAt DateTime @default(now())
+  source    String   @default("Trading Economics")
 }
 
 model SarbRate {

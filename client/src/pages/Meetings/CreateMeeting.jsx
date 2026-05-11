@@ -49,7 +49,7 @@ export default function CreateMeeting({ onSubmit }) {
         };
 
         const response = await fetch(
-        `http://localhost:3000/api/groups/${id}/create-meeting`,
+        import.meta.env.VITE_API_URL + `/api/groups/${id}/create-meeting`,
         {
             method: "POST",
             headers: {

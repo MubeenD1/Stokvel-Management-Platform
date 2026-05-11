@@ -33,8 +33,8 @@ export default function CreateGroup() {
 
         const token = await auth.currentUser.getIdToken();
 
-      //const response = await fetch(import.meta.env.VITE_API_URL + "/api/groups/create", {
-            const response = await fetch("http://localhost:3000/api/groups/create", {
+        const response = await fetch(import.meta.env.VITE_API_URL + "/api/groups/create", {
+        //const response = await fetch("http://localhost:3000/api/groups/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
