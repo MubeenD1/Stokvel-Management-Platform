@@ -1,0 +1,77 @@
+.meeting-card {
+  position: relative;
+  background: #fff;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  max-width: 420px;
+}
+
+.edit-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 0.5px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+}
+
+.meeting-agenda {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 1rem;
+}
+
+.meeting-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.meeting-row {
+  display: flex;
+  gap: 8px;
+}
+
+.label {
+  color: #888;
+  min-width: 72px;
+}
+
+.empty {
+  color: #aaa;
+  font-style: italic;
+}
+
+.minutes-editor {
+  margin-top: 1rem;
+  border-top: 0.5px solid #e0e0e0;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.minutes-editor textarea {
+  width: 100%;
+  font-size: 13px;
+  resize: vertical;
+  box-sizing: border-box;
+  border: 0.5px solid #ccc;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.minutes-editor button {
+  align-self: flex-start;
+  font-size: 13px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border: 0.5px solid #ccc;
+  background: transparent;
+  cursor: pointer;
+}

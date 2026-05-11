@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage",
+    "postinstall": "prisma generate"
   },
   "keywords": [],
   "author": "",
@@ -15,13 +17,20 @@
     "@prisma/client": "^5.22.0",
     "axios": "^1.16.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "firebase-admin": "^13.7.0",
+<<<<<<< HEAD
     "node-cache": "^5.1.2",
     "prisma": "^5.22.0"
+=======
+    "nodemailer": "^8.0.7",
+    "prisma": "^5.22.0",
+    "qs": "^6.15.1",
+    "uuid": "^14.0.0"
+>>>>>>> origin/main
   },
   "devDependencies": {
+    "dotenv": "^17.4.2",
     "jest": "^30.3.0",
     "nodemon": "^3.1.14"
   }

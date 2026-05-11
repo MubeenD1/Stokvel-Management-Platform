@@ -1,13 +1,21 @@
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-function GroupCard({ group }) {
+function GroupCard({ group, onViewSettings, onCardClick }) {
+    const { currentUser } = useAuth();
     const navigate = useNavigate();
+    const isAdmin = group.role === 'ADMIN';
+
+    function handleClick() {
+        if (onCardClick) {
+            onCardClick(group);
+        } else {
+            navigate(`/group/${group.id}`);
+        }
+    }
 
     return (
-        <div
-            style={styles.card}
-            onClick={() => navigate(`/group/${group.id}`)}
-        >
+        <div style={styles.card} onClick={handleClick}>
             <h3 style={styles.name}>{group.name}</h3>
             <p style={styles.role}>Role: {group.role}</p>
             <p style={styles.joined}>
@@ -29,6 +37,17 @@ const styles = {
         gap: '8px',
         cursor: 'pointer',
         transition: 'transform 0.2s',
+    },
+    button: {
+        padding: '12px 24px',
+        backgroundColor: '#206663',
+        color: '#ffffff',
+        border: 'none',
+        borderRadius: '8px',
+        fontWeight: 'bold',
+        cursor: 'pointer',
+        fontSize: '14px',
+        marginTop: '8px',
     },
     name: {
         fontSize: '18px',

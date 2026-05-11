@@ -1,11 +1,11 @@
+import "./Group.css"
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { auth } from '../firebase';
-import { signOut } from 'firebase/auth';
-import GroupCard from '../components/GroupCard';
+import { useAuth } from '../../context/AuthContext';
+import { auth } from '../../firebase';
+import GroupCard from '../../components/GroupCard';
 
-function Dashboard() {
+export default function Groups() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -17,7 +17,7 @@ function Dashboard() {
             try {
                 const token = await auth.currentUser.getIdToken();
 
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups`, {
+                const response = await fetch(import.meta.env.VITE_API_URL + '/api/groups', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                     },
@@ -43,55 +43,23 @@ function Dashboard() {
         fetchGroups();
     }, []);
 
-    const handleLogout = async () => {
-        await signOut(auth);
-        navigate('/login');
-    };
-
     return (
         <div style={styles.container}>
-            <div style={styles.header}>
-                <h1 style={styles.title}>My Dashboard</h1>
-                <div style={styles.headerButtons}>
-                    <p style={styles.welcome}>Welcome, {currentUser?.email}</p>
-                    <button
-                        style={styles.joinButton}
-                        onClick={() => navigate('/join')}
-                    >
-                        + Join Group
-                    </button>
-                    <button
-                        style={styles.logoutButton}
-                        onClick={handleLogout}
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-
-            {/* loading state */}
             {loading && <p style={styles.message}>Loading your groups...</p>}
 
-            {/* error state */}
             {error && <p style={styles.error}>{error}</p>}
 
-            {/* empty state */}
             {!loading && !error && groups.length === 0 && (
-                <div style={styles.emptyState}>
-                    <p style={styles.emptyText}>You are not part of any groups yet.</p>
-                    <button
-                        style={styles.joinButton}
-                        onClick={() => navigate('/join')}
-                    >
-                        Join a Group
-                    </button>
-                </div>
+                <p style={styles.emptyText}>You are not part of any groups yet.</p>
             )}
 
-            {/* groups list */}
             <div style={styles.groupsGrid}>
                 {groups.map((group) => (
-                    <GroupCard key={group.id} group={group} />
+                    <GroupCard
+                        key={group.id}
+                        group={group}
+                        onCardClick={(group) => navigate(`/groups/${group.id}/members`)}
+                    />
                 ))}
             </div>
         </div>
@@ -106,7 +74,7 @@ const styles = {
     },
     header: {
         display: 'flex',
-        flexDirection : 'column',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
         marginBottom: '32px',
@@ -121,29 +89,6 @@ const styles = {
         fontWeight: 'bold',
         color: '#1a1a1a',
         margin: 0,
-    },
-    welcome: {
-        fontSize: '14px',
-        color: '#666',
-        margin: 0,
-    },
-    joinButton: {
-        padding: '12px 24px',
-        backgroundColor: '#2e7d32',
-        color: '#ffffff',
-        border: 'none',
-        borderRadius: '8px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
-    },
-    logoutButton: {
-        padding: '12px 24px',
-        backgroundColor: 'transparent',
-        color: '#c62828',
-        border: '2px solid #c62828',
-        borderRadius: '8px',
-        fontWeight: 'bold',
-        cursor: 'pointer',
     },
     groupsGrid: {
         display: 'grid',
@@ -170,14 +115,3 @@ const styles = {
         fontSize: '20px',
     },
 };
-
-export default Dashboard;
-
-
-
-
-
-
-
-
-

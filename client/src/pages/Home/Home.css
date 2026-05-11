@@ -1,0 +1,55 @@
+.home {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
+  text-align: center;
+  padding: 20px;
+}
+
+.buttons {
+  min-height: auto;
+  min-width: none;
+  display: flex;
+  gap: 10px;  
+  justify-content: center; 
+  align-items: center;           
+  height: 100%;
+  width: 100%;  
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#joinButton {
+  padding: 12px 24px;
+  background-color: #2e7d32;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#createButton {
+  padding: 12px 24px;
+  background-color: #206663;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.logo a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.logo a:hover {
+  color: #17cf97;
+}

@@ -1,15 +1,43 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
-const { joinGroup, getUserGroups, getGroupById } = require('../controllers/groupController');
+const {
+    addMinutes,
+    createMeeting,
+    getMeetings,
+    getGroupById,
+    getGroups,
+    createGroup,
+    joinGroup,
+    getGroupSettings,
+    getGroupContributions,
+    updateGroupSettings,
+    refreshInviteCode,
+    getNotifications,
+    updateContributionStatus,
+} = require('../controllers/groupController');
 
-// GET /api/groups - fetch all groups for the logged in user
-router.get('/', verifyToken, getUserGroups);
-
-// POST /api/groups/join
+// POST group join and create
 router.post('/join', verifyToken, joinGroup);
+router.post('/create', verifyToken, createGroup);
+router.post('/:groupId/invite', verifyToken, refreshInviteCode);
+router.post('/:id/create-meeting', verifyToken, createMeeting);
 
-// GET /api/groups/:groupId - fetch a single group by id
-router.get('/:groupId', verifyToken, getGroupById);
+// GET notifications for current user
+router.get('/notifications', verifyToken, getNotifications);
+
+// GET groups
+router.get('/', verifyToken, getGroups);
+
+// GET group settings
+router.get('/:groupId/settings', verifyToken, getGroupSettings);
+router.get('/:groupId/contributions', verifyToken, getGroupContributions);
+router.get('/:id/meetings', verifyToken, getMeetings);
+router.get('/:id', verifyToken, getGroupById);
+
+// PUT group settings
+router.put('/:groupId/settings', verifyToken, updateGroupSettings);
+router.put('/:groupId/contributions/:contributionId/status', verifyToken, updateContributionStatus);
+router.patch('/:id/meetings/:meetingId/minutes', verifyToken, addMinutes);
 
 module.exports = router;

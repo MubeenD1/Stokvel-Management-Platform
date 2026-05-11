@@ -1,8 +1,21 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from './context/AuthContext';
 import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
-import JoinGroup from './pages/JoinGroup';
+import Dashboard from './pages/Dashboard/Dashboard';
+import JoinGroup from './pages/Groups/JoinGroup';
+import CreateGroup from './pages/Groups/CreateGroup';
+import Home from './pages/Home/Home';
+import Navbar from './pages/Navbar/Navbar';
+import Groups from './pages/Groups/Groups';
+import GroupPage from './pages/Groups/GroupPage';
+import GroupNavbar from './pages/Navbar/GroupNavbar';
+import MeetingsPage from './pages/Meetings/MeetingsPage';
+import GroupSettingsModal from './components/GroupSettingsModal';
+import CreateMeeting from './pages/Meetings/CreateMeeting';
+import InviteManager from './components/InviteManager/InviteManager';
+import Notifications from './pages/Notifications/Notifications';
+import Contributions from './pages/Contributions/Contributions';
 import Group from './pages/Group';
 
 function ProtectedRoute({ children }) {
@@ -10,35 +23,74 @@ function ProtectedRoute({ children }) {
   return currentUser ? children : <Navigate to="/login" />;
 }
 
+function Layout() {
+  return (
+    <div className="app-layout">
+      <Navbar />
+      <main>
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+function GroupLayout() {
+  const { id } = useParams();
+  const { currentUser } = useAuth();
+  const [myRole, setMyRole] = useState(null);
+
+  useEffect(() => {
+    async function fetchRole() {
+      try {
+        const token = await currentUser.getIdToken();
+        const res = await fetch(import.meta.env.VITE_API_URL + `/api/groups`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const myGroup = data.groups?.find(g => g.id === id);
+        setMyRole(myGroup?.role || 'MEMBER');
+      } catch (err) {
+        setMyRole('MEMBER');
+      }
+    }
+    fetchRole();
+  }, [id, currentUser]);
+
+  if (!myRole) return null;
+
+  return (
+    <div className="group-layout">
+      <GroupNavbar groupId={id} myRole={myRole} />
+      <main><Outlet /></main>
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/join"
-          element={
-            <ProtectedRoute>
-              <JoinGroup />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/group/:groupId"
-          element={
-            <ProtectedRoute>
-              <Group />
-            </ProtectedRoute>
-          }
-        />
+
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/groups" element={<Groups />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/create" element={<CreateGroup />} />
+          <Route path="/join" element={<JoinGroup />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/group/:groupId" element={<Group />} />
+        </Route>
+
+        <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
+          <Route path="/groups/:id/members" element={<GroupPage />} />
+          <Route path="/groups/:id/meetings" element={<MeetingsPage />} />
+          <Route path="/groups/:id/settings" element={<GroupSettingsModal />} />
+          <Route path="/groups/:id/meetings/create" element={<CreateMeeting />} />
+          <Route path="/groups/:id/invite" element={<InviteManager />} />
+          <Route path="/groups/:id/contributions" element={<Contributions />} />
+        </Route>
+
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>

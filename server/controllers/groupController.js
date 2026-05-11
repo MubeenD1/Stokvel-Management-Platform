@@ -101,4 +101,49 @@ async function getUserGroups(req, res) {
     }
 }
 
-module.exports = { joinGroup, getUserGroups };
+// this will fetch a single group by its id
+async function getGroupById(req, res) {
+    const { groupId } = req.params;
+    const firebaseId = req.user.uid;
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const membership = await prisma.groupMember.findUnique({
+            where: {
+                userId_groupId: {
+                    userId: user.id,
+                    groupId,
+                },
+            },
+            include: {
+                group: true,
+            },
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: 'You are not a member of this group' });
+        }
+
+        return res.status(200).json({
+            group: {
+                id: membership.group.id,
+                name: membership.group.name,
+                role: membership.role,
+                joinedAt: membership.joinedAt,
+            },
+        });
+
+    } catch (error) {
+        console.error('getGroupById error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+module.exports = { joinGroup, getUserGroups, getGroupById };

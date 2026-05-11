@@ -1,24 +1,41 @@
-const { Prisma } = require('@prisma/client')
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 const admin = require('../config/firebase')
 const requireAdmin = async (req, res, next) => { 
-  const {userId, groupId} = req.params
-
+  const { groupId } = req.params; // Get the group from the URL
+  
   try {
-    //To-do
-    // const member = await Prisma.groupMember.findUnique({
-    //   where: { userId_groupId: {userId, groupId}}
-    // })
-    // if (!member || member.role !== 'ADMIN') return res.status(403).json({error: 'Only admins can assiugn roles'})
-    // next()
-    //Placeholder
+    // 1. Get the logged-in user from the database
+    const requester = await prisma.user.findUnique({
+      where: { firebaseId: req.user.uid }
+    });
+
+    if (!requester) return res.status(403).json({ error: 'User not found' });
+
+    // 2. Check if the REQUESTER is an admin in this group
+    const membership = await prisma.groupMember.findUnique({
+      where: { 
+        userId_groupId: { 
+          userId: requester.id, // Use the ID of the person logged in
+          groupId: groupId 
+        } 
+      }
+    });
+
+    if (!membership || membership.role !== 'ADMIN') {
+      return res.status(403).json({ error: 'Only admins can assign roles' });
+    }
+
+    next(); // All good, proceed to assignRole controller
   } catch (error) {
-    res.status(500).json({error: 'Failed to verify admin role'})
+    console.error('requireAdmin error', error);
+    res.status(500).json({ error: 'Failed to verify admin role' });
   }
 }
 
 async function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split('Bearer ')[1]
-
+  console.log('verifyToken called, token exists:', !!token)
   if (!token) {
     return res.status(401).json({ error: 'No token provided' })
   }
