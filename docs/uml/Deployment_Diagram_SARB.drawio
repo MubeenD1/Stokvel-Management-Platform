@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="giYqqoBKBRuihW_jro-7">
-    <mxGraphModel dx="1012" dy="587" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="860" dy="499" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -42,7 +42,7 @@
             <mxPoint y="-1" as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="6" parent="1" style="swimlane;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;startSize=40;" value="&lt;&lt;server&gt;&gt;&#xa;Azure App Service" vertex="1">
+        <mxCell id="6" parent="1" style="swimlane;fontStyle=1;fillColor=#fff2cc;strokeColor=#d6b656;startSize=40;" value="&lt;&lt;server&gt;&gt;&#xa;Vercel Service" vertex="1">
           <mxGeometry height="220" width="200" x="320" y="70" as="geometry" />
         </mxCell>
         <mxCell id="7" parent="6" style="rounded=1;fillColor=#ffffff;strokeColor=#d6b656;" value="&lt;&lt;artifact&gt;&gt;&#xa;Node.js + Express" vertex="1">
