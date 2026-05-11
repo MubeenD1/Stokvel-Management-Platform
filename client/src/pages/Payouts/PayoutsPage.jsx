@@ -20,7 +20,7 @@ export default function PayoutsPage() {
         'Content-Type': 'application/json' 
       };
 
-      const [histRes, eligRes] = await Promise.all([
+      const [histRes, eligRes, groupRes] = await Promise.all([
        //fetch(`http://localhost:3000/api/groups/${id}/payouts/history`, { headers }),
         fetch(import.meta.env.VITE_API_URL + '/api/groups/${id}/payouts/history', { headers }), 
         //fetch(`http://localhost:3000/api/groups/${id}/payouts/eligible`, { headers }),
@@ -30,7 +30,7 @@ export default function PayoutsPage() {
       ]);
       
       //Safety check to prevent the "Unexpected token <" crash
-      if (!histRes.ok || !eligRes.ok) {
+      if (!histRes.ok || !eligRes.ok || !groupRes.ok) {
         console.error("Backend returned an error. Check your Express routes!");
         return; 
       }
