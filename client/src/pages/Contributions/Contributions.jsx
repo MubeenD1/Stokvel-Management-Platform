@@ -78,11 +78,8 @@ function Contributions() {
 
             try {
                 const token = await currentUser.getIdToken();
-
-                const res = await fetch(`http://localhost:3000/api/groups/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const res = await fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
                 });
 
                 const data = await res.json();

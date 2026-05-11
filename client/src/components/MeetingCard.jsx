@@ -21,7 +21,7 @@ export default function MeetingCard({ meeting , role}) {
         setError("500 character limit exceeded")
     }
     const token = await auth.currentUser.getIdToken();
-    const response = await fetch(`http://localhost:3000/api/groups/${id}/meetings/${meeting.id}/minutes`, {
+    const response = await fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/meetings/${meeting.id}/minutes`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
