@@ -22,7 +22,8 @@
     "nodemailer": "^8.0.7",
     "prisma": "^5.22.0",
     "qs": "^6.15.1",
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "node-cache": "^5.1.2"
   },
   "devDependencies": {
     "dotenv": "^17.4.2",

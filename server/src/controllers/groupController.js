@@ -6,18 +6,64 @@ const { generateUniqueInviteCode } = require('../utils/inviteCode');
 const { sendMeetingNotification } = require('../utils/notificationService');
 const { updateContributionStatus } = require('../../controllers/contributionController');
 
+// this will fetch a single group by its id
+async function getGroupById(req, res) {
+    const { groupId } = req.params;
+    const firebaseId = req.user.uid;
+
+    console.log('getGroupById called with groupId:', groupId);
+    console.log('firebaseId:', firebaseId);
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const membership = await prisma.groupMember.findUnique({
+            where: {
+                userId_groupId: {
+                    userId: user.id,
+                    groupId,
+                },
+            },
+            include: {
+                group: true,
+            },
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: 'You are not a member of this group' });
+        }
+
+        return res.status(200).json({
+            group: {
+                id: membership.group.id,
+                name: membership.group.name,
+                role: membership.role,
+                joinedAt: membership.joinedAt,
+            },
+        });
+
+    } catch (error) {
+        console.error('getGroupById error:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
 // this will handle the logic for joining a group via the invite code
 async function joinGroup(req, res) {
     const { inviteCode } = req.body;
     const firebaseId = req.user.uid;
 
-    // this will verify that an invite code was sent
     if (!inviteCode) {
         return res.status(400).json({ error: 'Invite code is required' });
     }
 
     try {
-        // this will find the user in the database using their firebase Id
         const user = await prisma.user.findUnique({
             where: { firebaseId },
         });
@@ -32,17 +78,14 @@ async function joinGroup(req, res) {
             where: { inviteCode: iC },
         });
 
-        // this accounts for when no groups are found meaning an invalid code
         if (!group) {
             return res.status(404).json({ error: 'Invalid invite code' });
         }
 
-        // this will check if the invite code that was sent has expired
         if (group.inviteCodeExpiry && new Date() > group.inviteCodeExpiry) {
             return res.status(400).json({ error: 'Invite code has expired' });
         }
 
-        // this will check if the user is an existing member of the group
         const existingMember = await prisma.groupMember.findUnique({
             where: {
                 userId_groupId: {
@@ -56,7 +99,6 @@ async function joinGroup(req, res) {
             return res.status(400).json({ error: 'You are already a member of this group' });
         }
 
-        // if not, this will add the user to the group as a member
         await prisma.groupMember.create({
             data: {
                 userId: user.id,
@@ -65,7 +107,6 @@ async function joinGroup(req, res) {
             },
         });
 
-        // return the group details so the frontend can redirect to it
         return res.status(200).json({
             message: 'Successfully joined group',
             group: {
