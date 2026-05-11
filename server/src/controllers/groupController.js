@@ -52,6 +52,62 @@ async function getGroupById(req, res) {
         console.error('getGroupById error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
+}async function getGroupById(req, res) {
+    try {
+        const groupId = req.params?.groupId ?? req.params?.id;
+
+        if (!groupId) {
+            return res.status(400).json({ error: "Group ID is required" });
+        }
+
+        const firebaseId = req.user?.uid;
+
+        if (!firebaseId) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { firebaseId },
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        const membership = await prisma.groupMember.findFirst({
+            where: { groupId, userId: user.id },
+        });
+
+        if (!membership) {
+            return res.status(403).json({ error: "Not a member of this group" });
+        }
+
+        const group = await prisma.group.findUnique({
+            where: { id: groupId },
+        });
+
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId },
+            include: {
+                user: {
+                    select: {
+                        email: true,
+                        firebaseId: true,
+                    },
+                },
+            },
+        });
+
+        return res.status(200).json({
+            group,
+            groupMembers,
+            role: membership.role,
+        });
+
+    } catch (error) {
+        console.error("getGroupById error:", error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
 }
 
 // this will handle the logic for joining a group via the invite code
