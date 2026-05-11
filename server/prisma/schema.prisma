@@ -29,6 +29,7 @@ model Group {
   payoutOrder        String?
   meetingFrequency   String?
   contributions      Contribution[]
+  payouts            Payout[]
   members            GroupMember[]
   Meeting            Meeting[]
 }
@@ -41,6 +42,7 @@ model GroupMember {
   joinedAt               DateTime       @default(now())
   confirmedContributions Contribution[] @relation("TreasurerConfirmations")
   contributions          Contribution[] @relation("MemberContributions")
+  payouts                Payout[]
   group                  Group          @relation(fields: [groupId], references: [id])
   user                   User           @relation(fields: [userId], references: [id])
 
@@ -60,6 +62,20 @@ model Contribution {
   treasurer   GroupMember?       @relation("TreasurerConfirmations", fields: [confirmedBy], references: [id])
   group       Group              @relation(fields: [groupId], references: [id])
   member      GroupMember        @relation("MemberContributions", fields: [memberId], references: [id])
+}
+
+model Payout {
+  id        String       @id @default(uuid())
+  amount    Float
+  status    PayoutStatus @default(PENDING)
+  reference String? // To store the PayFast Batch ID
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  memberId  String
+  groupId   String
+
+  group  Group       @relation(fields: [groupId], references: [id])
+  member GroupMember @relation(fields: [memberId], references: [id])
 }
 
 model Meeting {
@@ -84,9 +100,8 @@ model Notification {
   sentAt      DateTime         @default(now())
   success     Boolean          @default(true)
   error       String?
-
-  recipient User    @relation(fields: [recipientId], references: [id], onDelete: Cascade)
-  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  meeting     Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  recipient   User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([recipientId])
   @@index([meetingId])
@@ -100,6 +115,7 @@ model SarbRate {
   source    String   @default("Trading Economics")
 }
 
+
 enum Role {
   MEMBER
   TREASURER
@@ -110,6 +126,12 @@ enum ContributionStatus {
   CONFIRMED
   MISSED
   PENDING
+}
+
+enum PayoutStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 enum NotificationType {

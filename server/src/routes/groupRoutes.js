@@ -6,6 +6,7 @@ const { refreshInviteCode}=require('../controllers/groupController');
 //const {fetchUserGroups, createGroup, joinGroup, getGroupSettings,updateGroupSettings } = require('../controllers/groupController');
 const {addMinutes, createMeeting , getMeetings , getGroupById , getGroups, createGroup, joinGroup, getGroupSettings, getGroupContributions, updateGroupSettings, getNotifications } = require('../controllers/groupController');
 const { updateContributionStatus } = require('../controllers/groupController');
+const { initiatePayout, getPayoutHistory, getEligibleMembers } = require('../../controllers/payoutController')
 // debug - check if functions are loaded correctly
 console.log('verifyToken:', typeof verifyToken);
 console.log('getGroups:', typeof getGroups);
@@ -21,6 +22,8 @@ console.log('refreshInviteCode:', typeof refreshInviteCode);
 router.post('/join', verifyToken, joinGroup);
 router.post('/:groupId/invite', verifyToken, refreshInviteCode);
 router.post('/:id/create-meeting' , verifyToken , createMeeting);
+//When treasurer clicks pay
+router.post('/:groupId/payouts/initiate', initiatePayout);
 
 // GET notifications for current user
 router.get('/notifications', verifyToken, getNotifications);  
@@ -31,8 +34,12 @@ router.get('/', verifyToken, getGroups);
 
 router.get('/:groupId/settings', verifyToken, getGroupSettings);
 router.get('/:groupId/contributions', verifyToken, getGroupContributions);
+router.get('/:groupId/payouts/history', getPayoutHistory);
+router.get('/:groupId/payouts/eligible', getEligibleMembers);
 router.get('/:id/meetings', verifyToken ,getMeetings);
 router.get('/:id' , verifyToken , getGroupById);
+
+
 
 
 

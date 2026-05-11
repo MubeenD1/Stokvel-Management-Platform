@@ -108,7 +108,7 @@ return (
                                 <div style={{ marginTop: '5px' }}>Amount: <span style={{ color: '#10b981' }}>R{c.amount}</span></div>
                                 <div style={{ fontSize: '0.9em', color: 'gray' }}>Due: {new Date(c.date).toLocaleDateString()}</div>
                                 
-                                {/* ACCEPTANCE TEST 2: The Audit Trail */}
+                                {/* ACCEPTANCE TEST 2: Audit Trail */}
                                 {c.status !== 'PENDING' && c.treasurer && (
                                     <div style={{ marginTop: '8px', fontSize: '0.8em', color: '#9ca3af', fontStyle: 'italic' }}>
                                         {c.status === 'CONFIRMED' ? 'Verified' : 'Marked Missed'} by: {c.treasurer.user?.email} <br/>

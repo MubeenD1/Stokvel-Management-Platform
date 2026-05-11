@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/13</span>
+                <span class='fraction'>13/13</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>12/12</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -91,62 +91,62 @@
 <a name='L26'></a><a href='#L26'>26</a>
 <a name='L27'></a><a href='#L27'>27</a>
 <a name='L28'></a><a href='#L28'>28</a>
-<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-no">&nbsp;</span>
+<a name='L29'></a><a href='#L29'>29</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const prisma = <span class="cstat-no" title="statement not covered" >require("../lib/prisma")</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const prisma = require("../lib/prisma")
 //const prisma = new PrismaClient
 &nbsp;
-const assignRole = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {</span>
+const assignRole = async (req, res) =&gt; {
     // The route gives us 'userId', but we now know it's actually the GroupMember.id
-    const { groupId, userId } = <span class="cstat-no" title="statement not covered" >req.params; </span>
-    const { role } = <span class="cstat-no" title="statement not covered" >req.body;</span>
+    const { groupId, userId } = req.params; 
+    const { role } = req.body;
 &nbsp;
-    const validRoles = <span class="cstat-no" title="statement not covered" >['ADMIN', 'TREASURER', 'MEMBER'];</span>
-<span class="cstat-no" title="statement not covered" >    if (!validRoles.includes(role)) <span class="cstat-no" title="statement not covered" >return res.status(400).json({error: 'Invalid role'});</span></span>
+    const validRoles = ['ADMIN', 'TREASURER', 'MEMBER'];
+    if (!validRoles.includes(role)) return res.status(400).json({error: 'Invalid role'});
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    try {</span>
+    try {
         // Bulletproof update using the primary key!
-        const updated = <span class="cstat-no" title="statement not covered" >await prisma.groupMember.update({</span>
+        const updated = await prisma.groupMember.update({
             where: {
                 id: userId  
             },
             data: { role }
         });
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        res.json(updated);</span>
+        res.json(updated);
         
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >        console.error('🔥 Prisma Error:', error);</span>
-<span class="cstat-no" title="statement not covered" >        res.status(500).json({error: 'Failed to assign role'});</span>
+        console.error('🔥 Prisma Error:', error);
+        res.status(500).json({error: 'Failed to assign role'});
     }
 }
-<span class="cstat-no" title="statement not covered" >module.exports = {assignRole}</span>
+module.exports = {assignRole}
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -154,7 +154,7 @@ const assignRole = <span class="cstat-no" title="statement not covered" ><span c
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-10T12:03:10.871Z
+                at 2026-05-11T01:26:53.179Z
             </div>
         <script src="../prettify.js"></script>
         <script>
