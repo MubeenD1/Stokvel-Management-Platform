@@ -605,3 +605,144 @@ let req, res;
 
 
 });
+
+describe('createMeeting', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('returns 400 if group ID is missing', async () => {
+    const req = { params: { id: null }, user: { uid: 'firebase123' }, body: {} };
+    const res = mockRes();
+
+    await createMeeting(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Group ID is required' });
+  });
+
+  test('returns 403 if user is not ADMIN or TREASURER', async () => {
+    const req = {
+      params: { id: 'group1' },
+      user: { uid: 'firebase123' },
+      body: { rDate: '2025-01-01', rLocation: 'HQ', rAgenda: 'Budget review' },
+    };
+    const res = mockRes();
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user1', firebaseId: 'firebase123' });
+    prisma.groupMember.findUnique.mockResolvedValue({ role: 'MEMBER' });
+
+    await createMeeting(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Not authorized to create meetings' });
+  });
+
+  test('returns 201 and meeting data on successful creation', async () => {
+    const req = {
+      params: { id: 'group1' },
+      user: { uid: 'firebase123' },
+      body: { rDate: '2025-06-01', rLocation: 'Office', rAgenda: 'Q2 Planning' },
+    };
+    const res = mockRes();
+
+    const mockMeeting = {
+      id: 'meeting1',
+      groupId: 'group1',
+      date: new Date('2025-06-01'),
+      location: 'Office',
+      agenda: 'Q2 Planning',
+      createdById: 'user1',
+      Group: { id: 'group1', name: 'Dev Team' },
+      User: { id: 'user1', name: 'Alice' },
+    };
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user1', firebaseId: 'firebase123' });
+    prisma.groupMember.findUnique.mockResolvedValue({ role: 'ADMIN' });
+    prisma.meeting.create.mockResolvedValue(mockMeeting);
+
+    await createMeeting(req, res);
+
+    expect(prisma.meeting.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ groupId: 'group1', location: 'Office' }),
+      })
+    );
+    expect(res.status).toHaveBeenCalledWith(201);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Meeting Created Successfully',
+      meeting: mockMeeting,
+    });
+  });
+});
+
+
+describe('joinGroup', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  test('returns 400 if invite code is missing', async () => {
+    const req = { body: {}, user: { uid: 'firebase123' } };
+    const res = mockRes();
+
+    await joinGroup(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invite code is required' });
+  });
+
+  test('returns 404 if invite code does not match any group', async () => {
+    const req = { body: { inviteCode: 'BADCODE' }, user: { uid: 'firebase123' } };
+    const res = mockRes();
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
+    prisma.group.findUnique.mockResolvedValue(null);
+
+    await joinGroup(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid invite code' });
+  });
+
+  test('returns 400 if user is already a member', async () => {
+    const req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
+    const res = mockRes();
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
+    prisma.group.findUnique.mockResolvedValue({
+      id: 'group1',
+      name: 'Dev Team',
+      inviteCode: 'VALID123',
+      inviteCodeExpiry: null,
+    });
+    prisma.groupMember.findUnique.mockResolvedValue({ userId: 'user1', groupId: 'group1' });
+
+    await joinGroup(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'You are already a member of this group' });
+  });
+
+  test('returns 200 and group info on successful join', async () => {
+    const req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
+    const res = mockRes();
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
+    prisma.group.findUnique.mockResolvedValue({
+      id: 'group1',
+      name: 'Dev Team',
+      inviteCode: 'VALID123',
+      inviteCodeExpiry: null,
+    });
+    prisma.groupMember.findUnique.mockResolvedValue(null);
+    prisma.groupMember.create.mockResolvedValue({});
+
+    await joinGroup(req, res);
+
+    expect(prisma.groupMember.create).toHaveBeenCalledWith({
+      data: { userId: 'user1', groupId: 'group1', role: 'MEMBER' },
+    });
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'Successfully joined group',
+      group: { id: 'group1', name: 'Dev Team' },
+    });
+  });
+});
