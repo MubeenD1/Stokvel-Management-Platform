@@ -14,7 +14,6 @@ function GroupCard({ group, onViewSettings, onCardClick}){
                 Joined:{new Date(group.joinedAt).toLocaleDateString()}
             </p>
         </div>
-
     );
 }
 const styles ={
@@ -24,8 +23,10 @@ const styles ={
         borderRadius:'10px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
         display: 'flex',
-        flexDirection : 'column',
-        gap : '10px',
+        flexDirection: 'column',
+        gap: '8px',
+        cursor: 'pointer',
+        transition: 'transform 0.2s',
     },
     button: {
     padding: '12px 24px',
@@ -41,21 +42,26 @@ const styles ={
     name : {
         fontSize : '15px',
         fontWeight: 'bold',
-        color : '#1a1a1a',
-        margin : 0,
+        color: '#1a1a1a',
+        margin: 0,
     },
     role: {
-        fontSize : '15px',
-        color : '#2e7d32',
-        margin : 0,
-        textTransform : 'capitalize',
+        fontSize: '14px',
+        color: '#2e7d32',
+        margin: 0,
+        textTransform: 'capitalize',
     },
-    joined : {
-        fontSize : '12px',
-        color:'#999',
-        margin: '0',
+    joined: {
+        fontSize: '13px',
+        color: '#999',
+        margin: 0,
     },
-
+    viewGroup: {
+        fontSize: '13px',
+        color: '#2e7d32',
+        margin: 0,
+        fontWeight: 'bold',
+    },
 };
 
 export default GroupCard;

@@ -7,7 +7,9 @@ const crypto = require('crypto');
 const CHARACTERS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
 const CODE_LENGTH = 6
 async function generateUniqueInviteCode() {
-    
+    const CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    const CODE_LENGTH = 6;
+
     let isUnique = false;
     let code = '';
 
