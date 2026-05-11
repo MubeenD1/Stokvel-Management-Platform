@@ -7,52 +7,53 @@ const { sendMeetingNotification } = require('../utils/notificationService');
 const { updateContributionStatus } = require('../../controllers/contributionController');
 
 // this will fetch a single group by its id
+// async function getGroupById(req, res) {
+//     const { groupId } = req.params;
+//     const firebaseId = req.user.uid;
+
+//     console.log('getGroupById called with groupId:', groupId);
+//     console.log('firebaseId:', firebaseId);
+
+//     try {
+//         const user = await prisma.user.findUnique({
+//             where: { firebaseId },
+//         });
+
+//         if (!user) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+
+//         const membership = await prisma.groupMember.findUnique({
+//             where: {
+//                 userId_groupId: {
+//                     userId: user.id,
+//                     groupId,
+//                 },
+//             },
+//             include: {
+//                 group: true,
+//             },
+//         });
+
+//         if (!membership) {
+//             return res.status(403).json({ error: 'You are not a member of this group' });
+//         }
+
+//         return res.status(200).json({
+//             group: {
+//                 id: membership.group.id,
+//                 name: membership.group.name,
+//                 role: membership.role,
+//                 joinedAt: membership.joinedAt,
+//             },
+//         });
+
+//     } catch (error) {
+//         console.error('getGroupById error:', error);
+//         return res.status(500).json({ error: 'Internal server error' });
+//     }
+//}
 async function getGroupById(req, res) {
-    const { groupId } = req.params;
-    const firebaseId = req.user.uid;
-
-    console.log('getGroupById called with groupId:', groupId);
-    console.log('firebaseId:', firebaseId);
-
-    try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseId },
-        });
-
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-        const membership = await prisma.groupMember.findUnique({
-            where: {
-                userId_groupId: {
-                    userId: user.id,
-                    groupId,
-                },
-            },
-            include: {
-                group: true,
-            },
-        });
-
-        if (!membership) {
-            return res.status(403).json({ error: 'You are not a member of this group' });
-        }
-
-        return res.status(200).json({
-            group: {
-                id: membership.group.id,
-                name: membership.group.name,
-                role: membership.role,
-                joinedAt: membership.joinedAt,
-            },
-        });
-
-    } catch (error) {
-        console.error('getGroupById error:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-}async function getGroupById(req, res) {
     try {
         const groupId = req.params?.groupId ?? req.params?.id;
 
