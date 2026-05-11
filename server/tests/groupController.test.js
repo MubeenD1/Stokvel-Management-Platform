@@ -3,7 +3,7 @@
 // =========================
 jest.mock('../lib/prisma', () => ({
   user: { findUnique: jest.fn() },
-  group: { create: jest.fn() , findUnique : jest.fn()},
+  group: { create: jest.fn() , findUnique : jest.fn(),  update: jest.fn()},
   meeting: {findMany: jest.fn() , findUnique :jest.fn() , create : jest.fn() , update : jest.fn()},
   groupMember: { findMany: jest.fn(), findUnique: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
   contribution: {findMany: jest.fn() , create: jest.fn()}
@@ -756,5 +756,222 @@ describe('joinGroup', () => {
       message: 'Successfully joined group',
       group: { id: 'group1', name: 'Dev Team' },
     });
+  });
+
+
+  
+});
+
+describe('getGroupContributions', () => {
+  let req, res;
+
+  beforeEach(() => {
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test('returns contributions for a valid group', async () => {
+    req = { params: { groupId: 'group-123' } };
+
+    const mockContributions = [
+      {
+        id: 'contrib-1',
+        amount: 500,
+        date: new Date('2026-01-01'),
+        status: 'CONFIRMED',
+        groupId: 'group-123',
+        member: { user: { email: 'member@test.com' } },
+        treasurer: { user: { email: 'treasurer@test.com' } },
+      },
+    ];
+
+    prisma.contribution.findMany.mockResolvedValue(mockContributions);
+
+    await getGroupContributions(req, res);
+
+    expect(prisma.contribution.findMany).toHaveBeenCalledWith({
+      where: { groupId: 'group-123' },
+      include: {
+        member: { include: { user: true } },
+        treasurer: { include: { user: true } },
+      },
+      orderBy: { date: 'asc' },
+    });
+    expect(res.json).toHaveBeenCalledWith(mockContributions);
+  });
+
+  test('returns empty array when group has no contributions', async () => {
+    req = { params: { groupId: 'group-empty' } };
+
+    prisma.contribution.findMany.mockResolvedValue([]);
+
+    await getGroupContributions(req, res);
+
+    expect(res.json).toHaveBeenCalledWith([]);
+  });
+
+  test('returns 500 if prisma throws an error', async () => {
+    req = { params: { groupId: 'group-123' } };
+
+    prisma.contribution.findMany.mockRejectedValue(new Error('DB crash'));
+
+    await getGroupContributions(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to load group contributions.' });
+  });
+});
+
+describe('refreshInviteCode', () => {
+  let req, res;
+
+  beforeEach(() => {
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test('returns 403 if user is not an ADMIN of the group', async () => {
+    req = {
+      params: { groupId: 'group-123' },
+      user: { uid: 'firebase-member' },
+    };
+
+    prisma.group.findUnique.mockResolvedValue({
+      id: 'group-123',
+      members: [
+        { role: 'MEMBER', user: { firebaseId: 'firebase-member' } },
+      ],
+    });
+
+    await refreshInviteCode(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Only admins can do this' });
+  });
+
+  test('returns new invite code and expiry for ADMIN user', async () => {
+    req = {
+      params: { groupId: 'group-123' },
+      user: { uid: 'firebase-admin' },
+    };
+
+    prisma.group.findUnique.mockResolvedValue({
+      id: 'group-123',
+      members: [
+        { role: 'ADMIN', user: { firebaseId: 'firebase-admin' } },
+      ],
+    });
+
+    generateUniqueInviteCode.mockResolvedValue('new-invite-code');
+
+    const mockExpiry = new Date();
+    prisma.group.update = jest.fn().mockResolvedValue({
+      inviteCode: 'new-invite-code',
+      inviteCodeExpiry: mockExpiry,
+    });
+
+    await refreshInviteCode(req, res);
+
+    expect(generateUniqueInviteCode).toHaveBeenCalled();
+    expect(prisma.group.update).toHaveBeenCalledWith({
+      where: { id: 'group-123' },
+      data: {
+        inviteCode: 'new-invite-code',
+        inviteCodeExpiry: expect.any(Date),
+      },
+    });
+    expect(res.json).toHaveBeenCalledWith({
+      inviteCode: 'new-invite-code',
+      expiresAt: mockExpiry,
+    });
+  });
+
+  test('returns 500 if prisma throws an error', async () => {
+    req = {
+      params: { groupId: 'group-123' },
+      user: { uid: 'firebase-admin' },
+    };
+
+    prisma.group.findUnique.mockRejectedValue(new Error('DB crash'));
+
+    await refreshInviteCode(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to refresh code' });
+  });
+});
+
+describe('getNotifications', () => {
+  let req, res;
+
+  beforeEach(() => {
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
+
+  test('returns 404 if user is not found', async () => {
+    req = { user: { uid: 'firebase-123' } };
+
+    prisma.user.findUnique.mockResolvedValue(null);
+
+    await getNotifications(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ error: 'User not found' });
+  });
+
+  test('returns notifications for a valid user', async () => {
+    req = { user: { uid: 'firebase-123' } };
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user-1' });
+
+    const mockNotifications = [
+      {
+        id: 'notif-1',
+        recipientId: 'user-1',
+        sentAt: new Date('2026-01-01'),
+        meeting: {
+          id: 'meeting-1',
+          Group: { id: 'group-1', name: 'Dev Team' },
+        },
+      },
+    ];
+
+    // add to your top-level mock: notification: { findMany: jest.fn() }
+    prisma.notification = { findMany: jest.fn().mockResolvedValue(mockNotifications) };
+
+    await getNotifications(req, res);
+
+    expect(prisma.notification.findMany).toHaveBeenCalledWith({
+      where: { recipientId: 'user-1' },
+      orderBy: { sentAt: 'desc' },
+      include: {
+        meeting: {
+          include: { Group: true },
+        },
+      },
+    });
+    expect(res.json).toHaveBeenCalledWith({ notifications: mockNotifications });
+  });
+
+  test('returns 500 if prisma throws an error', async () => {
+    req = { user: { uid: 'firebase-123' } };
+
+    prisma.user.findUnique.mockResolvedValue({ id: 'user-1' });
+    prisma.notification = { findMany: jest.fn().mockRejectedValue(new Error('DB crash')) };
+
+    await getNotifications(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch notifications' });
   });
 });
