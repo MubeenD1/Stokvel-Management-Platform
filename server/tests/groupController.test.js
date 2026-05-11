@@ -5,7 +5,7 @@ jest.mock('../lib/prisma', () => ({
   user: { findUnique: jest.fn() },
   group: { create: jest.fn() , findUnique : jest.fn()},
   meeting: {findMany: jest.fn() , findUnique :jest.fn() , create : jest.fn() , update : jest.fn()},
-  groupMember: { findMany: jest.fn() , findUnique :jest.fn() , findFirst : jest.fn()},
+  groupMember: { findMany: jest.fn(), findUnique: jest.fn(), findFirst: jest.fn(), create: jest.fn() },
   contribution: {findMany: jest.fn() , create: jest.fn()}
 }));
 
@@ -606,12 +606,22 @@ let req, res;
 
 });
 
+// ─────────────────────────────────────────────
+// createMeeting
+// ─────────────────────────────────────────────
 describe('createMeeting', () => {
-  beforeEach(() => jest.clearAllMocks());
+  let req, res;
+
+  beforeEach(() => {
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
 
   test('returns 400 if group ID is missing', async () => {
-    const req = { params: { id: null }, user: { uid: 'firebase123' }, body: {} };
-    const res = mockRes();
+    req = { params: { id: null }, user: { uid: 'firebase123' }, body: {} };
 
     await createMeeting(req, res);
 
@@ -620,12 +630,11 @@ describe('createMeeting', () => {
   });
 
   test('returns 403 if user is not ADMIN or TREASURER', async () => {
-    const req = {
+    req = {
       params: { id: 'group1' },
       user: { uid: 'firebase123' },
       body: { rDate: '2025-01-01', rLocation: 'HQ', rAgenda: 'Budget review' },
     };
-    const res = mockRes();
 
     prisma.user.findUnique.mockResolvedValue({ id: 'user1', firebaseId: 'firebase123' });
     prisma.groupMember.findUnique.mockResolvedValue({ role: 'MEMBER' });
@@ -637,12 +646,11 @@ describe('createMeeting', () => {
   });
 
   test('returns 201 and meeting data on successful creation', async () => {
-    const req = {
+    req = {
       params: { id: 'group1' },
       user: { uid: 'firebase123' },
       body: { rDate: '2025-06-01', rLocation: 'Office', rAgenda: 'Q2 Planning' },
     };
-    const res = mockRes();
 
     const mockMeeting = {
       id: 'meeting1',
@@ -674,13 +682,19 @@ describe('createMeeting', () => {
   });
 });
 
-
 describe('joinGroup', () => {
-  beforeEach(() => jest.clearAllMocks());
+  let req, res;
+
+  beforeEach(() => {
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+    jest.clearAllMocks();
+  });
 
   test('returns 400 if invite code is missing', async () => {
-    const req = { body: {}, user: { uid: 'firebase123' } };
-    const res = mockRes();
+    req = { body: {}, user: { uid: 'firebase123' } };
 
     await joinGroup(req, res);
 
@@ -689,8 +703,7 @@ describe('joinGroup', () => {
   });
 
   test('returns 404 if invite code does not match any group', async () => {
-    const req = { body: { inviteCode: 'BADCODE' }, user: { uid: 'firebase123' } };
-    const res = mockRes();
+    req = { body: { inviteCode: 'BADCODE' }, user: { uid: 'firebase123' } };
 
     prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
     prisma.group.findUnique.mockResolvedValue(null);
@@ -702,8 +715,7 @@ describe('joinGroup', () => {
   });
 
   test('returns 400 if user is already a member', async () => {
-    const req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
-    const res = mockRes();
+    req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
 
     prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
     prisma.group.findUnique.mockResolvedValue({
@@ -721,8 +733,7 @@ describe('joinGroup', () => {
   });
 
   test('returns 200 and group info on successful join', async () => {
-    const req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
-    const res = mockRes();
+    req = { body: { inviteCode: 'VALID123' }, user: { uid: 'firebase123' } };
 
     prisma.user.findUnique.mockResolvedValue({ id: 'user1' });
     prisma.group.findUnique.mockResolvedValue({
@@ -732,7 +743,8 @@ describe('joinGroup', () => {
       inviteCodeExpiry: null,
     });
     prisma.groupMember.findUnique.mockResolvedValue(null);
-    prisma.groupMember.create.mockResolvedValue({});
+    // groupMember.create is not in your mock — add it to the top-level jest.mock:
+    prisma.groupMember.create = jest.fn().mockResolvedValue({});
 
     await joinGroup(req, res);
 
