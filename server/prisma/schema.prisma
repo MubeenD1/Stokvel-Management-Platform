@@ -79,7 +79,7 @@ model Payout {
 }
 
 model Meeting {
-  id           String         @id
+  id           String          @id @default(uuid())
   groupId      String
   date         DateTime
   location     String
