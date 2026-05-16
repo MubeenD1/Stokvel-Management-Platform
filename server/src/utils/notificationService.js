@@ -23,4 +23,31 @@ const sendMeetingNotification = async (emails, groupName, meetingDetails, type =
     return transporter.sendMail(mailOptions);
 };
 
-module.exports = { sendMeetingNotification };
+
+const sendContributionEmail = async ({ toEmail, name, amount, groupName }) => {
+  await transporter.sendMail({
+    from: `"Stokvel Platform" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: '✅ Contribution Received',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 500px; margin: auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 8px;">
+        
+        <img 
+          src="https://www.payfast.co.za/assets/images/payfast-logo.svg" 
+          alt="PayFast" 
+          style="width: 120px; margin-bottom: 20px;"
+        />
+
+        <h2 style="color: #2e7d32;">Payment Confirmed ✅</h2>
+        <p>Hi ${name},</p>
+        <p>Your contribution of <strong>R${amount}</strong> to <strong>${groupName}</strong> has been received.</p>
+        <p>A treasurer will confirm it shortly.</p>
+
+        <hr style="margin: 24px 0; border: none; border-top: 1px solid #e0e0e0;" />
+        <p style="font-size: 12px; color: #999;">Secured by PayFast</p>
+      </div>
+    `,
+  });
+};
+
+module.exports = { sendMeetingNotification, sendContributionEmail };

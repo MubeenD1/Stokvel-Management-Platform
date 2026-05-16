@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { saveContribution } = require('./contributionService');
+const { sendContributionEmail } = require('../src/utils/notificationService')
 
 const {
   PAYFAST_MERCHANT_ID,
@@ -82,6 +83,13 @@ const handleNotify = async (req, res) => {
       amount: pfData.amount_gross, // The actual amount paid
       groupId: pfData.custom_str1, // We stored groupId here
       groupMemberId: pfData.custom_str2 // We stored groupMemberId here
+    });
+
+    await sendContributionEmail({
+      toEmail: contribution.member.user.email,
+      name: contribution.member.user.name,
+      amount: pfData.amount_gross,
+      groupName: contribution.group.name,       // make sure saveContribution returns this
     });
 
     
