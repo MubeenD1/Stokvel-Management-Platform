@@ -5,9 +5,6 @@ export default function GroupNavbar( {groupId,myRole} ) {
   return (
     <nav>
       <div className="group-nav-container">
-        <div className="logo">
-          <NavLink to="/home">Stokvel Management Platform</NavLink>
-        </div>
 
         <ul id="group-navbar">
           <li>

@@ -56,11 +56,12 @@ function GroupLayout() {
     fetchRole();
   }, [id, currentUser]);
 
-  if (!myRole) return null; // ← wait until role is fetched before rendering navbar
+  if (!myRole) return null;
 
   return (
     <div className="group-layout">
-      <GroupNavbar groupId={id} myRole={myRole} />
+      <Navbar />   
+      <GroupNavbar groupId={id} myRole={myRole} /> 
       <main><Outlet /></main>
     </div>
   );
