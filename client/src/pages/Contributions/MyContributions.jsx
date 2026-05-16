@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MakeContributionButton from '../../components/MakeContributtionButton';
-import PaymentModal from '../../components/paymentModals/PaymentModal';
 import './MyContributions.css'
 
 export default function MyContributions() {
@@ -62,8 +61,6 @@ export default function MyContributions() {
           email: currentUser.email,
         }}
       />
-
-      <PaymentModal amount={amount} reference={null} />
 
       <h1 style={styles.title}>My Contributions</h1>
       {contributions.length === 0 ? (

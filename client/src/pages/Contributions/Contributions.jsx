@@ -60,6 +60,8 @@ import MyContributions from './MyContributions';
 import ContributionsSection from './ContributionsSection';
 import SarbRates from '../../components/SarbRates';
 import SavingsProjection from '../../components/SavingsProjection';
+import PaymentModal from '../../components/paymentModals/PaymentModal';
+
 
 function Contributions() {
     const { id } = useParams();
@@ -107,6 +109,7 @@ function Contributions() {
 
     return (
         <div style={styles.container}>
+            <PaymentModal amount={amount} reference={null} />
 
             {isTreasurerOrAdmin ? (
                 <ContributionsSection
@@ -119,12 +122,11 @@ function Contributions() {
             ) : (
                 <MyContributions />
             )}
-             <SavingsProjection groupId={id} />
-            {/* SARB Rates Section */}
+
+            <SavingsProjection groupId={id} />
             <div style={styles.ratesSection}>
                 <SarbRates />
             </div>
-
         </div>
     );
 }
