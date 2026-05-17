@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { auth } from '../../firebase';
 import './CustomView.css';
@@ -12,21 +12,20 @@ import PayoutsTable from './AnalyticsComponents/PayoutsTable';
 
 const CustomView = () => {
   const { id } = useParams();
+  const resultsRef = useRef(null);
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [member, setMember] = useState(['all']); // Holds a single string value now
+  const [member, setMember] = useState(['all']);
   const [type, setType] = useState('Contribution');
-  const [status, setStatus] = useState('all'); // Fixed to track a single string like your useEffect setup
+  const [status, setStatus] = useState('all');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // Members state
   const [members, setMembers] = useState([]);
   const [membersLoading, setMembersLoading] = useState(true);
+  const [exportingPdf, setExportingPdf] = useState(false);
 
-  // Fetch group members using the same pattern
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       if (firebaseUser && id) {
@@ -52,7 +51,6 @@ const CustomView = () => {
     return () => unsubscribe();
   }, [id]);
 
-  // Reset status when type changes
   useEffect(() => {
     setStatus('all');
   }, [type]);
@@ -64,7 +62,6 @@ const CustomView = () => {
 
     try {
       const token = await auth.currentUser.getIdToken();
-
       const endpoint = type === 'Contribution'
         ? '/api/analytics/contributions'
         : '/api/analytics/payouts';
@@ -75,7 +72,7 @@ const CustomView = () => {
         memberId: member.includes('all') ? 'all' : member.join(','),
         statuses: status,
         groupId: id
-        });
+      });
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -87,14 +84,80 @@ const CustomView = () => {
       }
 
       const result = await response.json();
-      console.log('tableData:', result.tableData)
-        console.log('pieData:', result.pieData)
       setData(result);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  // ─── CSV Export ──────────────────────────────────────────────────────────────
+  const exportToCSV = () => {
+    if (!data?.tableData?.length) return;
+
+    const rows = data.tableData;
+
+    // Exclude any key that is "id" or ends with "Id" / "_id"
+    const headers = Object.keys(rows[0]).filter(
+      (h) => !/^id$|[_-]?id$/i.test(h)
+    );
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row =>
+        headers.map(h => {
+          const val = row[h] ?? '';
+          const str = String(val).replace(/"/g, '""');
+          return /[",\n]/.test(str) ? `"${str}"` : str;
+        }).join(',')
+      )
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${type.toLowerCase()}_report_${startDate}_to_${endDate}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ─── PDF Export ───────────────────────────────────────────────────────────
+  const exportToPDF = async () => {
+    if (!resultsRef.current) return;
+    setExportingPdf(true);
+
+    // Dynamically import html2pdf (works for both npm install and CDN)
+    let html2pdf;
+    try {
+      html2pdf = (await import('html2pdf.js')).default;
+    } catch {
+      // Fallback to global from CDN
+      html2pdf = window.html2pdf;
+    }
+
+    if (!html2pdf) {
+      alert('PDF export library not available. Please add html2pdf.js to your project.');
+      setExportingPdf(false);
+      return;
+    }
+
+    const filename = `${type.toLowerCase()}_report_${startDate}_to_${endDate}.pdf`;
+
+    await html2pdf()
+      .set({
+        margin: [10, 10, 10, 10],
+        filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
+      })
+      .from(resultsRef.current)
+      .save();
+
+    setExportingPdf(false);
   };
 
   return (
@@ -125,51 +188,45 @@ const CustomView = () => {
           </div>
         </div>
 
-        {/* Member — Dropdown Checkbox list */}
+        {/* Member */}
         <div className="custom-view__group">
-        <label className="custom-view__label">Select Members</label>
-        <div style={{ 
-            border: '1px solid #ced4da', 
-            borderRadius: '4px', 
-            maxHeight: '120px', 
-            overflowY: 'auto', 
+          <label className="custom-view__label">Select Members</label>
+          <div style={{
+            border: '1px solid #ced4da',
+            borderRadius: '4px',
+            maxHeight: '120px',
+            overflowY: 'auto',
             padding: '8px',
             backgroundColor: '#fff'
-        }}>
-            {/* All Members Toggle */}
+          }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px', cursor: 'pointer' }}>
-            <input 
-                type="checkbox" 
+              <input
+                type="checkbox"
                 checked={member.includes('all')}
-                onChange={() => setMember(['all'])} 
-            />
-            <span>All Members</span>
+                onChange={() => setMember(['all'])}
+              />
+              <span>All Members</span>
             </label>
-
-            {/* Individual Checkboxes */}
             {members.map((m) => (
-            <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', cursor: 'pointer' }}>
-                <input 
-                type="checkbox" 
-                checked={member.includes(m.id) && !member.includes('all')}
-                onChange={() => {
+              <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  checked={member.includes(m.id) && !member.includes('all')}
+                  onChange={() => {
                     if (member.includes('all')) {
-                    // If replacing "all", start a fresh list with just this ID
-                    setMember([m.id]);
+                      setMember([m.id]);
                     } else if (member.includes(m.id)) {
-                    // Uncheck item
-                    const updated = member.filter(id => id !== m.id);
-                    setMember(updated.length === 0 ? ['all'] : updated);
+                      const updated = member.filter(id => id !== m.id);
+                      setMember(updated.length === 0 ? ['all'] : updated);
                     } else {
-                    // Check item
-                    setMember([...member, m.id]);
+                      setMember([...member, m.id]);
                     }
-                }} 
+                  }}
                 />
                 <span>{m.user?.email ?? m.id}</span>
-            </label>
+              </label>
             ))}
-        </div>
+          </div>
         </div>
 
         {/* Type */}
@@ -195,14 +252,12 @@ const CustomView = () => {
           >
             <option value="all">All</option>
             <option value="PENDING">Pending</option>
-
             {type === 'Contribution' && (
               <>
                 <option value="CONFIRMED">Confirmed</option>
                 <option value="MISSED">Missed</option>
               </>
             )}
-
             {type === 'Payout' && (
               <>
                 <option value="COMPLETED">Completed</option>
@@ -222,36 +277,51 @@ const CustomView = () => {
 
       {/* Results */}
       {data && (
-        <div className="custom-view__results">
+        <>
+          {/* Export Buttons */}
+          <div className="custom-view__export-bar">
+            <button
+              className="custom-view__export-btn custom-view__export-btn--csv"
+              onClick={exportToCSV}
+              title="Download table data as CSV"
+            >
+              ⬇ Export CSV
+            </button>
+            <button
+              className="custom-view__export-btn custom-view__export-btn--pdf"
+              onClick={exportToPDF}
+              disabled={exportingPdf}
+              title="Download full report as PDF"
+            >
+              {exportingPdf ? 'Generating PDF...' : '⬇ Export PDF'}
+            </button>
+          </div>
+
+          <div className="custom-view__results" ref={resultsRef}>
+            {/* Report header printed into PDF */}
+            <div className="custom-view__pdf-header">
+              <h3>{type} Report</h3>
+              <p>{startDate} → {endDate}</p>
+            </div>
+
             {type === 'Contribution' && (
-            <>
-               <ContributionBarChart 
-                data={data.tableData} 
-                startDate={startDate} 
-                endDate={endDate} 
-                />
-
+              <>
+                <ContributionBarChart data={data.tableData} startDate={startDate} endDate={endDate} />
                 <ContributionPieChart data={data.tableData} />
-
-                <ContributionsTable data={data.tableData} />  
-            </>
+                <ContributionsTable data={data.tableData} />
+              </>
             )}
 
             {type === 'Payout' && (
-            <>
-              <PayoutsBarChart 
-                data={data.tableData} 
-                startDate={startDate} 
-                endDate={endDate} 
-              />
-
-              <PayoutsPieChart data={data.tableData} />
-
-              <PayoutsTable data={data.tableData} />  
-            </>
-          )}
-        </div>
-        )}
+              <>
+                <PayoutsBarChart data={data.tableData} startDate={startDate} endDate={endDate} />
+                <PayoutsPieChart data={data.tableData} />
+                <PayoutsTable data={data.tableData} />
+              </>
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };
