@@ -17,6 +17,7 @@ import InviteManager from './components/InviteManager/InviteManager';
 import Notifications from './pages/Notifications/Notifications';
 import Contributions from './pages/Contributions/Contributions';
 import Group from './pages/Group';
+import ComplianceReport from './pages/Analytics/ComplianceReport';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -38,6 +39,7 @@ function GroupLayout() {
   const { id } = useParams();
   const { currentUser } = useAuth();
   const [myRole, setMyRole] = useState(null);
+  
 
   useEffect(() => {
     async function fetchRole() {
@@ -80,6 +82,7 @@ export default function App() {
           <Route path="/join" element={<JoinGroup />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/group/:groupId" element={<Group />} />
+          
         </Route>
 
         <Route element={<ProtectedRoute><GroupLayout /></ProtectedRoute>}>
@@ -89,6 +92,7 @@ export default function App() {
           <Route path="/groups/:id/meetings/create" element={<CreateMeeting />} />
           <Route path="/groups/:id/invite" element={<InviteManager />} />
           <Route path="/groups/:id/contributions" element={<Contributions />} />
+          <Route path="/groups/:id/compliance" element={<ComplianceReport />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />

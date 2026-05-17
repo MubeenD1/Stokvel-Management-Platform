@@ -36,6 +36,11 @@ export default function GroupNavbar({ groupId, myRole }) {
             </NavLink>
           </li>
           <li>
+  <NavLink to={`/groups/${groupId}/compliance`} className={({ isActive }) => isActive ? "active" : ""}>
+    Analytics
+  </NavLink>
+</li>
+          <li>
             <NavLink to={`/groups/${groupId}/settings`} className={({ isActive }) => isActive ? "active" : ""}>
               Settings
             </NavLink>
