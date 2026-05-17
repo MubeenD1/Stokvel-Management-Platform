@@ -23,6 +23,7 @@ const roleRoutes = require('./routes/role');
 const contributionRoutes = require('./routes/contribution');
 const payfastRoutes = require('./routes/payfast');
 const sarbRoutes = require('./src/routes/sarbRoutes');
+const analyticsRoutes = require('./src/routes/analyticsRoutes')
 
 const app = express();
 
@@ -41,6 +42,7 @@ app.use('/api/groups', groupRoutes);
 app.use('/api/contributions', contributionRoutes);
 app.use('/api/payfast', payfastRoutes);
 app.use('/api/sarb', sarbRoutes);
+app.use('/api/analytics', analyticsRoutes)
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

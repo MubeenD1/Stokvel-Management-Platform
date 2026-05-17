@@ -24,8 +24,10 @@ export default function GroupPage() {
                         headers: { 'Authorization': `Bearer ${token}` },
                     });
                     const data = await response.json();
+                    console.log(data)
                     if (response.ok) {
                         setMembers(data.groupMembers || []);
+                        
                     } else {
                         setError('Failed to fetch members');
                     }
