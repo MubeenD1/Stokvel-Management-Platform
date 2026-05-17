@@ -2,13 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { auth } from '../../firebase';
 import './CustomView.css';
+import ContributionCompliance from './ContributionComplianceTab';
+import ContributionsTable from './AnalyticsComponents/ContributionsTable';
+import ContributionPieChart from './AnalyticsComponents/ContributionPieChart';
+import ContributionBarChart from './AnalyticsComponents/ContributionBarChart';
 
 const CustomView = () => {
   const { id } = useParams();
 
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [member, setMember] = useState('all'); // Holds a single string value now
+  const [member, setMember] = useState(['all']); // Holds a single string value now
   const [type, setType] = useState('Contribution');
   const [status, setStatus] = useState('all'); // Fixed to track a single string like your useEffect setup
   const [data, setData] = useState(null);
@@ -65,10 +69,10 @@ const CustomView = () => {
       const params = new URLSearchParams({
         startDate,
         endDate,
-        memberId: member, // Sends 'all' or the single selected member ID
+        memberId: member.includes('all') ? 'all' : member.join(','),
         statuses: status,
         groupId: id
-      });
+        });
 
       const response = await fetch(`${import.meta.env.VITE_API_URL}${endpoint}?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -80,6 +84,8 @@ const CustomView = () => {
       }
 
       const result = await response.json();
+      console.log('tableData:', result.tableData)
+        console.log('pieData:', result.pieData)
       setData(result);
     } catch (err) {
       setError(err.message);
@@ -214,9 +220,27 @@ const CustomView = () => {
       {/* Results */}
       {data && (
         <div className="custom-view__results">
-          {/* your table and charts here */}
+            {type === 'Contribution' && (
+            <>
+               <ContributionBarChart 
+                data={data.tableData} 
+                startDate={startDate} 
+                endDate={endDate} 
+                />
+
+                <ContributionPieChart data={data.tableData} />
+
+                <ContributionsTable data={data.tableData} />  
+            </>
+            )}
+
+            {type === 'Payout' && (
+            <>
+                {/* add payout components here when ready */}
+            </>
+            )}
         </div>
-      )}
+        )}
     </div>
   );
 };

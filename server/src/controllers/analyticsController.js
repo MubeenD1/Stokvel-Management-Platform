@@ -32,7 +32,7 @@ const getContributionAnalytics = async (req, res) => {
     const filters = {
       startDate: start,
       endDate: end,
-      memberId: memberId === 'all' ? null : memberId,
+      memberId: memberId === 'all' ? null : memberId.split(','),
       statuses: statuses === 'all' ? null : statuses.split(','),
       groupId
     }

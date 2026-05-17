@@ -12,7 +12,7 @@ const getContributionData = async (filters) => {
       lte: endDate
     },
     // Only add memberId filter if a specific member was selected
-    ...(memberId && { memberId }),
+    ...(memberId && { memberId: {in: Array.isArray(memberId) ? memberId : [memberId]}}),
     // Only add status filter if specific statuses were selected
     ...(statuses && { status: { in: statuses } })
   }
