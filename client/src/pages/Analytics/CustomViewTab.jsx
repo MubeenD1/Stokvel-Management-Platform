@@ -6,6 +6,9 @@ import ContributionCompliance from './ContributionComplianceTab';
 import ContributionsTable from './AnalyticsComponents/ContributionsTable';
 import ContributionPieChart from './AnalyticsComponents/ContributionPieChart';
 import ContributionBarChart from './AnalyticsComponents/ContributionBarChart';
+import PayoutsBarChart from './AnalyticsComponents/PayoutsBarChart';
+import PayoutsPieChart from './AnalyticsComponents/PayoutsPieChart';
+import PayoutsTable from './AnalyticsComponents/PayoutsTable';
 
 const CustomView = () => {
   const { id } = useParams();
@@ -236,9 +239,17 @@ const CustomView = () => {
 
             {type === 'Payout' && (
             <>
-                {/* add payout components here when ready */}
+              <PayoutsBarChart 
+                data={data.tableData} 
+                startDate={startDate} 
+                endDate={endDate} 
+              />
+
+              <PayoutsPieChart data={data.tableData} />
+
+              <PayoutsTable data={data.tableData} />  
             </>
-            )}
+          )}
         </div>
         )}
     </div>

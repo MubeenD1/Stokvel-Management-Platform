@@ -87,4 +87,82 @@ const getContributionData = async (filters) => {
   }
 }
 
-module.exports = { getContributionData }
+const getPayoutData = async (filters) => {
+  const { startDate, endDate, memberId, statuses, groupId } = filters
+
+  // Build where clause dynamically mapping to Prisma Payout fields
+  const where = {
+    groupId,
+    createdAt: {
+      gte: startDate,
+      lte: endDate
+    },
+    // Only add memberId filter if a specific member was selected
+    ...(memberId && { memberId: { in: Array.isArray(memberId) ? memberId : [memberId] } }),
+    // Only add status filter if specific statuses were selected
+    ...(statuses && { status: { in: statuses } })
+  }
+
+  // Fetch all matching payouts based on your Prisma Model relations
+  const payouts = await prisma.payout.findMany({
+    where,
+    include: {
+      member: {
+        include: {
+          user: {
+            select: { email: true }
+          }
+        }
+      }
+    },
+    orderBy: { createdAt: 'asc' }
+  })
+
+  // ── Table Data ──────────────────────────────────────────
+  const tableData = payouts.map(p => ({
+    id: p.id,
+    email: p.member?.user?.email ?? 'N/A',
+    amount: p.amount,
+    createdAt: p.createdAt, // Frontend components look for createdAt on payouts
+    reference: p.reference,
+    status: p.status
+  }))
+
+  // ── Pie Chart Data ──────────────────────────────────────
+  const statusCounts = payouts.reduce((acc, p) => {
+    acc[p.status] = (acc[p.status] || 0) + 1
+    return acc
+  }, {})
+
+  const pieData = Object.entries(statusCounts).map(([status, count]) => ({
+    status,
+    count
+  }))
+
+  // ── Bar Chart Data ──────────────────────────────────────
+  const barMap = {}
+
+  payouts.forEach(p => {
+    const date = new Date(p.createdAt)
+    const monthKey = date.toLocaleString('default', { month: 'short', year: 'numeric' })
+
+    if (!barMap[monthKey]) {
+      barMap[monthKey] = { month: monthKey }
+    }
+
+    barMap[monthKey][p.status] = (barMap[monthKey][p.status] || 0) + p.amount
+  })
+
+  const barData = Object.values(barMap)
+
+  return {
+    tableData,
+    pieData,
+    barData
+  }
+}
+
+module.exports = { 
+  getContributionData, 
+  getPayoutData 
+}

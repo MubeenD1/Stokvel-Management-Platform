@@ -1,29 +1,26 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Global color syncing matrix
+// Global color syncing matrix adjusted for PayFast Payout statuses
 const STATUS_COLORS = {
-  CONFIRMED: '#28a745', // Green
-  PENDING: '#ffc107',   // Yellow
-  MISSED: '#dc3545',      // Red
+  SUCCESS: '#28a745', // Green
+  PENDING: '#ffc107', // Yellow
+  FAILED: '#dc3545',  // Red
 };
 
-const ContributionBarChart = ({ data = [], startDate, endDate }) => {
-    console.log('Bar chart received:', data)  // ← add this line
-  // Helper: Aggregate row data by Month-Year, constrained to a 6-month window
+const PayoutsBarChart = ({ data = [], startDate, endDate }) => {
+  console.log('Payout Bar chart received:', data); 
+
   const prepareChartData = () => {
     if (!data || data.length === 0) return [];
 
-    // Determine target months boundary range (Cap to maximum of past 6 months if broad range provided)
     const start = startDate ? new Date(startDate) : new Date();
     const end = endDate ? new Date(endDate) : new Date();
     
-    // Fallback logic to generate last 6 chronological months if user leaves inputs blank
     if (!startDate) {
       start.setMonth(end.getMonth() - 5);
     }
 
-    // Build ordered baseline calendar array matching our 6-month scope
     const activeMonths = [];
     let currentIterNode = new Date(start.getFullYear(), start.getMonth(), 1);
     const endCompareNode = new Date(end.getFullYear(), end.getMonth(), 1);
@@ -33,17 +30,16 @@ const ContributionBarChart = ({ data = [], startDate, endDate }) => {
       activeMonths.push({
         monthKey: `${currentIterNode.getFullYear()}-${String(currentIterNode.getMonth() + 1).padStart(2, '0')}`,
         label: monthLabel,
-        CONFIRMED: 0,
+        SUCCESS: 0,   // Fixed here: Changed from COMPLETED to SUCCESS
         PENDING: 0,
-        MISSED: 0,
+        FAILED: 0,
       });
       currentIterNode.setMonth(currentIterNode.getMonth() + 1);
     }
 
-    // Allocate data array contributions into respective structured month buckets
     data.forEach((item) => {
-      if (!item.contributionDate && !item.createdAt) return;
-      const itemDate = new Date(item.contributionDate || item.createdAt);
+      if (!item.createdAt) return;
+      const itemDate = new Date(item.createdAt);
       const itemKey = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
       const status = item.status ? item.status.toUpperCase() : 'UNKNOWN';
       const amount = Number(item.amount) || 0;
@@ -77,9 +73,9 @@ const ContributionBarChart = ({ data = [], startDate, endDate }) => {
       border: '1px solid #e0e0e0',
       boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'between', alignItems: 'center', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h3 style={{ margin: 0, fontFamily: 'sans-serif', color: '#333', fontSize: '16px' }}>
-          Monthly Contribution Volume Tracking (Max 6 Months)
+          Monthly Payout Volume Tracking (Max 6 Months)
         </h3>
       </div>
 
@@ -102,7 +98,7 @@ const ContributionBarChart = ({ data = [], startDate, endDate }) => {
             tickLine={false}
           />
           <Tooltip 
-            formatter={(value) => [`R${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`]}
+            formatter={(value) => [`R ${value.toLocaleString(undefined, {minimumFractionDigits: 2})}`]}
             contentStyle={{ fontFamily: 'sans-serif', borderRadius: '6px', border: '1px solid #ccc' }}
           />
           <Legend 
@@ -110,31 +106,34 @@ const ContributionBarChart = ({ data = [], startDate, endDate }) => {
             wrapperStyle={{ fontFamily: 'sans-serif', fontSize: '13px', paddingTop: '10px' }}
           />
           
-          {/* Stacked Breakdown Bars. Swap stackId="a" out if you want them side by side instead */}
+          {/* Fixed dataKey pointers down here */}
           <Bar
-  dataKey="CONFIRMED"
-  name="Confirmed"
-  fill={STATUS_COLORS.CONFIRMED}
-  radius={[4, 4, 0, 0]}
-/>
+            dataKey="SUCCESS"
+            name="Success"
+            fill={STATUS_COLORS.SUCCESS}
+            stackId="payout"
+            radius={[0, 0, 0, 0]}
+          />
 
-<Bar
-  dataKey="PENDING"
-  name="Pending"
-  fill={STATUS_COLORS.PENDING}
-  radius={[4, 4, 0, 0]}
-/>
+          <Bar
+            dataKey="PENDING"
+            name="Pending"
+            fill={STATUS_COLORS.PENDING}
+            stackId="payout"
+            radius={[0, 0, 0, 0]}
+          />
 
-<Bar
-  dataKey="MISSED"
-  name="Missed"
-  fill={STATUS_COLORS.MISSED}
-  radius={[4, 4, 0, 0]}
-/>
+          <Bar
+            dataKey="FAILED"
+            name="Failed"
+            fill={STATUS_COLORS.FAILED}
+            stackId="payout"
+            radius={[4, 4, 0, 0]} 
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
   );
 };
 
-export default ContributionBarChart;
+export default PayoutsBarChart;
