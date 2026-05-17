@@ -17,6 +17,7 @@ import InviteManager from './components/InviteManager/InviteManager';
 import Notifications from './pages/Notifications/Notifications';
 import Contributions from './pages/Contributions/Contributions';
 import PayoutsPage from './pages/Payouts/PayoutsPage';
+import Analytics from './pages/Analytics/Analytics';
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -89,6 +90,7 @@ export default function App() {
           <Route path = "/groups/:id/invite" element = {<InviteManager/>}/>
           <Route path = "/groups/:id/contributions" element = {<Contributions/>}/>
           <Route path = "/groups/:id/payouts" element = {<PayoutsPage/>}/>
+          <Route path = "/groups/:id/analytics" element = {<Analytics />}/>
       
         </Route>
 

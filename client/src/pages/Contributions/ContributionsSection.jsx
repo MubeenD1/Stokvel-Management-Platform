@@ -72,7 +72,7 @@ export default function ContributionsSection({ groupId, myRole, members, groupMe
 
 
 return (
-    <div style={{ marginTop: '40px', background: '#111', padding: '20px', borderRadius: '8px', color: 'white' }}>
+    <div style={{ marginTop: '40px', background: '#fff', padding: '20px', borderRadius: '8px', color: 'white' }}>
         
         {/* Floating Pay Button — same as MyContributions */}
         <MakeContributionButton

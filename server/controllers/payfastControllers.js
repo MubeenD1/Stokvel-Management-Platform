@@ -67,35 +67,33 @@ const initiatePayment = async (req, res) => {
 };
 
 const handleNotify = async (req, res) => {
-  
   const pfData = req.body;
-
   console.log('PayFast ITN Received:', pfData);
 
   if (pfData.payment_status !== 'COMPLETE') {
-    console.log(`Transaction not complete (Status: ${pfData.payment_status}). Skipping DB save.`);
-    return res.sendStatus(200); 
+    return res.sendStatus(200);
   }
 
   try {
-    // 3. Save to Database
-    await saveContribution({
-      amount: pfData.amount_gross, // The actual amount paid
-      groupId: pfData.custom_str1, // We stored groupId here
-      groupMemberId: pfData.custom_str2 // We stored groupMemberId here
+    const contribution = await saveContribution({
+      amount: pfData.amount_gross,
+      groupId: pfData.custom_str1,
+      groupMemberId: pfData.custom_str2,
     });
+
+    console.log('Contribution saved:', contribution);
 
     await sendContributionEmail({
-      toEmail: contribution.member.user.email,
-      name: contribution.member.user.name,
+      toEmail: pfData.email_address,   
+      name: pfData.name_first || 'Member',
       amount: pfData.amount_gross,
-      groupName: contribution.group.name,       // make sure saveContribution returns this
+      groupName: contribution.group.name,
     });
 
-    
     res.sendStatus(200);
   } catch (err) {
-    console.error('Error saving contribution to DB:', err);
+    console.error('handleNotify error:', err.message);
+    console.error(err.stack);
     res.sendStatus(500);
   }
 };
