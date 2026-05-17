@@ -111,7 +111,6 @@ const PayoutsBarChart = ({ data = [], startDate, endDate }) => {
             dataKey="SUCCESS"
             name="Success"
             fill={STATUS_COLORS.SUCCESS}
-            stackId="payout"
             radius={[0, 0, 0, 0]}
           />
 
@@ -119,7 +118,6 @@ const PayoutsBarChart = ({ data = [], startDate, endDate }) => {
             dataKey="PENDING"
             name="Pending"
             fill={STATUS_COLORS.PENDING}
-            stackId="payout"
             radius={[0, 0, 0, 0]}
           />
 
@@ -127,7 +125,6 @@ const PayoutsBarChart = ({ data = [], startDate, endDate }) => {
             dataKey="FAILED"
             name="Failed"
             fill={STATUS_COLORS.FAILED}
-            stackId="payout"
             radius={[4, 4, 0, 0]} 
           />
         </BarChart>
