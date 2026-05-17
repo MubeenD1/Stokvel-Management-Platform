@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import CustomView from './CustomViewTab';
-import ContributionCompliance from './ContributionComplianceTab';
+import CustomView from './CustomView';
+import ComplianceReport from './ComplianceReport';
 
-
-const AnalyticsTabs = () => {
+const Analytics = () => {
   const [activeTab, setActiveTab] = useState('compliance');
 
   const styles = {
@@ -43,7 +42,7 @@ const AnalyticsTabs = () => {
 
       {/* Tab Content */}
       <div style={styles.contentArea}>
-        {activeTab === 'compliance' && <ContributionCompliance />}
+        {activeTab === 'compliance' && <ComplianceReport />}
         {activeTab === 'custom' && <CustomView />}
       </div>
 
@@ -51,4 +50,4 @@ const AnalyticsTabs = () => {
   );
 };
 
-export default AnalyticsTabs;
+export default Analytics;

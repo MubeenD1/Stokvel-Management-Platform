@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { auth } from '../../firebase';
 import './CustomView.css';
-import ContributionCompliance from './ContributionComplianceTab';
+import ComplianceReport from './ComplianceReport';
 import ContributionsTable from './AnalyticsComponents/ContributionsTable';
 import ContributionPieChart from './AnalyticsComponents/ContributionPieChart';
 import ContributionBarChart from './AnalyticsComponents/ContributionBarChart';

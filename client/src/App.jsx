@@ -19,6 +19,7 @@ import Contributions from './pages/Contributions/Contributions';
 import PayoutsPage from './pages/Payouts/PayoutsPage';
 import Analytics from './pages/Analytics/Analytics';
 
+
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
   return currentUser ? children : <Navigate to="/login" />;
