@@ -174,13 +174,40 @@ async function updateGroupSettings(req, res) {
         });
 
         if (isDateChanged || isFreqChanged) {
-            const memberEmails = currentGroup.members.map(m => m.user.email);
-            
-            await sendMeetingNotification(
-                memberEmails, 
-                updatedGroup.name, 
-                { date: nextMeetingDate, frequency: meetingFrequency },
-                isDateChanged ? "update" : "schedule"
+            await Promise.allSettled(
+                currentGroup.members.map(async (member) => {
+                    let success = true;
+                    let errorMsg = null;
+
+                    try {
+                        await sendMeetingNotification(
+                            [member.user.email],
+                            updatedGroup.name,
+                            { date: nextMeetingDate, frequency: meetingFrequency },
+                            isDateChanged ? "update" : "schedule"
+                        );
+                    } catch (err) {
+                        success = false;
+                        errorMsg = err.message;
+                    }
+
+                    const latestMeeting = await prisma.meeting.findFirst({
+                        where: { groupId },
+                        orderBy: { date: 'desc' },
+                    });
+
+                    if (latestMeeting) {
+                        await prisma.notification.create({
+                            data: {
+                                type: 'MEETING_UPDATED',
+                                recipientId: member.user.id,
+                                meetingId: latestMeeting.id,
+                                success,
+                                error: errorMsg,
+                            },
+                        });
+                    }
+                })
             );
         }
 
@@ -419,6 +446,40 @@ async function createMeeting(req,res){
             User: true, 
         },
         });
+
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId: gId },
+            include: { user: true },
+        });
+
+        await Promise.allSettled(
+            groupMembers.map(async (member) => {
+                let success = true;
+                let errorMsg = null;
+
+                try {
+                    await sendMeetingNotification(
+                        [member.user.email],
+                        meeting.Group.name,
+                        { date: rDate, location: rLocation, agenda: rAgenda },
+                        'schedule'
+                    );
+                } catch (err) {
+                    success = false;
+                    errorMsg = err.message;
+                }
+
+                await prisma.notification.create({
+                    data: {
+                        type: 'MEETING_CREATED',
+                        recipientId: member.user.id,
+                        meetingId: meeting.id,
+                        success,
+                        error: errorMsg,
+                    },
+                });
+            })
+        );
         return res.status(201).json({
             message : "Meeting Created Successfully",
             meeting,
