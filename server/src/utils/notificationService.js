@@ -23,6 +23,15 @@ const sendMeetingNotification = async (emails, groupName, meetingDetails, type =
     return transporter.sendMail(mailOptions);
 };
 
+const sendMinutesNotification = async (emails, groupName, meetingDetails) => {
+    const mailOptions = {
+        from: process.env.EMAIL_USER,
+        to: emails,
+        subject: `Meeting Minutes Available: ${groupName}`,
+        text: `Hello!\n\nThe minutes for the ${groupName} meeting held on ${meetingDetails.date} have been published.\n\n${meetingDetails.minutes}\n\nPlease check your dashboard for full details.`,
+    };
+    return transporter.sendMail(mailOptions);
+};
 
 const sendContributionEmail = async ({ toEmail, name, amount, groupName }) => {
   await transporter.sendMail({
@@ -50,4 +59,8 @@ const sendContributionEmail = async ({ toEmail, name, amount, groupName }) => {
   });
 };
 
-module.exports = { sendMeetingNotification, sendContributionEmail };
+module.exports = {
+  sendMeetingNotification,
+  sendMinutesNotification,
+  sendContributionEmail
+};

@@ -566,9 +566,9 @@ async function getMeetings(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
-async function addMinutes(req,res){
+async function addMinutes(req, res) {
     if (!req.user || !req.user.uid) {
-        return res.status(401).json({ error: "Unauthorized" });
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const { id: gId, meetingId } = req.params;
@@ -577,43 +577,72 @@ async function addMinutes(req,res){
     if (!gId) {
         return res.status(400).json({ error: 'Group ID is required' });
     }
-    const firebaseId = req.user.uid;
-    try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseId },
-        });
 
+    const firebaseId = req.user.uid;
+
+    try {
+        const user = await prisma.user.findUnique({ where: { firebaseId } });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }        
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         const membership = await prisma.groupMember.findUnique({
-        where: {
-            userId_groupId: {
-                userId: user.id,
-                groupId: gId,
-                },
+            where: {
+                userId_groupId: { userId: user.id, groupId: gId },
             },
         });
-
         if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
-            return res.status(403).json({ error: "Not authorized to create add meeting minutes" });
+            return res.status(403).json({ error: 'Not authorized to add meeting minutes' });
         }
-        
+
         const meeting = await prisma.meeting.update({
             where: { id: meetingId },
             data: { minutes },
+            include: { Group: true },
         });
-        return res.status(201).json({
-            message : "successful", 
-            meeting
-         });
 
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId: gId },
+            include: { user: true },
+        });
+
+        await Promise.allSettled(
+            groupMembers.map(async (member) => {
+                let success = true;
+                let errorMsg = null;
+
+                try {
+                    await sendMinutesNotification(
+                        [member.user.email],
+                        meeting.Group.name,
+                        { date: meeting.date.toDateString(), minutes }
+                    );
+                } catch (err) {
+                    success = false;
+                    errorMsg = err.message;
+                }
+
+                await prisma.notification.create({
+                    data: {
+                        type: 'MINUTES_PUBLISHED',
+                        recipientId: member.user.id,
+                        meetingId: meeting.id,
+                        success,
+                        error: errorMsg,
+                    },
+                });
+            })
+        );
+
+        return res.status(201).json({
+            message: 'Minutes added successfully',
+            meeting,
+        });
     } catch (error) {
         console.error('addMinutes error:', error);
-    return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
-};
+}
 const getNotifications = async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
