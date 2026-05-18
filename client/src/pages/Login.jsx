@@ -16,7 +16,7 @@ export default function Login() {
   const loginWithGoogle = async () => {
     try{
       const result = await signInWithPopup(auth, googleProvider);
-      const user = reult.user;
+      const user = result.user;
       alert(`Logged in as ${user.displayName}`);
     } catch (err) {
       alert('Google login failed: ' + err.message);
@@ -104,6 +104,7 @@ export default function Login() {
             {loading ? 'Please wait...' : isRegistering ? 'Register' : 'Login'}
           </button> 
           <button
+            type="button"
             onClick={loginWithGoogle}
             style={{ ...styles.submitButton, backgroundColor: '#4285F4', marginTop: '12px' }}
           >
