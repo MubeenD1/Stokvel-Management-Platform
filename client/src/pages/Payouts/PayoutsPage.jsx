@@ -1,138 +1,62 @@
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext'; // <-- 1. Import useAuth (check your exact path)
+import { auth } from '../../firebase';
+
+import AdminUpcomingView from '../../components/AdminUpcomingView';
+import MemberPastPayouts from '../../components/MemberPastPayouts';
 
 export default function PayoutsPage() {
-  const { id } = useParams();
-  const { currentUser } = useAuth(); 
-  const [eligible, setEligible] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [contributionAmount, setContributionAmount] = useState(0);
-  const [loading, setLoading] = useState(false);
+    const { id } = useParams();
+    const [currentUser, setCurrentUser] = useState(null);
+    const [myRole, setMyRole] = useState(null);
+    const [userToken, setUserToken] = useState(null); 
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-  const fetchData = async () => {
-    if (!currentUser) return;
-
-    try {
-      const token = await currentUser.getIdToken();
-      const headers = { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json' 
-      };
-
-      const [histRes, eligRes, groupRes] = await Promise.all([
-       //fetch(`http://localhost:3000/api/groups/${id}/payouts/history`, { headers }),
-        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/history`, { headers }), 
-        //fetch(`http://localhost:3000/api/groups/${id}/payouts/eligible`, { headers }),
-        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/eligible`, { headers }),
-        //fetch(`http://localhost:3000/api/groups/${id}`, { headers })
-        fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}`, { headers })
-      ]);
-      
-      //Safety check to prevent the "Unexpected token <" crash
-      if (!histRes.ok || !eligRes.ok || !groupRes.ok) {
-        console.error("Backend returned an error. Check your Express routes!");
-        return; 
-      }
-
-      setHistory(await histRes.json());
-      setEligible(await eligRes.json());
-
-      const groupData = await groupRes.json();
-      setContributionAmount(groupData.contributionAmount || groupData.group?.contributionAmount || 0);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, [id, currentUser]);
-
-  const handlePayout = async (memberId, amount) => {
-    setLoading(true);
-    try {
-      const token = await currentUser.getIdToken(); 
-      
-      const res = await fetch(import.meta.env.VITE_API_URL + `/api/groups/${id}/payouts/initiate`, { 
-        //fetch(`http://localhost:3000/api/groups/${id}/payouts/initiate`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify({ groupId: id, memberId, amount })
-      });
-      
-      const result = await res.json();
-      
-      if (res.ok) {
-        alert("Payout Successful!");
-        fetchData(); 
-      } else {
-        alert(result.error || "Something went wrong");
-      }
-    } catch (error) {
-       console.error("Payout initiation failed:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  return (
-    <div className="payouts-container">
-      <h2>Group Payouts</h2>
-      <section className="eligible-section" style={{ marginBottom: '2rem' }}>
-        <h3>Eligible for Payout</h3>
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
+            setCurrentUser(firebaseUser); 
+            
+            if (firebaseUser && id) {
+                try {
+                    const token = await firebaseUser.getIdToken();
+                    setUserToken(token);
+                    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/groups/${id}`, {
+                        headers: { 'Authorization': `Bearer ${token}` },
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        const members = data.groupMembers || [];
+                        const myMembership = members.find(m =>
+                            m.user?.firebaseId === firebaseUser.uid ||
+                            m.user?.email?.toLowerCase() === firebaseUser.email?.toLowerCase()
+                        );
+                        
+                        setMyRole(myMembership?.role || 'MEMBER');
+                    } else {
+                        setError('Failed to fetch group data');
+                    }
+                } catch (err) {
+                    setError('Server connection error');
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(false);
+            }
+        });
         
-        {eligible.length === 0 ? (
-          <p>Everyone is paid up! No eligible members pending.</p>
-        ) : (
-          <div className="eligible-list" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            {eligible.map(member => (
-              <div key={member.id} className="member-card" style={{ padding: '1rem', background: '#2a2d34', borderRadius: '8px' }}>
-                <p style={{ margin: '0 0 10px 0' }}><strong>{member.user.email}</strong></p>
-                
-                <button 
-                  onClick={() => handlePayout(member.id, contributionAmount)} 
-                  disabled={loading}
-                  style={{ background: '#00df9a', color: '#000', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  {loading ? 'Processing...' : `Pay R${contributionAmount}`}
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-      <section>
-        <h3>Payout History</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {history.map(p => (
-              <tr key={p.id}>
-                <td>{p.member.user.email}</td>
-                <td>R{p.amount}</td>
-                <td>
-                  <span className={`status-${p.status.toLowerCase()}`}>
-                    {p.status}
-                  </span>
-                </td>
-                <td>{new Date(p.createdAt).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
-    </div>
-  );
+        return () => unsubscribe();
+    }, [id]);
+
+    if (loading) return <p style={{ padding: '30px', color: 'white', background: '#111', minHeight: '100vh' }}>Loading Payouts...</p>;
+    if (error) return <p style={{ color: "orange", padding: '30px' }}>{error}</p>;
+
+    if (myRole === 'ADMIN' || myRole === 'TREASURER') {
+        return <AdminUpcomingView groupId={id} />;
+    } else {
+        return <MemberPastPayouts groupId={id} userToken={userToken} />;
+    }
 }
