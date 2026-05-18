@@ -97,7 +97,7 @@ export default function AdminUpcomingView({groupId}) {
             
             {/* Header Section */}
             <div style={{ marginBottom: '24px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#ffffff', margin: '0 0 8px 0' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1a1a1a', margin: '0 0 8px 0' }}>
                     Group Payouts Dashboard
                 </h2>
                 <p style={styles.subtitle}>Manage group financials and issue pending payments</p>
