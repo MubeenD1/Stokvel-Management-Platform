@@ -200,7 +200,10 @@ describe('GroupPage', () => {
 
     renderWithRouter()
 
-    expect(await screen.findByText('Admin (Protected)')).toBeInTheDocument()
+    expect(await screen.findByText(/current role:\s*admin/i)).toBeInTheDocument()
+    
+    expect(screen.getByText('(Protected)')).toBeInTheDocument()
+    
     expect(screen.queryByText('Change Role')).not.toBeInTheDocument()
   })
 })

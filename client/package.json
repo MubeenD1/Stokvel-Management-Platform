@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest --reporter=verbose",
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
     "firebase": "^12.11.0",

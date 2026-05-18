@@ -24,10 +24,8 @@ export default function GroupPage() {
                         headers: { 'Authorization': `Bearer ${token}` },
                     });
                     const data = await response.json();
-                    console.log(data)
                     if (response.ok) {
                         setMembers(data.groupMembers || []);
-                        
                     } else {
                         setError('Failed to fetch members');
                     }
@@ -70,7 +68,7 @@ export default function GroupPage() {
 
 
     return (
-        <div className="members-container" style={{ padding: '30px', background: '#fff', minHeight: '100vh', color: 'white' }}>
+        <div className="members-container" style={{ padding: '30px', background: '#111', minHeight: '100vh', color: 'white' }}>
             {myRole === "ADMIN" && (
             <button className="invite-btn"
             onClick={()=> navigate(`/groups/${id}/invite`)}
@@ -107,7 +105,7 @@ export default function GroupPage() {
                             <div>
                                 {isMe ? (
                                     <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: '#9ca3af' }}>
-                                        Admin (Protected)
+                                        (Protected)
                                     </span>
                                 ) : editingMemberId === m.id ? (
                                     <select 
