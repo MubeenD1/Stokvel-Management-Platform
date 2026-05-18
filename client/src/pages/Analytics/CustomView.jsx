@@ -163,6 +163,8 @@ const CustomView = () => {
   return (
     <div className="custom-view">
       <h2 className="custom-view__title">Custom Report</h2>
+      <p>Complete all these to create your own custom report</p>
+
 
       <form onSubmit={handleApplyFilters} className="custom-view__form">
 
