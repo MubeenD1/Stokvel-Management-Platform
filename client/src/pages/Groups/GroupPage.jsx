@@ -105,7 +105,7 @@ export default function GroupPage() {
                             <div>
                                 {isMe ? (
                                     <span style={{ fontSize: '0.8em', fontStyle: 'italic', color: '#9ca3af' }}>
-                                        Admin (Protected)
+                                        (Protected)
                                     </span>
                                 ) : editingMemberId === m.id ? (
                                     <select 

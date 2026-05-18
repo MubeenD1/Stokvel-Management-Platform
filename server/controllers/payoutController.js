@@ -2,6 +2,96 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const crypto = require('crypto');
 
+const getPastPayouts = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const { groupId } = req.params; 
+
+    //Fetch successful payouts (GroupMember relation)
+    const payouts = await prisma.payout.findMany({
+      where: {
+        groupId: groupId,
+        status: 'SUCCESS',
+        member: {
+          userId: userId 
+        }
+      },
+      orderBy: {
+        updatedAt: 'desc' // Most recent
+      },
+      select: {
+        id: true,
+        amount: true,
+        updatedAt: true, // 'datePaid'
+        status: true,
+        reference: true
+      }
+    });
+
+    //Calc total
+    const totalReceived = payouts.reduce((sum, payout) => sum + payout.amount, 0);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalReceived,
+        payouts
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching past payouts:", error);
+    res.status(500).json({ success: false, message: "Server error retrieving payouts." });
+  }
+};
+
+const getUpcomingPayouts = async (req, res) => {
+    try {
+        const { groupId } = req.params; 
+
+        //Fetch pending payouts and include the associated User email
+        const schedule = await prisma.payout.findMany({
+            where: {
+                groupId: groupId,
+                status: 'PENDING' 
+            },
+            orderBy: {
+                createdAt: 'asc' //Oldest pending
+            },
+            select: {
+                id: true,
+                amount: true,
+                status: true,
+                createdAt: true, 
+                member: {
+                    select: {
+                        id: true,
+                        user: {
+                            select: {
+                                email: true 
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        //Calc total upcoming liability
+        const upcomingTotal = schedule.reduce((sum, item) => sum + item.amount, 0);
+
+        res.status(200).json({
+            success: true,
+            data: {
+                upcomingTotal,
+                schedule
+            }
+        });
+
+    } catch (error) {
+        console.error("Error fetching upcoming timeline:", error);
+        res.status(500).json({ success: false, message: "Server error retrieving timeline." });
+    }
+};
 
 //Mimics payfast api call
 const simulatePayFastPayout = async (amount, reference) => {
@@ -112,4 +202,4 @@ const getEligibleMembers = async (req, res) => {
     }
 };
 
-module.exports = { initiatePayout, getPayoutHistory, getEligibleMembers };
+module.exports = { initiatePayout, getPayoutHistory, getEligibleMembers, getPastPayouts, getUpcomingPayouts };
