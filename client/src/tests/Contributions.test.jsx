@@ -3,6 +3,23 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Contributions from '../pages/Contributions/Contributions'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 
+// ---------------------------
+// Firebase Mock (QUICK FIX)
+// ---------------------------
+const onAuthStateChangedMock = vi.hoisted(() => vi.fn())
+const getIdTokenMock = vi.hoisted(() => vi.fn().mockResolvedValue('mock-token'))
+
+vi.mock('../firebase', () => ({
+  auth: {
+    onAuthStateChanged: onAuthStateChangedMock,
+    currentUser: {
+      uid: 'user-1',
+      email: 'test@example.com',
+      getIdToken: getIdTokenMock,
+    },
+  },
+}))
+
 // Mock useAuth
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
@@ -26,6 +43,16 @@ const renderWithRouter = (groupId = 'group-123') => {
 describe('Contributions page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    
+    // Default implementation to prevent crashes if code triggers auth hooks
+    onAuthStateChangedMock.mockImplementation((cb) => {
+      cb({
+        uid: 'user-1',
+        email: 'test@example.com',
+        getIdToken: getIdTokenMock,
+      })
+      return () => {}
+    })
   })
 
   test('shows loading state initially', () => {
