@@ -31,6 +31,11 @@ export default function GroupNavbar( {groupId,myRole} ) {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/notifications" className={({ isActive }) => isActive ? "active" : ""}>
+              Notifications
+            </NavLink>
+          </li>
+          <li>
             <NavLink to={`/groups/${groupId}/settings`} className={({ isActive }) => isActive ? "active" : ""}>
               Settings
             </NavLink>
