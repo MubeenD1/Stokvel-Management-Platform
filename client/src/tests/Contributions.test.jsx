@@ -4,7 +4,7 @@ import Contributions from '../pages/Contributions/Contributions'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 
 // ---------------------------
-// Firebase Mock (QUICK FIX)
+// Firebase Mock
 // ---------------------------
 const onAuthStateChangedMock = vi.hoisted(() => vi.fn())
 const getIdTokenMock = vi.hoisted(() => vi.fn().mockResolvedValue('mock-token'))
@@ -29,6 +29,12 @@ vi.mock('../context/AuthContext', () => ({
   })
 }))
 
+vi.mock('../components/SavingsProjection', () => ({
+  default: function MockSavingsProjection() {
+    return <div data-testid="mock-savings-projection">Savings Projection Segment</div>
+  }
+}))
+
 // Helper to render with router
 const renderWithRouter = (groupId = 'group-123') => {
   return render(
@@ -44,7 +50,6 @@ describe('Contributions page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     
-    // Default implementation to prevent crashes if code triggers auth hooks
     onAuthStateChangedMock.mockImplementation((cb) => {
       cb({
         uid: 'user-1',
@@ -78,7 +83,12 @@ describe('Contributions page', () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ contributions: [] })
+        json: () =>
+          Promise.resolve({ 
+            contributions: [],
+            // FIXED: Provided fallback fallback data structure to keep SavingsProjection from crashing
+            projection: { totalContributions: 0 } 
+          })
       })
     )
     renderWithRouter()
@@ -102,7 +112,9 @@ describe('Contributions page', () => {
                 confirmedBy: 'treasurer@test.com',
                 createdAt: '2026-01-01T00:00:00.000Z'
               }
-            ]
+            ],
+            // FIXED: Provided fallback data structure to satisfy SavingsProjection properties
+            projection: { totalContributions: 500 }
           })
       })
     )
