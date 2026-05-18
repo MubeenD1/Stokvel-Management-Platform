@@ -1,0 +1,123 @@
+import React from 'react';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+
+// 1. Updated color palette mapped specifically to Payout status options
+const STATUS_COLORS = {
+  SUCCESS: '#28a745', // Green (Changed from COMPLETED)
+  PENDING: '#ffc107', // Yellow
+  FAILED: '#dc3545',  // Red
+};
+
+// Custom tooltip component to style the hover data box neatly
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    // Safely look up color, fallback to a neutral tone if an unmapped status arises
+    const statusColor = STATUS_COLORS[data.name] || '#333';
+
+    return (
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '10px 14px',
+        border: '1px solid #ccc',
+        borderRadius: '6px',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.15)',
+        fontFamily: 'sans-serif'
+      }}>
+        <p style={{ margin: 0, fontWeight: 'bold', color: statusColor }}>
+          {data.name}
+        </p>
+        <p style={{ margin: '4px 0 0 0', color: '#555', fontSize: '14px' }}>
+          Total: <strong>R {data.value.toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+        </p>
+        <p style={{ margin: 0, color: '#888', fontSize: '12px' }}>
+          Count: {data.count}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+const PayoutsPieChart = ({ data = [] }) => {
+  
+  // Helper: Process raw tabular payout data into chart-ready aggregated metrics
+  const prepareChartData = () => {
+    const aggregations = {};
+
+    data.forEach((item) => {
+      const status = item.status ? item.status.toUpperCase() : 'UNKNOWN';
+      const amount = Number(item.amount) || 0;
+
+      if (!aggregations[status]) {
+        aggregations[status] = { name: status, value: 0, count: 0 };
+      }
+      aggregations[status].value += amount;
+      aggregations[status].count += 1;
+    });
+
+    return Object.values(aggregations);
+  };
+
+  const chartData = prepareChartData(); 
+
+  if (chartData.length === 0) {
+    return (
+      <div style={{ textAlign: 'center', padding: '40px', color: '#6c757d', fontStyle: 'italic' }}>
+        No chart data available.
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ 
+      width: '100%', 
+      height: 350, 
+      backgroundColor: '#ffffff', 
+      padding: '20px', 
+      borderRadius: '8px', 
+      border: '1px solid #e0e0e0',
+      boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+    }}>
+      {/* Updated Heading */}
+      <h3 style={{ margin: '0 0 20px 0', fontFamily: 'sans-serif', color: '#333', fontSize: '16px' }}>
+        Payout Distribution by Status Allocation
+      </h3>
+      
+      <ResponsiveContainer width="100%" height="90%">
+        <PieChart>
+          <Pie
+            data={chartData}
+            dataKey="value" // Measures slice sizes by total ZAR amount
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={90}
+            innerRadius={50} // Modern donut layout
+            paddingAngle={3}
+            label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+            style={{ fontFamily: 'sans-serif', fontSize: '12px', fontWeight: '500' }}
+          >
+            {chartData.map((entry, index) => (
+              <Cell 
+                key={`cell-${index}`} 
+                fill={STATUS_COLORS[entry.name] || '#007bff'} 
+              />
+            ))}
+          </Pie>
+          
+          <Tooltip content={<CustomTooltip />} />
+          
+          <Legend 
+            verticalAlign="bottom" 
+            height={36} 
+            iconType="circle"
+            wrapperStyle={{ fontFamily: 'sans-serif', fontSize: '13px' }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
+
+export default PayoutsPieChart;

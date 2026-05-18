@@ -5,9 +5,6 @@ export default function GroupNavbar( {groupId,myRole} ) {
   return (
     <nav>
       <div className="group-nav-container">
-        <div className="logo">
-          <NavLink to="/home">Stokvel Management Platform</NavLink>
-        </div>
 
         <ul id="group-navbar">
           <li>
@@ -28,6 +25,11 @@ export default function GroupNavbar( {groupId,myRole} ) {
           <li>
             <NavLink to={`/groups/${groupId}/payouts`} className={({ isActive }) => isActive ? "active" : ""}>
               Payouts
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to={`/groups/${groupId}/analytics`} className={({ isActive }) => isActive ? "active" : ""}>
+              Analytics
             </NavLink>
           </li>
           <li>

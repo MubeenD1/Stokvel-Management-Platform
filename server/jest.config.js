@@ -5,9 +5,12 @@ module.exports = {
 
   collectCoverage: true,
 
+  // Tailored specifically to match your exact directory tree layout
   collectCoverageFrom: [
-    "src/controllers/groupController.js",
-    "controllers/**.js"
+    "controllers/**/*.js",       // Matches root controllers (auth, contribution, payfast, payout, role)
+    "src/controllers/**/*.js",   // Matches src controllers (analytics, group, sarb)
+    "src/utils/**/*.js",         // Matches src utils & services (analyticsService, inviteCode, notificationService, sarbService)
+    "!**/node_modules/**"        // Ignores dependencies completely
   ],
 
   coverageDirectory: "coverage",

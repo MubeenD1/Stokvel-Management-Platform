@@ -17,6 +17,8 @@ import InviteManager from './components/InviteManager/InviteManager';
 import Notifications from './pages/Notifications/Notifications';
 import Contributions from './pages/Contributions/Contributions';
 import PayoutsPage from './pages/Payouts/PayoutsPage';
+import Analytics from './pages/Analytics/Analytics';
+
 
 function ProtectedRoute({ children }) {
   const { currentUser } = useAuth();
@@ -56,11 +58,12 @@ function GroupLayout() {
     fetchRole();
   }, [id, currentUser]);
 
-  if (!myRole) return null; // ← wait until role is fetched before rendering navbar
+  if (!myRole) return null;
 
   return (
     <div className="group-layout">
-      <GroupNavbar groupId={id} myRole={myRole} />
+      <Navbar />   
+      <GroupNavbar groupId={id} myRole={myRole} /> 
       <main><Outlet /></main>
     </div>
   );
@@ -88,6 +91,7 @@ export default function App() {
           <Route path = "/groups/:id/invite" element = {<InviteManager/>}/>
           <Route path = "/groups/:id/contributions" element = {<Contributions/>}/>
           <Route path = "/groups/:id/payouts" element = {<PayoutsPage/>}/>
+          <Route path = "/groups/:id/analytics" element = {<Analytics />}/>
       
         </Route>
 

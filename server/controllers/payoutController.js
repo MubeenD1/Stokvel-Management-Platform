@@ -202,4 +202,5 @@ const getEligibleMembers = async (req, res) => {
     }
 };
 
+
 module.exports = { initiatePayout, getPayoutHistory, getEligibleMembers, getPastPayouts, getUpcomingPayouts };

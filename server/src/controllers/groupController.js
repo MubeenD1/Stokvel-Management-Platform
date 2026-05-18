@@ -177,13 +177,16 @@ async function updateGroupSettings(req, res) {
 
     try {
         const firebaseId = req.user.uid;
-
-        const user = await prisma.user.findUnique({
-            where: { firebaseId },
-        });
-
+        const user = await prisma.user.findUnique({ where: { firebaseId } });
         if (!user) {
             return res.status(404).json({ error: 'User not found' });
+        }
+
+        const membership = await prisma.groupMember.findFirst({
+            where: { groupId, userId: user.id, role: 'ADMIN' }
+        });
+        if (!membership) {
+            return res.status(403).json({ error: 'Only admins can change group settings' });
         }
 
         const currentGroup = await prisma.group.findUnique({
@@ -191,7 +194,6 @@ async function updateGroupSettings(req, res) {
             include: { members: { include: { user: true } } }
         });
 
-        // 2. Check if meeting details actually changed
         const isDateChanged = currentGroup.nextMeetingDate !== nextMeetingDate;
         const isFreqChanged = currentGroup.meetingFrequency !== meetingFrequency;
 
@@ -199,43 +201,58 @@ async function updateGroupSettings(req, res) {
             where: { id: groupId },
             data: {
                 contributionAmount: contributionAmount ? parseFloat(contributionAmount) : null,
-        meetingFrequency,
-        payoutOrder,
+                meetingFrequency,
+                payoutOrder,
             },
         });
 
         if (isDateChanged || isFreqChanged) {
-            const memberEmails = currentGroup.members.map(m => m.user.email);
-            
-            await sendMeetingNotification(
-                memberEmails, 
-                updatedGroup.name, 
-                { date: nextMeetingDate, frequency: meetingFrequency },
-                isDateChanged ? "update" : "schedule"
+            const latestMeeting = await prisma.meeting.findFirst({
+                where: { groupId },
+                orderBy: { date: 'desc' },
+            });
+
+            await Promise.allSettled(
+                currentGroup.members.map(async (member) => {
+                    let success = true;
+                    let errorMsg = null;
+
+                    try {
+                        await sendMeetingNotification(
+                            [member.user.email],
+                            updatedGroup.name,
+                            { date: nextMeetingDate, frequency: meetingFrequency },
+                            isDateChanged ? 'update' : 'schedule'
+                        );
+                    } catch (err) {
+                        success = false;
+                        errorMsg = err.message;
+                    }
+
+                    if (latestMeeting) {
+                        await prisma.notification.create({
+                            data: {
+                                type: 'MEETING_UPDATED',
+                                recipientId: member.user.id,
+                                meetingId: latestMeeting.id,
+                                success,
+                                error: errorMsg,
+                            },
+                        });
+                    }
+                })
             );
         }
 
-        const membership = await prisma.groupMember.findFirst({
-            where: {
-                groupId: groupId,
-                userId: user.id,
-                role: 'ADMIN'
-            }
-        });
-
-        if (!membership) {
-            return res.status(403).json({ error: "Only admins can change group settings" });
-        }
         return res.status(200).json({
             message: 'Group settings updated successfully',
             group: updatedGroup,
         });
-
     } catch (error) {
         console.error('updateGroupSettings error:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
-};
+}
 async function createGroup(req, res) {
     if (!req.user || !req.user.uid) {
         return res.status(401).json({ error: "Unauthorized" });
@@ -406,61 +423,88 @@ async function refreshInviteCode(req, res) {
         res.status(500).json({ error: "Failed to refresh code" });
     }
 };
-async function createMeeting(req,res){
+async function createMeeting(req, res) {
     const gId = req.params.id;
     const firebaseId = req.user.uid;
+
     if (!gId) {
         return res.status(400).json({ error: 'Group ID is required' });
     }
 
-    const { rDate , rLocation , rAgenda } = req.body;
+    const { rDate, rLocation, rAgenda } = req.body;
 
     try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseId },
-        });
-
+        const user = await prisma.user.findUnique({ where: { firebaseId } });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.status(404).json({ error: 'User not found' });
         }
 
         const membership = await prisma.groupMember.findUnique({
-        where: {
-            userId_groupId: {
-                userId: user.id,
+            where: {
+                userId_groupId: { userId: user.id, groupId: gId },
+            },
+        });
+        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
+            return res.status(403).json({ error: 'Not authorized to create meetings' });
+        }
+
+        const meeting = await prisma.meeting.create({
+            data: {
                 groupId: gId,
-                },
+                date: new Date(rDate),
+                location: rLocation,
+                agenda: rAgenda,
+                createdById: user.id,
+            },
+            include: {
+                Group: true,
+                User: true,
             },
         });
 
-        if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
-        return res.status(403).json({ error: "Not authorized to create meetings" });
-        }
-
-      const meeting = await prisma.meeting.create({
-        data: {
-            groupId: gId,
-            date: new Date(rDate),
-            location: rLocation,
-            agenda: rAgenda,
-            createdById: user.id,
-        },
-        include: {
-            Group: true,     
-            User: true, 
-        },
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId: gId },
+            include: { user: true },
         });
+
+        await Promise.allSettled(
+            groupMembers.map(async (member) => {
+                let success = true;
+                let errorMsg = null;
+
+                try {
+                    await sendMeetingNotification(
+                        [member.user.email],
+                        meeting.Group.name,
+                        { date: rDate, location: rLocation, agenda: rAgenda },
+                        'schedule'
+                    );
+                } catch (err) {
+                    success = false;
+                    errorMsg = err.message;
+                }
+
+                await prisma.notification.create({
+                    data: {
+                        type: 'MEETING_CREATED',
+                        recipientId: member.user.id,
+                        meetingId: meeting.id,
+                        success,
+                        error: errorMsg,
+                    },
+                });
+            })
+        );
+
         return res.status(201).json({
-            message : "Meeting Created Successfully",
+            message: 'Meeting Created Successfully',
             meeting,
         });
-
     } catch (error) {
-        console.error("createMeeting error:", error);
+        console.error('createMeeting error:', error);
         return res.status(500).json({ error: error.message });
     }
-
-};
+}
 async function getMeetings(req, res) {
     // console.log("params:", req.params);
     // console.log("gId:", req.params.id);
@@ -522,9 +566,9 @@ async function getMeetings(req, res) {
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
-async function addMinutes(req,res){
+async function addMinutes(req, res) {
     if (!req.user || !req.user.uid) {
-        return res.status(401).json({ error: "Unauthorized" });
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 
     const { id: gId, meetingId } = req.params;
@@ -533,45 +577,72 @@ async function addMinutes(req,res){
     if (!gId) {
         return res.status(400).json({ error: 'Group ID is required' });
     }
-    const firebaseId = req.user.uid;
-    try {
-        const user = await prisma.user.findUnique({
-            where: { firebaseId },
-        });
 
+    const firebaseId = req.user.uid;
+
+    try {
+        const user = await prisma.user.findUnique({ where: { firebaseId } });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
-        }        
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         const membership = await prisma.groupMember.findUnique({
-        where: {
-            userId_groupId: {
-                userId: user.id,
-                groupId: gId,
-                },
+            where: {
+                userId_groupId: { userId: user.id, groupId: gId },
             },
         });
-
         if (!membership || (membership.role !== 'ADMIN' && membership.role !== 'TREASURER')) {
-            return res.status(403).json({ error: "Not authorized to create add meeting minutes" });
+            return res.status(403).json({ error: 'Not authorized to add meeting minutes' });
         }
-        
+
         const meeting = await prisma.meeting.update({
             where: { id: meetingId },
             data: { minutes },
+            include: { Group: true },
         });
-        return res.status(201).json({
-            message : "successful", 
-            meeting
-         });
 
+        const groupMembers = await prisma.groupMember.findMany({
+            where: { groupId: gId },
+            include: { user: true },
+        });
+
+        await Promise.allSettled(
+            groupMembers.map(async (member) => {
+                let success = true;
+                let errorMsg = null;
+
+                try {
+                    await sendMinutesNotification(
+                        [member.user.email],
+                        meeting.Group.name,
+                        { date: meeting.date.toDateString(), minutes }
+                    );
+                } catch (err) {
+                    success = false;
+                    errorMsg = err.message;
+                }
+
+                await prisma.notification.create({
+                    data: {
+                        type: 'MINUTES_PUBLISHED',
+                        recipientId: member.user.id,
+                        meetingId: meeting.id,
+                        success,
+                        error: errorMsg,
+                    },
+                });
+            })
+        );
+
+        return res.status(201).json({
+            message: 'Minutes added successfully',
+            meeting,
+        });
     } catch (error) {
         console.error('addMinutes error:', error);
-    return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: error.message });
     }
-};
-
-
+}
 const getNotifications = async (req, res) => {
     try {
         const user = await prisma.user.findUnique({
@@ -598,5 +669,4 @@ const getNotifications = async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch notifications' });
     }
 };
-
 module.exports = {addMinutes, createMeeting , getMeetings , getGroupById , getGroups,createGroup, joinGroup, getGroupSettings, updateGroupSettings, refreshInviteCode,getGroupContributions, updateContributionStatus ,getNotifications};

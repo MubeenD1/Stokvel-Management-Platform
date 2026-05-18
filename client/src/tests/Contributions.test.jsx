@@ -3,6 +3,23 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import Contributions from '../pages/Contributions/Contributions'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 
+// ---------------------------
+// Firebase Mock
+// ---------------------------
+const onAuthStateChangedMock = vi.hoisted(() => vi.fn())
+const getIdTokenMock = vi.hoisted(() => vi.fn().mockResolvedValue('mock-token'))
+
+vi.mock('../firebase', () => ({
+  auth: {
+    onAuthStateChanged: onAuthStateChangedMock,
+    currentUser: {
+      uid: 'user-1',
+      email: 'test@example.com',
+      getIdToken: getIdTokenMock,
+    },
+  },
+}))
+
 // Mock useAuth
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
@@ -10,6 +27,12 @@ vi.mock('../context/AuthContext', () => ({
       getIdToken: vi.fn().mockResolvedValue('mock-token')
     }
   })
+}))
+
+vi.mock('../components/SavingsProjection', () => ({
+  default: function MockSavingsProjection() {
+    return <div data-testid="mock-savings-projection">Savings Projection Segment</div>
+  }
 }))
 
 // Helper to render with router
@@ -26,6 +49,15 @@ const renderWithRouter = (groupId = 'group-123') => {
 describe('Contributions page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    
+    onAuthStateChangedMock.mockImplementation((cb) => {
+      cb({
+        uid: 'user-1',
+        email: 'test@example.com',
+        getIdToken: getIdTokenMock,
+      })
+      return () => {}
+    })
   })
 
   test('shows loading state initially', () => {
@@ -51,7 +83,12 @@ describe('Contributions page', () => {
     global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ contributions: [] })
+        json: () =>
+          Promise.resolve({ 
+            contributions: [],
+            // FIXED: Provided fallback fallback data structure to keep SavingsProjection from crashing
+            projection: { totalContributions: 0 } 
+          })
       })
     )
     renderWithRouter()
@@ -75,7 +112,9 @@ describe('Contributions page', () => {
                 confirmedBy: 'treasurer@test.com',
                 createdAt: '2026-01-01T00:00:00.000Z'
               }
-            ]
+            ],
+            // FIXED: Provided fallback data structure to satisfy SavingsProjection properties
+            projection: { totalContributions: 500 }
           })
       })
     )

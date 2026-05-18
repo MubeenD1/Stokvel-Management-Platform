@@ -9,6 +9,14 @@ async function saveContribution({ amount, groupId, groupMemberId, status = 'PEND
       memberId: groupMemberId,
       groupId,
     },
+    include: {
+      member: {
+        include: {
+          user: true,       // gets email, name, etc.
+        },
+      },
+      group: true,          // gets group name
+    },
   });
 }
 

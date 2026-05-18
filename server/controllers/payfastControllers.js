@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { saveContribution } = require('./contributionService');
+const { sendContributionEmail } = require('../src/utils/notificationService')
 
 const {
   PAYFAST_MERCHANT_ID,
@@ -20,7 +21,9 @@ const initiatePayment = async (req, res) => {
       merchant_id: PAYFAST_MERCHANT_ID.trim(),
       merchant_key: PAYFAST_MERCHANT_KEY.trim(),
       return_url: `https://stokvel-management-platform.vercel.app/groups/${groupId}/contributions?role=${role}&payment=success`,
-cancel_url: `https://stokvel-management-platform.vercel.app/groups/${groupId}/contributions?role=${role}&payment=cancelled`,
+      cancel_url: `https://stokvel-management-platform.vercel.app/groups/${groupId}/contributions?role=${role}&payment=cancelled`,
+      //return_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=success`,
+      // cancel_url: `http://localhost:5173/groups/${groupId}/contributions?role=${role}&payment=cancelled`,
       notify_url: NOTIFY_URL.trim(),
       name_first: (name_first || '').trim(),
       name_last: (name_last || '').trim(),
@@ -64,28 +67,33 @@ cancel_url: `https://stokvel-management-platform.vercel.app/groups/${groupId}/co
 };
 
 const handleNotify = async (req, res) => {
-  
   const pfData = req.body;
-
   console.log('PayFast ITN Received:', pfData);
 
   if (pfData.payment_status !== 'COMPLETE') {
-    console.log(`Transaction not complete (Status: ${pfData.payment_status}). Skipping DB save.`);
-    return res.sendStatus(200); 
+    return res.sendStatus(200);
   }
 
   try {
-    // 3. Save to Database
-    await saveContribution({
-      amount: pfData.amount_gross, // The actual amount paid
-      groupId: pfData.custom_str1, // We stored groupId here
-      groupMemberId: pfData.custom_str2 // We stored groupMemberId here
+    const contribution = await saveContribution({
+      amount: pfData.amount_gross,
+      groupId: pfData.custom_str1,
+      groupMemberId: pfData.custom_str2,
     });
 
-    
+    console.log('Contribution saved:', contribution);
+
+    await sendContributionEmail({
+      toEmail: pfData.email_address,   
+      name: pfData.name_first || 'Member',
+      amount: pfData.amount_gross,
+      groupName: contribution.group.name,
+    });
+
     res.sendStatus(200);
   } catch (err) {
-    console.error('Error saving contribution to DB:', err);
+    console.error('handleNotify error:', err.message);
+    console.error(err.stack);
     res.sendStatus(500);
   }
 };
