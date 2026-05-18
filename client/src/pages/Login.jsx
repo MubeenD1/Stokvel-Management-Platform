@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { auth } from '../firebase'
+import { auth,googleProvider } from '../firebase'
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
+  signInWithPopup
 } from 'firebase/auth'
 
 export default function Login() {
@@ -12,6 +13,15 @@ export default function Login() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const loginWithGoogle = async () => {
+    try{
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = reult.user;
+      alert(`Logged in as ${user.displayName}`);
+    } catch (err) {
+      alert('Google login failed: ' + err.message);
+    } 
+  }
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -24,7 +34,7 @@ export default function Login() {
         userCredential = await createUserWithEmailAndPassword(auth, email, password)
       } else {
         userCredential = await signInWithEmailAndPassword(auth, email, password)
-      }
+      } 
 
       const token = await userCredential.user.getIdToken()
 
@@ -92,6 +102,12 @@ export default function Login() {
             style={styles.submitButton}
           >
             {loading ? 'Please wait...' : isRegistering ? 'Register' : 'Login'}
+          </button> 
+          <button
+            onClick={loginWithGoogle}
+            style={{ ...styles.submitButton, backgroundColor: '#4285F4', marginTop: '12px' }}
+          >
+            Login with Google
           </button>
         </form>
 
@@ -103,6 +119,7 @@ export default function Login() {
             ? 'Already have an account? Login'
             : "Don't have an account? Register"}
         </button>
+      
       </section>
     </main>
   )
