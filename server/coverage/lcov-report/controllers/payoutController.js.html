@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">72.13% </span>
+                <span class="strong">91.8% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>44/61</span>
+                <span class='fraction'>56/61</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">63.63% </span>
+                <span class="strong">90.9% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>7/11</span>
+                <span class='fraction'>10/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">74.13% </span>
+                <span class="strong">93.1% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>43/58</span>
+                <span class='fraction'>54/58</span>
             </div>
         
             
@@ -273,15 +273,12 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -299,9 +296,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -316,14 +316,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -347,9 +344,12 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -477,13 +477,13 @@
 const prisma = new PrismaClient();
 const crypto = require('crypto');
 &nbsp;
-const getPastPayouts = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
-<span class="cstat-no" title="statement not covered" >  try {</span>
-    const userId = <span class="cstat-no" title="statement not covered" >req.user.id; </span>
-    const { groupId } = <span class="cstat-no" title="statement not covered" >req.params; </span>
+const getPastPayouts = async (req, res) =&gt; {
+  try {
+    const userId = req.user.id; 
+    const { groupId } = req.params; 
 &nbsp;
     //Fetch successful payouts (GroupMember relation)
-    const payouts = <span class="cstat-no" title="statement not covered" >await prisma.payout.findMany({</span>
+    const payouts = await prisma.payout.findMany({
       where: {
         groupId: groupId,
         status: 'SUCCESS',
@@ -504,9 +504,9 @@ const getPastPayouts = <span class="fstat-no" title="function not covered" >as</
     });
 &nbsp;
     //Calc total
-    const totalReceived = <span class="cstat-no" title="statement not covered" >payouts.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, payout) =&gt; <span class="cstat-no" title="statement not covered" >sum + payout.amount,</span> 0);</span>
+    const totalReceived = payouts.reduce((sum, payout) =&gt; sum + payout.amount, 0);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    res.status(200).json({</span>
+    res.status(200).json({
       success: true,
       data: {
         totalReceived,
@@ -520,12 +520,12 @@ const getPastPayouts = <span class="fstat-no" title="function not covered" >as</
   }
 };
 &nbsp;
-const getUpcomingPayouts = <span class="fstat-no" title="function not covered" >as</span>ync (req, res) =&gt; {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-        const { groupId } = <span class="cstat-no" title="statement not covered" >req.params; </span>
+const getUpcomingPayouts = async (req, res) =&gt; {
+    try {
+        const { groupId } = req.params; 
 &nbsp;
         //Fetch pending payouts and include the associated User email
-        const schedule = <span class="cstat-no" title="statement not covered" >await prisma.payout.findMany({</span>
+        const schedule = await prisma.payout.findMany({
             where: {
                 groupId: groupId,
                 status: 'PENDING' 
@@ -552,9 +552,9 @@ const getUpcomingPayouts = <span class="fstat-no" title="function not covered" >
         });
 &nbsp;
         //Calc total upcoming liability
-        const upcomingTotal = <span class="cstat-no" title="statement not covered" >schedule.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, item) =&gt; <span class="cstat-no" title="statement not covered" >sum + item.amount,</span> 0);</span>
+        const upcomingTotal = schedule.reduce(<span class="fstat-no" title="function not covered" >(s</span>um, item) =&gt; <span class="cstat-no" title="statement not covered" >sum + item.amount,</span> 0);
 &nbsp;
-<span class="cstat-no" title="statement not covered" >        res.status(200).json({</span>
+        res.status(200).json({
             success: true,
             data: {
                 upcomingTotal,
@@ -685,7 +685,7 @@ module.exports = { initiatePayout, getPayoutHistory, getEligibleMembers, getPast
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-05-18T12:03:17.648Z
+                at 2026-05-19T23:24:23.783Z
             </div>
         <script src="../prettify.js"></script>
         <script>

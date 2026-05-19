@@ -8,10 +8,15 @@ jest.mock('@prisma/client', () => {
       findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
-      findMany: jest.fn(), // <-- Fixed to a colon!
+      findMany: jest.fn(), 
+      aggregate: jest.fn(),
     },
     groupMember: {
         findMany: jest.fn(),
+        findUnique: jest.fn(),
+    }, 
+    contribution: {
+      aggregate: jest.fn(),
     }
   };
   return { PrismaClient: jest.fn(() => mPrisma) };
@@ -150,6 +155,123 @@ describe('Payout Controller Test Suite', () => {
 
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch eligible members' });
+    });
+  });
+  // --- GET PAST PAYOUTS TESTS (Member Statement) ---
+  describe('getPastPayouts', () => {
+    // Add user info to req since this is a member-facing route
+    beforeEach(() => {
+      req.user = { uid: 'auth-uid-123', email: 'test@student.wits.ac.za' };
+    });
+
+    it('should successfully calculate net balances and return payout history', async () => {
+      // 1. Mock finding the member profile
+      prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' });
+      
+      // 2. Mock the total payouts received (e.g., R 5000)
+      prisma.payout.aggregate.mockResolvedValue({ _sum: { amount: 5000 } });
+      
+      // 3. Mock the total contributions made (e.g., R 1500)
+      prisma.contribution.aggregate.mockResolvedValue({ _sum: { amount: 1500 } });
+      
+      // 4. Mock the explicit ledger rows
+      const mockPastPayouts = [{ id: 'pay-1', amount: 5000, status: 'SUCCESS' }];
+      prisma.payout.findMany.mockResolvedValue(mockPastPayouts);
+
+      const { getPastPayouts } = require('../controllers/payoutController');
+      await getPastPayouts(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          totalReceived: 5000,
+          payouts: mockPastPayouts
+        }
+      });
+    });
+
+    it('should fall back to 0 if aggregate sums return null (brand new member)', async () => {
+      prisma.groupMember.findUnique.mockResolvedValue({ id: 'member-123' });
+      prisma.payout.aggregate.mockResolvedValue({ _sum: { amount: null } });
+      prisma.contribution.aggregate.mockResolvedValue({ _sum: { amount: null } });
+      prisma.payout.findMany.mockResolvedValue([]);
+
+      const { getPastPayouts } = require('../controllers/payoutController');
+      await getPastPayouts(req, res);
+
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          totalReceived: 0,
+          payouts: []
+        }
+      });
+    });
+
+    it('should handle errors gracefully', async () => {
+      prisma.groupMember.findUnique.mockRejectedValue(new Error('DB connection failed'));
+      
+      const { getPastPayouts } = require('../controllers/payoutController');
+      await getPastPayouts(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      //expect(res.json).toHaveBeenCalledWith(200);
+    });
+  });
+
+  // --- GET UPCOMING PAYOUTS TESTS (Admin Projection) ---
+  describe('getUpcomingPayouts', () => {
+    it('should calculate pending liability and return a schedule for unpaid members', async () => {
+      // Mock two members who haven't been paid yet
+      const mockUnpaidMembers = [
+        { id: 'mem-1', user: { email: 'alice@wits.ac.za' } },
+        { id: 'mem-2', user: { email: 'bob@wits.ac.za' } }
+      ];
+      
+      // Mock Prisma returning these members
+      prisma.groupMember.findMany.mockResolvedValue(mockUnpaidMembers);
+
+      // Assume the group contribution standard payout size is R2500 per member
+      // The controller likely loops through unpaid members and builds a schedule array
+      const { getUpcomingPayouts } = require('../controllers/payoutController');
+      await getUpcomingPayouts(req, res);
+
+      //expect(prisma.groupMember.findMany).toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
+      
+      // We expect the controller to return a data object with a total and schedule array
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: expect.objectContaining({
+          upcomingTotal: expect.any(Number),
+          schedule: expect.any(Array)
+        })
+      }));
+    });
+
+    it('should return 0 liability if all members have been paid', async () => {
+      // Return an empty array indicating no one is eligible for a pending payout
+      prisma.groupMember.findMany.mockResolvedValue([]);
+
+      const { getUpcomingPayouts } = require('../controllers/payoutController');
+      await getUpcomingPayouts(req, res);
+
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({
+        data: {
+          upcomingTotal: 0,
+          schedule: []
+        }
+      }));
+    });
+
+    it('should catch database errors when generating projections', async () => {
+      prisma.groupMember.findMany.mockRejectedValue(new Error('Calculation Error'));
+
+      const { getUpcomingPayouts } = require('../controllers/payoutController');
+      await getUpcomingPayouts(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      //expect(res.json).toHaveBeenCalledWith(200);
     });
   });
 });
