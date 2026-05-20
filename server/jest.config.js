@@ -5,12 +5,18 @@ module.exports = {
 
   collectCoverage: true,
 
+  // Force Jest to list out every single checked test line cleanly
+  verbose: true,
+
+  // Silence console.log and console.error output using our script
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+
   // Tailored specifically to match your exact directory tree layout
   collectCoverageFrom: [
-    "controllers/**/*.js",       // Matches root controllers (auth, contribution, payfast, payout, role)
-    "src/controllers/**/*.js",   // Matches src controllers (analytics, group, sarb)
-    "src/utils/**/*.js",         // Matches src utils & services (analyticsService, inviteCode, notificationService, sarbService)
-    "!**/node_modules/**"        // Ignores dependencies completely
+    "controllers/**/*.js",     
+    "src/controllers/**/*.js",   
+    "src/utils/**/*.js",        
+    "!**/node_modules/**"   
   ],
 
   coverageDirectory: "coverage",
