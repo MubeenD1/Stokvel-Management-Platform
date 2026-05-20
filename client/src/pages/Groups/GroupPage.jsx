@@ -68,7 +68,7 @@ export default function GroupPage() {
 
 
     return (
-        <div className="members-container" style={{ padding: '30px', background: '#111', minHeight: '100vh', color: 'white' }}>
+        <div className="members-container" style={{ padding: '30px', background: '#ffff', minHeight: '100vh', color: 'white' }}>
             {myRole === "ADMIN" && (
             <button className="invite-btn"
             onClick={()=> navigate(`/groups/${id}/invite`)}
