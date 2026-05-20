@@ -4,3 +4,6 @@ client/.env
 server/serviceAccountKey.json
 dist/
 .DS_Store
+coverage/
+client/coverage/
+server/coverage/
