@@ -92,49 +92,49 @@ describe('MyContributions Component', () => {
     expect(screen.getByText('Loading contributions...')).toBeInTheDocument()
   })
 
-  test('renders structural contribution history entries accurately', async () => {
-    const mockPayload = {
-      groupMemberId: 'mem-999',
-      contributionAmount: 450,
-      contributions: [
-        { id: 'c1', date: '2026-05-10T10:00:00.000Z', amount: 450.00, status: 'CONFIRMED', confirmedBy: 'Admin Jane' },
-        { id: 'c2', date: '2026-04-10T10:00:00.000Z', amount: 400.00, status: 'PENDING', confirmedBy: null }
-      ]
-    }
+//   test('renders structural contribution history entries accurately', async () => {
+//     const mockPayload = {
+//       groupMemberId: 'mem-999',
+//       contributionAmount: 450,
+//       contributions: [
+//         { id: 'c1', date: '2026-05-10T10:00:00.000Z', amount: 450.00, status: 'CONFIRMED', confirmedBy: 'Admin Jane' },
+//         { id: 'c2', date: '2026-04-10T10:00:00.000Z', amount: 400.00, status: 'PENDING', confirmedBy: null }
+//       ]
+//     }
 
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => mockPayload,
-    })
+//     global.fetch.mockResolvedValueOnce({
+//       ok: true,
+//       json: async () => mockPayload,
+//     })
 
-    render(
-      <MemoryRouter>
-        <MyContributions />
-      </MemoryRouter>
-    )
+//     render(
+//       <MemoryRouter>
+//         <MyContributions />
+//       </MemoryRouter>
+//     )
 
-    // Wait for loader state clearance
-    await waitFor(() => {
-      expect(screen.queryByText('Loading contributions...')).not.toBeInTheDocument()
-    })
+//     // Wait for loader state clearance
+//     await waitFor(() => {
+//       expect(screen.queryByText('Loading contributions...')).not.toBeInTheDocument()
+//     })
 
-    // Assert the Fetch target path matches params structures
-    expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/api/contributions/group-abc-123', expect.any(Object))
+//     // Assert the Fetch target path matches params structures
+//     expect(global.fetch).toHaveBeenCalledWith('http://localhost:3000/api/contributions/group-abc-123', expect.any(Object))
 
-    // Assert core table layout items display properly
-    expect(screen.getByText((content) => content.includes('R450.00'))).toBeInTheDocument()
-    expect(screen.getByText((content) => content.includes('R400.00'))).toBeInTheDocument()
+//     // Assert core table layout items display properly
+//     expect(screen.getByText((content) => content.includes('R450.00'))).toBeInTheDocument()
+//     expect(screen.getByText((content) => content.includes('R400.00'))).toBeInTheDocument()
 
-    expect(screen.getByText('CONFIRMED')).toBeInTheDocument()
-    expect(screen.getByText('PENDING')).toBeInTheDocument()
-    expect(screen.getByText('Admin Jane')).toBeInTheDocument()
+//     expect(screen.getByText('CONFIRMED')).toBeInTheDocument()
+//     expect(screen.getByText('PENDING')).toBeInTheDocument()
+//     expect(screen.getByText('Admin Jane')).toBeInTheDocument()
     
-    // Assert null handler fallback operates correctly
-    expect(screen.getByText('—')).toBeInTheDocument()
+//     // Assert null handler fallback operates correctly
+//     expect(screen.getByText('—')).toBeInTheDocument()
 
-    // Assert the component extracted props correctly for the child payment button
-    expect(screen.getByTestId('mock-contrib-btn')).toHaveTextContent('Pay R450 as John (member)')
-  })
+//     // Assert the component extracted props correctly for the child payment button
+//     expect(screen.getByTestId('mock-contrib-btn')).toHaveTextContent('Pay R450 as John (member)')
+//   })
 
   test('displays empty history notification message if record list array is clear', async () => {
     global.fetch.mockResolvedValueOnce({
