@@ -1,10 +1,27 @@
-import { render, screen, waitFor, act } from '@testing-library/react'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
+
+// 1. HOIST RIGHT AT THE TOP: Intercept Firebase before anything else compiles
+vi.mock('../firebase', () => {
+  return {
+    auth: {
+      onAuthStateChanged: vi.fn((callback) => () => {}),
+      currentUser: {
+        uid: 'user-generic',
+        email: 'test@test.com',
+        getIdToken: vi.fn().mockResolvedValue('mock-jwt-token')
+      }
+    },
+    googleProvider: {}
+  }
+})
+
+// 2. NOW IMPORT LIBRARIES AND PAGE COMPONENTS SAFELY
+import { render, screen, waitFor, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import PayoutsPage from '../pages/Payouts/PayoutsPage'
 import { auth } from '../firebase'
 
-// 1. Mock 'react-router-dom' parameters
+// 3. MOCK DEPENDENCIES USING RELATIVE PATHS FOR CI/CD COMPATIBILITY
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
   return {
@@ -13,13 +30,11 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// 2. STUB SUBCOMPONENTS DIRECTLY VIA ABSOLUTE ALIASES
-// This intercepts the components no matter what import path or file-URL resolution is used
-vi.mock('/src/components/AdminUpcomingView', () => ({
+vi.mock('../components/AdminUpcomingView', () => ({
   default: ({ groupId }) => <div data-testid="admin-view">Admin Workspace Group: {groupId}</div>,
 }))
 
-vi.mock('/src/components/MemberPastPayouts', () => ({
+vi.mock('../components/MemberPastPayouts', () => ({
   default: ({ groupId, userToken }) => (
     <div data-testid="member-view">
       Member Workspace Group: {groupId} with Token: {userToken}
@@ -27,14 +42,13 @@ vi.mock('/src/components/MemberPastPayouts', () => ({
   ),
 }))
 
-// 3. Mock useAuth hook safely to prevent destructuring failures inside child contexts
-vi.mock('/src/context/AuthContext', () => ({
+vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
     currentUser: { uid: 'user-generic', email: 'test@test.com' }
   })
 }))
 
-// 4. Set Environment Variables
+// 4. Force Mock API URL env variable for headless containers
 vi.stubEnv('VITE_API_URL', 'http://localhost:3000')
 
 describe('PayoutsPage Component', () => {
@@ -42,7 +56,7 @@ describe('PayoutsPage Component', () => {
     vi.clearAllMocks()
     global.fetch = vi.fn()
     
-    // Default fallback so auth won't crash on initial render tracking
+    // Reset our base mock default
     vi.spyOn(auth, 'onAuthStateChanged').mockImplementation((callback) => {
       return () => {}
     })
@@ -210,8 +224,6 @@ describe('PayoutsPage Component', () => {
     })
   })
 
-
-
   test('displays fetch parsing processing error status state notifications correctly when api route channels fail', async () => {
     const mockFirebaseUser = {
       uid: 'user-001',
@@ -225,7 +237,6 @@ describe('PayoutsPage Component', () => {
       return () => {}
     })
 
-    // Simulate an HTTP 500 or 404 error response
     global.fetch.mockResolvedValueOnce({
       ok: false,
     })
@@ -240,7 +251,6 @@ describe('PayoutsPage Component', () => {
       await triggerAuthChange(mockFirebaseUser)
     })
 
-    // FIX: Match the actual DOM output your component renders on non-ok responses
     await waitFor(() => {
       expect(screen.getByText('Server connection error')).toBeInTheDocument()
     })
