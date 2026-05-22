@@ -186,104 +186,12 @@ export default function GroupSettingsModal(){
     
     );
 }
-// const styles = {
-//     label: {
-//     fontSize: '14px',
-//     fontWeight: 'bold',
-//     color: '#1a1a1a',
-//   },
-//   input: {
-//     padding: '12px',
-//     borderRadius: '8px',
-//     border: '1px solid #ddd',
-//     fontSize: '14px',
-//     outline: 'none',
-//     width: '100%',
-//     boxSizing: 'border-box',
-//   },
-//   Button: {
-//     padding: '12px 24px',
-//     backgroundColor: '#206663',
-//     color: '#ffffff',
-//     border: 'none',
-//     borderRadius: '8px',
-//     fontWeight: 'bold',
-//     cursor: 'pointer',
-//     fontSize: '14px',
-//     marginTop: '8px',
-//   },
-//      container: {
-//     padding: '32px',
-//     maxWidth: '1000px',
-//     margin: '0 auto',
-//     display: 'flex',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     minHeight: '100vh',
-//   },
-//   card: {
-//     backgroundColor: '#ffffff',
-//     borderRadius: '12px',
-//     padding: '40px',
-//     width: '100%',
-//     maxWidth: '420px',
-//     boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-//   },
-//     modal: {
-//         backgroundColor: '#fff',
-//         borderRadius: '12px',
-//         padding: '2rem',
-//         maxWidth: '500px',
-//         width: '100%',
-//         boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-//     },
-//     heading: {
-//         marginBottom: '1rem',
-//         fontSize: '1.5rem',
-//         color: '#1a1a1a',
-//     },
-//     info: {
-//         fontSize: '0.95rem',
-//         color: '#555',
-//         marginBottom: '0.5rem',
-//     },
-//     input: {
-//         display: 'block',
-//         width: '100%',
-//         padding: '0.5rem 0.75rem',
-//         marginBottom: '1rem',
-//         borderRadius: '8px',
-//         border: '1px solid #ddd',
-//         fontSize: '0.95rem',
-//     },
-//     select: {
-//         display: 'block',
-//         width: '100%',
-//         padding: '0.5rem 0.75rem',
-//         marginBottom: '1rem',
-//         borderRadius: '8px',
-//         border: '1px solid #ddd',
-//         fontSize: '0.95rem',
-//     },
-//     editButton: {
-//         backgroundColor: '#4f46e5',
-//         color: '#fff',
-//         border: 'none',
-//         padding: '0.6rem 1.2rem',
-//         borderRadius: '8px',
-//         cursor: 'pointer',
-//         marginTop: '1rem',
-//     },
-//     saveButton: {
-//         backgroundColor: '#16a34a',
-//         color: '#fff',
-//         border: 'none',
-//         padding: '0.6rem 1.2rem',
-//         borderRadius: '8px',
-//         cursor: 'pointer',
-//         marginTop: '0.5rem',
-//     },
-// };
+
+
+
+
+
+
 const styles = {
     arrowButtons:{
         display: 'flex',
